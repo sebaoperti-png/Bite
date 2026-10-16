@@ -1,6 +1,6 @@
 {
-  "name": "bite: Real food, real people",
-  "short_name": "bite",
+  "name": "Bite: Real food, real people",
+  "short_name": "Bite",
   "description": "Home-cooked meals shared with real people in your neighbourhood.",
   "start_url": "./bite.html",
   "scope": "./",
