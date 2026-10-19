@@ -112,8 +112,11 @@ body:has(.st-page) { background: radial-gradient(ellipse 70% 45% at 50% 0%, rgba
 }
 .st-input:focus { outline: none; border-color: #6b21d9; }
 .st-checks { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; animation: stLine .35s ease both; }
-.st-checks label { display: flex; gap: 12px; align-items: center; font-size: 16px; font-weight: 700; }
-.st-checks input { width: 22px; height: 22px; accent-color: #6b21d9; flex-shrink: 0; }
+.st-checks label { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; font-weight: 600; line-height: 1.45; cursor: pointer; }
+.st-checks label span { flex: 1; }
+.st-checks input { width: 22px; height: 22px; accent-color: #6b21d9; flex-shrink: 0; margin-top: 1px; }
+.st-start-privacy { text-align: center; margin-top: 14px; }
+.st-inbox { background: #f0e9fb; border-radius: 12px; padding: 10px 14px; font-size: 15px; font-weight: 700; color: #4c12a8; margin: 10px 0 0; }
 .st-small { font-size: 13px; color: #8b7bb5; margin: 2px 0 0; line-height: 1.5; }
 .st-small a { color: #6b21d9; font-weight: 700; }
 .st-error { color: #d92d55; font-weight: 700; font-size: 15px; margin: 14px 0 0; }

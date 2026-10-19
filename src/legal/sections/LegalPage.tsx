@@ -35,6 +35,10 @@ export function LegalPage() {
             Privacy Policy
           </a>
           {" "}
+          <a href="#survey">
+            {"Survey, interviews & newsletter"}
+          </a>
+          {" "}
           <a href="#cookies">
             Cookie Policy
           </a>
@@ -259,16 +263,11 @@ export function LegalPage() {
             </h3>
             {" "}
             <p>
-              {"Controller: Bite GmbH, [street & number], Frankfurt am Main, Germany. Email: "}
-              <a href="mailto:privacy@bite.food">
-                privacy@bite.food
+              {"Controller: Bite — Sebastiano Operti (Bite is not yet a registered company), address as in the Impressum. Email: "}
+              <a href="mailto:sebaoperti@gmail.com">
+                sebaoperti@gmail.com
               </a>
-              . You can reach our Data Protection Officer at
-              {" "}
-              <a href="mailto:dpo@bite.food">
-                dpo@bite.food
-              </a>
-              .
+              . A Data Protection Officer is not required at this stage (§ 38 BDSG); for any privacy question, write to the email above.
             </p>
             {" "}
             <h3>
@@ -408,10 +407,10 @@ export function LegalPage() {
             <p>
               You have the right to access (Art. 15), rectification (16), erasure (17), restriction (18), data portability (20) and objection (21), and to withdraw consent at any time (7(3)) without affecting prior processing. To exercise them, contact
               {" "}
-              <a href="mailto:privacy@bite.food">
-                privacy@bite.food
+              <a href="mailto:sebaoperti@gmail.com">
+                sebaoperti@gmail.com
               </a>
-              . You may also lodge a complaint with a supervisory authority — for us, the Hessian Commissioner for Data Protection and Freedom of Information (HBDI), Wiesbaden.
+              . You may also lodge a complaint with a data protection supervisory authority, in particular in the EU country where you live or work (Art. 77 GDPR).
             </p>
             {" "}
             <h3>
@@ -429,6 +428,117 @@ export function LegalPage() {
             <p>
               We will post any changes here and, for material changes, notify you in-app or by email.
             </p>
+          </section>
+          {" "}
+          {/* SURVEY, INTERVIEWS & NEWSLETTER */}
+          <section className="lg-sec" id="survey" style={{ marginBottom: "56px" }}>
+            <h2>
+              {"Survey, interviews & newsletter"}
+            </h2>
+            <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
+              {"Information under Art. 13 GDPR · Effective 20 October 2026 · Deutsche Fassung unten"}
+            </p>
+            <h3>
+              {"1. What this covers"}
+            </h3>
+            <p>
+              {"This section covers the 60-second survey (stand.html, also used on a tablet at events such as the Aalener Industriemesse), the optional follow-up interview and the Bite newsletter, including the “Save me a seat” form on the home page. Bite is in an early, non-commercial feedback phase."}
+            </p>
+            <h3>
+              {"2. Who is responsible"}
+            </h3>
+            <p>
+              {"Sebastiano Operti, founder of Bite (no company registered yet), address as in the Impressum. Email: sebaoperti@gmail.com."}
+            </p>
+            <h3>
+              {"3. The survey (anonymous)"}
+            </h3>
+            <p>
+              {"The survey does not ask for your name. We store your answers (for example your group and age range, how often you eat alone and what you would pay per plate), the time, the language and whether you answered on the stand tablet or your own phone. Without an email address these answers cannot be linked to you and are used only, in aggregate, to develop Bite and for applications to start-up programmes (for example EXIST). The live results screen at the stand only shows totals and percentages, never emails."}
+            </p>
+            <h3>
+              {"4. Interview (optional, with consent)"}
+            </h3>
+            <p>
+              {"If you tick the interview box and enter your email, Sebastiano Operti may email you once or twice to arrange a 15-minute interview (in person or online) about how you eat. Legal basis: your consent, Art. 6(1)(a) GDPR. Your email is stored together with your survey answers and deleted once the interviews are done, at the latest 12 months after you gave it. Interview notes are kept without your name."}
+            </p>
+            <h3>
+              {"5. Newsletter (optional, with consent and double opt-in)"}
+            </h3>
+            <p>
+              {"If you tick the newsletter box (survey) or use “Save me a seat” (home page), we send you news about Bite by email, at most once a month: launch news, events and ways to take part. Legal basis: your consent, Art. 6(1)(a) GDPR and § 7(2) no. 2 UWG. You first receive an email with a confirmation link; nothing else is sent until you click it (double opt-in). To prove your consent we store the time of sign-up, the time of confirmation and the version of the consent text you saw. Unconfirmed sign-ups are deleted after 30 days. Every email has an unsubscribe link; after unsubscribing we keep only the fact that you withdrew, so we don't contact you again."}
+            </p>
+            <h3>
+              {"6. Where the data is stored"}
+            </h3>
+            <p>
+              {"Answers and emails are stored in a Google Sheet in Sebastiano Operti's Google account and the confirmation emails are sent through Gmail (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland). Google may process data in the USA; Google LLC is certified under the EU-U.S. Data Privacy Framework (EU adequacy decision of 10 July 2023, Art. 45 GDPR). When the survey runs on the stand tablet, answers are also kept on that device until they are uploaded and the device is cleared after the event. The website is hosted on GitHub Pages (GitHub Inc., USA, also certified under the Data Privacy Framework), which processes your IP address to deliver the pages (Art. 6(1)(f) GDPR)."}
+            </p>
+            <h3>
+              {"7. Age"}
+            </h3>
+            <p>
+              {"Please give your email only if you are at least 16 years old (Art. 8 GDPR)."}
+            </p>
+            <h3>
+              {"8. Your rights"}
+            </h3>
+            <p>
+              {"You can withdraw any consent at any time without giving a reason, by email to sebaoperti@gmail.com or with the unsubscribe link; this does not affect processing before the withdrawal (Art. 7(3) GDPR). You also have the rights of access, rectification, erasure, restriction, data portability and objection (Art. 15 to 21 GDPR), and the right to complain to a data protection supervisory authority (Art. 77 GDPR). Giving your email is voluntary; you can take the survey without it."}
+            </p>
+            <h2 style={{ marginTop: "36px" }} lang="de">
+              {"Umfrage, Interviews & Newsletter"}
+            </h2>
+            <div lang="de">
+            <h3>
+              {"1. Worum es geht"}
+            </h3>
+            <p>
+              {"Dieser Abschnitt gilt für die 60-Sekunden-Umfrage (stand.html, auch auf einem Tablet bei Veranstaltungen wie der Aalener Industriemesse), das optionale Folge-Interview und den Bite-Newsletter, einschließlich des Formulars „Save me a seat“ auf der Startseite. Bite befindet sich in einer frühen, nicht kommerziellen Feedback-Phase."}
+            </p>
+            <h3>
+              {"2. Verantwortlicher"}
+            </h3>
+            <p>
+              {"Sebastiano Operti, Gründer von Bite (noch keine Gesellschaft eingetragen), Anschrift wie im Impressum. E-Mail: sebaoperti@gmail.com."}
+            </p>
+            <h3>
+              {"3. Die Umfrage (anonym)"}
+            </h3>
+            <p>
+              {"Die Umfrage fragt nicht nach deinem Namen. Wir speichern deine Antworten (z. B. Gruppe und Altersgruppe, wie oft du allein isst, was du pro Teller zahlen würdest), den Zeitpunkt, die Sprache und ob du am Stand-Tablet oder am eigenen Handy geantwortet hast. Ohne E-Mail-Adresse lassen sich die Antworten dir nicht zuordnen; sie werden nur zusammengefasst ausgewertet, um Bite zu entwickeln und für Bewerbungen bei Gründungsprogrammen (z. B. EXIST). Der Live-Ergebnisbildschirm am Stand zeigt nur Summen und Prozente, nie E-Mails."}
+            </p>
+            <h3>
+              {"4. Interview (optional, mit Einwilligung)"}
+            </h3>
+            <p>
+              {"Wenn du den Interview-Haken setzt und deine E-Mail angibst, darf Sebastiano Operti dir ein- bis zweimal schreiben, um ein 15-minütiges Interview (vor Ort oder online) darüber zu vereinbaren, wie du isst. Rechtsgrundlage: deine Einwilligung, Art. 6 Abs. 1 lit. a DSGVO. Deine E-Mail wird zusammen mit deinen Antworten gespeichert und gelöscht, sobald die Interviews abgeschlossen sind, spätestens 12 Monate nach der Angabe. Interviewnotizen werden ohne Namen geführt."}
+            </p>
+            <h3>
+              {"5. Newsletter (optional, mit Einwilligung und Double-Opt-in)"}
+            </h3>
+            <p>
+              {"Wenn du den Newsletter-Haken setzt (Umfrage) oder „Save me a seat“ nutzt (Startseite), schicken wir dir höchstens einmal im Monat Neuigkeiten über Bite per E-Mail: Start, Veranstaltungen und Möglichkeiten mitzumachen. Rechtsgrundlage: deine Einwilligung, Art. 6 Abs. 1 lit. a DSGVO und § 7 Abs. 2 Nr. 2 UWG. Zuerst erhältst du eine E-Mail mit Bestätigungslink; erst nach dem Klick senden wir weitere E-Mails (Double-Opt-in). Zum Nachweis der Einwilligung speichern wir den Zeitpunkt der Anmeldung, den Zeitpunkt der Bestätigung und die Version des Einwilligungstextes. Nicht bestätigte Anmeldungen werden nach 30 Tagen gelöscht. Jede E-Mail enthält einen Abmeldelink; nach der Abmeldung speichern wir nur den Widerruf, damit wir dich nicht erneut kontaktieren."}
+            </p>
+            <h3>
+              {"6. Wo die Daten gespeichert werden"}
+            </h3>
+            <p>
+              {"Antworten und E-Mails werden in einer Google-Tabelle im Google-Konto von Sebastiano Operti gespeichert, die Bestätigungs-E-Mails werden über Gmail versendet (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland). Google kann Daten in den USA verarbeiten; die Google LLC ist nach dem EU-US Data Privacy Framework zertifiziert (Angemessenheitsbeschluss der EU vom 10. Juli 2023, Art. 45 DSGVO). Läuft die Umfrage auf dem Stand-Tablet, bleiben die Antworten bis zum Hochladen auch auf dem Gerät; nach der Veranstaltung wird es geleert. Die Website wird über GitHub Pages bereitgestellt (GitHub Inc., USA, ebenfalls nach dem Data Privacy Framework zertifiziert), das deine IP-Adresse zur Auslieferung der Seiten verarbeitet (Art. 6 Abs. 1 lit. f DSGVO)."}
+            </p>
+            <h3>
+              {"7. Alter"}
+            </h3>
+            <p>
+              {"Bitte gib deine E-Mail nur an, wenn du mindestens 16 Jahre alt bist (Art. 8 DSGVO)."}
+            </p>
+            <h3>
+              {"8. Deine Rechte"}
+            </h3>
+            <p>
+              {"Du kannst jede Einwilligung jederzeit ohne Angabe von Gründen widerrufen, per E-Mail an sebaoperti@gmail.com oder über den Abmeldelink; die Rechtmäßigkeit der Verarbeitung bis zum Widerruf bleibt unberührt (Art. 7 Abs. 3 DSGVO). Außerdem hast du das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch (Art. 15 bis 21 DSGVO) sowie das Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde (Art. 77 DSGVO). Die Angabe deiner E-Mail ist freiwillig; die Umfrage funktioniert auch ohne."}
+            </p>
+            </div>
           </section>
           {" "}
           {/* COOKIES */}

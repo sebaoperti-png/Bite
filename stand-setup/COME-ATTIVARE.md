@@ -19,20 +19,22 @@ Hidden admin panel: **tap the Bite logo 5 times quickly**. There you can see how
 ---
 
 ## 1. Connect the Google Sheet (5 minutes, once)
-Without this step, answers stay only on the device where they were given (you can still export them as CSV).
+The sheet already exists: **"Bite – Survey & Newsletter (AIM 2026)"** in the Drive folder *Bite Startup*. Its **Setup** tab repeats these steps in Italian.
 
-1. Go to sheets.google.com and create a new sheet called **"Bite AIM"**.
-2. Menu **Extensions → Apps Script**.
-3. Delete everything there, paste the contents of `google-apps-script.js`, and save (💾).
-4. Click **Deploy → New deployment**:
-   - type: **Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-5. Click **Deploy** and authorise. Google will show a "not verified" warning: click *Advanced → Go to …*. It's your own script.
-6. Copy the URL ending in **/exec**.
-7. Paste it into `src/shared/forms.ts` → `export const FORMS_ENDPOINT = "…/exec";` (or send it to me and I'll do it).
+1. In the sheet: **Extensions → Apps Script**.
+2. Delete everything there, paste the contents of `google-apps-script.js` (raw link: https://raw.githubusercontent.com/sebaoperti-png/Bite/main/stand-setup/google-apps-script.js) and save (💾).
+3. Pick the function **setup** at the top and click **Run**. Authorise (Google shows "not verified": *Advanced → Go to …*; it's your own script). It creates the nightly cleanup and saves the print PDFs into *Bite Startup*.
+4. **Deploy → New deployment** → type **Web app**, execute as **Me**, access **Anyone** → Deploy.
+5. Copy the URL ending in **/exec** into `src/shared/forms.ts` → `FORMS_ENDPOINT` (or send it to Claude).
 
-The "Survey" tab will receive the survey answers; the "Waitlist" tab will receive the landing page "Keep me updated" sign-ups.
+Tabs: "Survey" (questionnaire answers), "Waitlist" (landing "Save me a seat").
+
+### Newsletter and interviews (GDPR / UWG)
+- Emails are only stored if the person ticks a consent box: **interview** (15-minute chat) and/or **newsletter**.
+- Newsletter uses **double opt-in**: the script emails a confirmation link from your Gmail; only rows with `newsletterStatus = confirmed` may receive news. Every email carries an unsubscribe link.
+- Unconfirmed newsletter sign-ups are removed after 30 days by `cleanup()` (runs every night).
+- Interview emails: delete them once the interview is done, at the latest after 12 months.
+- The full privacy text is at `legal.html#survey` (EN + DE).
 
 ## 2. Put it online (needed for the QR code)
 The QR code points to `https://sebaoperti-png.github.io/Bite/stand.html`, so before the fair the site must be published (push to `main`). After publishing, scan the QR with your phone and fill in a test survey: it should appear in the Sheet.
@@ -52,10 +54,10 @@ The QR code points to `https://sebaoperti-png.github.io/Bite/stand.html`, so bef
 If the fair Wi-Fi drops, carry on: the tablet keeps the answers and sends them as soon as it's back online (the admin panel shows how many are pending).
 
 ## 4. Privacy (important in Germany)
-- Email is **optional** and only saved if the person ticks "Keep me updated on Bite's news".
+- Email is **optional** and only saved together with a consent (interview and/or newsletter), with the consent text version.
 - The results screen **never** shows emails.
-- When you start sending newsletters, use a tool with **double opt-in** (e.g. Brevo or Mailchimp): in Germany it's standard practice for marketing emails.
-- Check that the privacy policy (`legal.html#privacy`) mentions the newsletter and the survey.
+- Newsletter: double opt-in is built in (see step 1). When the list grows, move confirmed contacts to a newsletter tool (e.g. Brevo) and keep the confirmation dates.
+- After the fair, clear the tablet (admin panel) once everything is uploaded.
 
 ## 5. After the fair
 Send me the link to the Sheet (or the CSV) and I'll produce the statistics for the deck: how many people, what % would join a dinner, the average price they'd pay, the biggest everyday pains, and the list of people who agreed to a follow-up interview.
