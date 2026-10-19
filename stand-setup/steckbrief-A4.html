@@ -1,0 +1,136 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Bite · A4 table sheet</title><link rel="stylesheet" href="../src/shared/fonts.css">
+<!-- A4 sheet for the AIM table: who Sebastiano is and what Bite is. Pure graphics in the landing page's style
+     (menu labels, plate with the bitten "b", price plates, ring notebook, place card). No photos.
+     Print: Chrome → Print → A4, margins "None", "Background graphics" on. PDF: bite-steckbrief-A4.pdf -->
+<style>
+@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}
+body{width:210mm;height:297mm;font-family:Inter,sans-serif;color:#160a2e;background:#f3eefb;position:relative;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.serif{font-family:'Instrument Serif',serif;font-weight:400}
+.lbl{display:flex;align-items:center;gap:2.4mm;font-size:2.5mm;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#9b4aff}
+.lbl i{width:7mm;height:.3mm;background:#b39ddb}
+.lbl em{font-family:'Instrument Serif',serif;font-size:4.6mm;letter-spacing:0;text-transform:none;font-weight:400;color:#6b21d9}
+.dot{position:absolute;border-radius:50%}
+
+/* header */
+.head{position:absolute;left:14mm;right:14mm;top:11mm;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:2.6mm}.brand img{width:11mm;height:11mm;border-radius:3mm;box-shadow:0 1mm 3mm rgba(107,33,217,.25)}.brand span{font-size:8.6mm;font-weight:900;letter-spacing:-.045em}
+.pill{display:flex;align-items:center;gap:1.8mm;background:#fff;border:.3mm solid #e2d5f7;border-radius:10mm;padding:1.6mm 3.4mm;font-size:2.9mm;font-weight:800;color:#6b21d9}
+.pill b{width:1.8mm;height:1.8mm;border-radius:50%;background:#22c55e}
+
+/* hero */
+.hero{position:absolute;left:14mm;top:31mm;width:112mm}
+.hero h1{font-size:13.6mm;line-height:.98;font-weight:900;letter-spacing:-.045em;margin-top:3mm}
+.hero h1 span{color:#6b21d9}
+.hero p{font-size:4mm;line-height:1.45;color:#4b3a6b;margin-top:4mm;width:100mm}
+.hero p em{font-family:'Instrument Serif',serif;font-size:5mm;color:#160a2e}
+.plate{position:absolute;right:6mm;top:28mm;width:80mm;height:80mm}
+
+/* prices */
+.prices{position:absolute;left:14mm;right:14mm;top:121mm;display:flex;align-items:center;justify-content:center;gap:5mm}
+.pp{width:36mm;height:36mm;border-radius:50%;background:#fff;box-shadow:0 2mm 6mm rgba(46,16,96,.10);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.pp small{font-size:2.3mm;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#7c6fa0}
+.pp b{font-size:10mm;font-weight:900;color:#a99cc6;letter-spacing:-.04em;line-height:1.05;text-decoration:line-through;text-decoration-color:#ff3d7f;text-decoration-thickness:.7mm}
+.pp span{font-size:2.5mm;color:#7c6fa0;line-height:1.3}
+.vs{font-family:'Instrument Serif',serif;font-style:italic;font-size:5mm;color:#9b8cc0}
+.bite{position:relative;width:58mm;height:58mm;border-radius:50%;background:radial-gradient(circle at 35% 28%,#9b4aff,#6b21d9 55%,#4c12a8);box-shadow:0 4mm 12mm rgba(107,33,217,.35),0 0 0 3mm #f3eefb,0 0 0 3.3mm #c9b3ef;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.bite small{font-size:2.6mm;font-weight:900;letter-spacing:.18em;opacity:.85}
+.bite b{font-size:22mm;font-weight:900;letter-spacing:-.05em;line-height:1}
+.bite span{font-size:2.9mm;opacity:.85;line-height:1.35}
+.bite .tag{position:absolute;bottom:-3mm;left:50%;transform:translateX(-50%) rotate(-4deg);background:#ff3d7f;border:.7mm solid #fff;border-radius:10mm;padding:1.4mm 3.6mm;font-size:3.1mm;font-weight:900;white-space:nowrap;box-shadow:0 1.5mm 4mm rgba(255,61,127,.35)}
+
+/* notebook */
+.book{position:absolute;left:14mm;right:14mm;top:191mm;height:42mm;background:#fffdf8;border-radius:2.5mm;box-shadow:0 2mm 6mm rgba(46,16,96,.10);background-image:repeating-linear-gradient(transparent 0 6.6mm,#ece4f6 6.6mm 6.9mm);background-position:0 9mm}
+.book::before{content:"";position:absolute;left:9mm;top:0;bottom:0;width:.3mm;background:#ffb3c7}
+.rings{position:absolute;left:5mm;right:5mm;top:-2.8mm;display:flex;justify-content:space-between}
+.rings i{width:1.8mm;height:5mm;border:.5mm solid #b39ddb;border-radius:1mm;background:#f3eefb}
+.book .t{position:absolute;left:13mm;top:5mm;font-size:6mm;font-style:italic;color:#6b21d9}
+.cols{position:absolute;left:13mm;right:6mm;top:15mm;display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.cols div{border-right:.3mm dashed #d9c8f3;padding-right:4mm}.cols div:last-child{border:0}
+.cols em{font-family:'Instrument Serif',serif;font-size:6.4mm;color:#160a2e}
+.cols b{display:block;font-size:4mm;font-weight:800;margin-top:.6mm}
+.cols span{display:block;font-size:2.9mm;line-height:1.45;color:#5c4a7c;margin-top:.6mm}
+.cols svg{float:right;width:5mm;height:5mm;stroke:#6b21d9;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-top:1mm}
+
+/* bottom: place card + survey pad */
+.place{position:absolute;left:14mm;top:243mm;width:102mm;height:44mm;background:#fff;border-radius:3mm;box-shadow:0 2mm 6mm rgba(46,16,96,.10);padding:5.5mm 6mm;transform:rotate(-1.2deg)}
+.place::after{content:"";position:absolute;left:3mm;right:3mm;top:3mm;bottom:3mm;border:.3mm solid #e2d5f7;border-radius:2mm;pointer-events:none}
+.place .k{font-size:2.4mm;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:#9b4aff;text-align:center}
+.place .n{font-size:10mm;text-align:center;line-height:1;margin-top:1mm}
+.place .r{font-size:2.8mm;color:#7c6fa0;text-align:center;margin-top:1mm}
+.place .ask{display:flex;justify-content:center;gap:1.6mm;margin-top:3mm}
+.place .ask span{background:#f0e9fb;color:#4c12a8;border-radius:10mm;padding:1.1mm 2.6mm;font-size:2.7mm;font-weight:800}
+.place .m{font-size:3.1mm;font-weight:800;color:#6b21d9;text-align:center;margin-top:2.6mm}
+.pad{position:absolute;right:14mm;top:240mm;width:74mm;height:50mm;background:#fff;border-radius:3mm;box-shadow:0 2mm 6mm rgba(46,16,96,.12);transform:rotate(1.6deg);display:grid;grid-template-columns:1fr 31mm;align-items:center;padding:5mm 4mm 4mm 5mm;gap:2mm}
+.pad::before{content:"";position:absolute;left:3mm;right:3mm;top:2mm;height:1.6mm;background:radial-gradient(circle,#d9c8f3 .55mm,transparent .6mm) 0 0/3.6mm 1.6mm repeat-x}
+.pad .k{font-size:2.4mm;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#9b4aff}
+.pad h4{font-size:7mm;line-height:1;margin-top:1.2mm}
+.pad p{font-size:2.7mm;color:#5c4a7c;line-height:1.4;margin-top:1.6mm}
+.pad .go{display:inline-block;margin-top:2.4mm;background:#6b21d9;color:#fff;border-radius:2mm;padding:1.4mm 2.6mm;font-size:2.8mm;font-weight:800}
+.pad img{width:31mm;height:31mm}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="549" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9b4aff"/><stop offset="1" stop-color="#6b21d9"/></linearGradient>
+  <mask id="bm" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549"><rect width="549" height="549" fill="#fff"/><path d="M190 405q72 62 144 0" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round"/><circle cx="405" cy="198" r="20"/><circle cx="434" cy="228" r="22"/><circle cx="456" cy="267" r="22"/><circle cx="469" cy="311" r="20"/></mask>
+  <symbol id="b" viewBox="0 0 549 549"><g mask="url(#bm)" fill="url(#bg)"><rect x="107" y="30" width="83" height="330" rx="41.5"/><circle cx="285" cy="340" r="178"/></g></symbol>
+ </defs>
+</svg>
+
+<div class="head">
+ <div class="brand"><img src="../public/landing/logo.png" alt=""><span>Bite</span></div>
+ <div class="pill"><b></b>Early stage · help us shape Bite</div>
+</div>
+
+<div class="hero">
+ <div class="lbl">No. 1 · Aperitivo <i></i><em>tonight's menu</em></div>
+ <h1>Real food,<br>real people,<br><span>your neighbourhood.</span></h1>
+ <p>Home cooks open their table, you pull up a chair and everyone splits the groceries. <em>Food is better shared.</em></p>
+</div>
+
+<svg class="plate" viewBox="0 0 200 200">
+ <defs><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#2e1060" flood-opacity=".16"/></filter></defs>
+ <!-- fork -->
+ <g fill="#c9b3ef"><rect x="8" y="40" width="5" height="120" rx="2.5"/><rect x="2" y="40" width="3" height="30" rx="1.5"/><rect x="8" y="40" width="3" height="30" rx="1.5" opacity="0"/><rect x="16" y="40" width="3" height="30" rx="1.5"/><rect x="2" y="64" width="17" height="10" rx="5"/></g>
+ <!-- knife -->
+ <g fill="#c9b3ef"><path d="M186 40c8 10 8 40 2 56h-6V40z"/><rect x="182" y="92" width="6" height="68" rx="3"/></g>
+ <circle cx="100" cy="100" r="76" fill="#fff" filter="url(#sh)"/>
+ <circle cx="100" cy="100" r="58" fill="none" stroke="#efe7fb" stroke-width="2"/>
+ <circle cx="100" cy="100" r="72" fill="none" stroke="#efe7fb" stroke-width="1"/>
+ <use href="#b" x="62" y="60" width="78" height="78"/>
+ <!-- steam -->
+ <g fill="none" stroke="#c9b3ef" stroke-width="2.4" stroke-linecap="round"><path d="M88 14c-5 6 5 10 0 16"/><path d="M100 8c-5 6 5 10 0 16"/><path d="M112 14c-5 6 5 10 0 16"/></g>
+ <circle cx="178" cy="22" r="5" fill="#f5c542"/><circle cx="24" cy="186" r="4" fill="#ff3d7f"/><path d="M164 176c8-10 20-10 24-6-6 10-16 12-24 6z" fill="#3fb36b"/>
+</svg>
+
+<div class="prices">
+ <div class="pp"><small>Takeaway</small><b>€15</b><span>+ delivery,<br>eaten alone</span></div>
+ <div class="vs">vs</div>
+ <div class="bite"><small>BITE</small><b>€6</b><span>home-cooked,<br>shared at a neighbour's table</span><div class="tag">up to 60% less</div></div>
+ <div class="vs">vs</div>
+ <div class="pp"><small>Restaurant</small><b>€25</b><span>before drinks<br>and tip</span></div>
+</div>
+
+<div class="book">
+ <div class="rings"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+ <div class="t serif">Three taps to a real meal</div>
+ <div class="cols">
+  <div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><em>i.</em><b>Find a dinner</b><span>See what neighbours are cooking tonight.</span></div>
+  <div><svg viewBox="0 0 24 24"><path d="M5 11h14v8H5zM8 11V6h8v5M7 19v3M17 19v3"/></svg><em>ii.</em><b>Book your seat</b><span>Pay your fair share of the groceries.</span></div>
+  <div><svg viewBox="0 0 24 24"><path d="M4 12h16a8 8 0 0 1-16 0zM12 4v4M8 6v2M16 6v2"/></svg><em>iii.</em><b>Sit down &amp; enjoy</b><span>Meet the host and the other guests.</span></div>
+ </div>
+</div>
+
+<div class="place">
+ <div class="k">Reserved for</div>
+ <div class="n serif">Sebastiano Operti</div>
+ <div class="r">Founder · M.Sc. Marketing &amp; AI, Hochschule Aalen</div>
+ <div class="ask"><span>🌍 New in town?</span><span>🍳 Love to cook?</span><span>💬 Say hi!</span></div>
+ <div class="m">sebaoperti@gmail.com</div>
+</div>
+
+<div class="pad">
+ <div><div class="k">Survey · 60 sec</div><h4 class="serif">Got 60<br>seconds?</h4><p>Tell us how you eat.<br>8 quick taps.</p><span class="go">Scan me →</span></div>
+ <img src="../public/stand/qr-stand.svg" alt="QR code">
+</div>
+</body></html>
