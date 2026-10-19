@@ -1,86 +1,59 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><title>Bite · A6 flyers</title><link rel="stylesheet" href="../src/shared/fonts.css">
-<!-- Four A6 hand-out flyers on one A4 sheet, cut along the dashed lines. Pure graphics, same style as the landing.
-     The QR opens the landing page (?ref=aim-flyer). Print: Chrome → Print → A4, margins "None", "Background graphics" on.
-     PDF: bite-flyers-A6.pdf -->
-<style>
-@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}
-body{width:210mm;height:297mm;font-family:Inter,sans-serif;color:#160a2e;background:#fff;position:relative;overflow:hidden;display:grid;grid-template-columns:105mm 105mm;grid-template-rows:148.5mm 148.5mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.serif{font-family:'Instrument Serif',serif;font-weight:400}
-.cut{position:absolute;z-index:5;border:0 dashed #b39ddb}
-.cut.v{left:105mm;top:0;bottom:0;border-left-width:.25mm}
-.cut.h{top:148.5mm;left:0;right:0;border-top-width:.25mm}
-.cut b{position:absolute;font-size:2.4mm;color:#b39ddb;background:#fff;padding:0 .8mm}
-.cut.v b{top:2mm;left:-1.6mm}.cut.h b{left:2mm;top:-1.8mm}
-
-.f{position:relative;overflow:hidden;background:#f3eefb;padding:9mm 9mm 8mm}
-.top{display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:1.8mm}.brand img{width:7.6mm;height:7.6mm;border-radius:2.1mm}.brand span{font-size:6mm;font-weight:900;letter-spacing:-.045em}
-.pill{background:#fff;border:.25mm solid #e2d5f7;border-radius:10mm;padding:1mm 2.4mm;font-size:2.2mm;font-weight:800;color:#6b21d9;display:flex;align-items:center;gap:1.2mm}
-.pill i{width:1.4mm;height:1.4mm;border-radius:50%;background:#22c55e}
-
-.art{position:relative;height:47mm;margin-top:3mm}
-.art svg{position:absolute;left:50%;top:0;width:47mm;height:47mm;transform:translateX(-50%)}
-.price{position:absolute;right:6mm;top:4mm;width:21mm;height:21mm;border-radius:50%;background:radial-gradient(circle at 35% 28%,#9b4aff,#6b21d9 60%,#4c12a8);border:.7mm solid #fff;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(10deg);box-shadow:0 1.5mm 4mm rgba(107,33,217,.35)}
-.price b{font-size:8mm;font-weight:900;letter-spacing:-.05em;line-height:1}
-.price small{font-size:1.9mm;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
-.was{position:absolute;left:5mm;bottom:5mm;background:#fff;border-radius:10mm;padding:1mm 2.4mm;font-size:2.3mm;font-weight:800;color:#7c6fa0;transform:rotate(-6deg);box-shadow:0 1mm 2.5mm rgba(46,16,96,.1)}
-.was s{color:#a99cc6;text-decoration-color:#ff3d7f;text-decoration-thickness:.45mm}
-
-.lbl{display:flex;align-items:center;gap:1.6mm;font-size:2mm;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#9b4aff;margin-top:2mm}
-.lbl i{width:5mm;height:.25mm;background:#b39ddb}.lbl em{font-family:'Instrument Serif',serif;font-size:3.6mm;letter-spacing:0;text-transform:none;font-weight:400;color:#6b21d9}
-h2{font-size:8.6mm;line-height:.98;font-weight:900;letter-spacing:-.045em;margin-top:1.6mm}
-h2 span{color:#6b21d9}
-.sub{font-size:2.9mm;line-height:1.45;color:#4b3a6b;margin-top:2mm}
-.sub em{font-family:'Instrument Serif',serif;font-size:3.5mm;color:#160a2e}
-
-.ticket{position:absolute;left:7mm;right:7mm;bottom:7mm;height:27mm;background:#fff;border-radius:2.5mm;box-shadow:0 1mm 3mm rgba(46,16,96,.1);display:grid;grid-template-columns:1fr 25mm;align-items:center;padding:0 3mm 0 4mm}
-.ticket::before{content:"";position:absolute;right:26.5mm;top:3mm;bottom:3mm;border-left:.3mm dashed #d9c8f3}
-.ticket .k{font-size:1.9mm;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#9b4aff}
-.ticket h4{font-size:5.2mm;line-height:1;margin-top:.8mm}
-.ticket h4 em{color:#6b21d9}
-.ticket p{font-size:2.2mm;color:#7c6fa0;margin-top:1.2mm;font-weight:600}
-.ticket img{width:22mm;height:22mm;justify-self:end}
-</style></head><body>
-
-<svg width="0" height="0" style="position:absolute">
+<!-- Four A6 hand-out flyers on one A4 sheet (cut along the lines). QR opens the landing page (?ref=aim-flyer).
+     Same look as the landing intro (dark purple, bitten "b" wordmark, "Food is better shared"); the crumbs are left out on paper. Print with margins "None" and "Background graphics" on. -->
+<style>@page{size:105mm 148.5mm;margin:0}*{box-sizing:border-box;margin:0;padding:0}
+body{width:105mm;height:148.5mm;font-family:Inter,sans-serif;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#0d0620}
+.p{position:relative;width:105mm;height:148.5mm;overflow:hidden;background:radial-gradient(ellipse 80% 70% at 50% 40%,#3b1278 0%,#1c0b3d 55%,#0d0620 100%)}
+.stage{position:absolute;left:50%;top:40mm;width:80mm;transform:translateX(-50%)}
+.word{display:block;width:100%;height:auto;overflow:visible}
+.crumbs{position:absolute;left:60%;top:48%;width:0;height:0}
+.crumbs i{position:absolute;border-radius:35%;opacity:.9}
+.tag{text-align:center;font-family:'Instrument Serif',serif;font-style:italic;font-size:6mm;color:#d6b8ff;margin-top:2.5mm}
+.me{position:absolute;left:9mm;right:9mm;bottom:9mm;display:flex;align-items:flex-end;justify-content:space-between;gap:3mm;border-top:0.25mm solid rgba(214,184,255,.28);padding-top:4mm}
+.me .k{font-size:1.8mm;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:#b87fff}
+.me .n{font-family:'Instrument Serif',serif;font-size:6.4mm;line-height:1;margin-top:1mm}
+.me .e{font-size:2.7mm;font-weight:700;color:#d6b8ff;margin-top:1mm}
+.qr{display:flex;align-items:center;gap:2.4mm;text-align:right}
+.qr span{font-size:2.3mm;font-weight:800;line-height:1.3;color:#fff}
+.qr span small{display:block;font-weight:600;color:#b8a3dc;font-size:1.8mm}
+.qr img{width:19mm;height:19mm;background:#fff;border-radius:1.4mm;padding:1mm}
+@page{size:A4;margin:0}
+body.sheet{width:210mm;height:297mm;display:grid;grid-template-columns:105mm 105mm;grid-template-rows:148.5mm 148.5mm;position:relative}
+.cut{position:absolute;z-index:5;border:0 dashed rgba(255,255,255,.45)}.cut.v{left:105mm;top:0;bottom:0;border-left-width:.25mm}.cut.h{top:148.5mm;left:0;right:0;border-top-width:.25mm}
+</style></head><body class="sheet"><div class="p"><div class="stage"><svg class="word" viewBox="0 0 706 300" role="img" aria-label="Bite">
  <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="549" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9b4aff"/><stop offset="1" stop-color="#6b21d9"/></linearGradient>
-  <mask id="bm" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549"><rect width="549" height="549" fill="#fff"/><path d="M190 405q72 62 144 0" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round"/><circle cx="405" cy="198" r="20"/><circle cx="434" cy="228" r="22"/><circle cx="456" cy="267" r="22"/><circle cx="469" cy="311" r="20"/></mask>
-  <symbol id="b" viewBox="0 0 549 549"><g mask="url(#bm)" fill="url(#bg)"><rect x="107" y="30" width="83" height="330" rx="41.5"/><circle cx="285" cy="340" r="178"/></g></symbol>
-  <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#2e1060" flood-opacity=".16"/></filter>
-  <symbol id="plate" viewBox="0 0 200 200">
-   <g fill="#c9b3ef"><rect x="8" y="44" width="5" height="116" rx="2.5"/><rect x="2" y="44" width="3" height="28" rx="1.5"/><rect x="16" y="44" width="3" height="28" rx="1.5"/><rect x="2" y="66" width="17" height="10" rx="5"/></g>
-   <g fill="#c9b3ef"><path d="M186 44c8 10 8 40 2 54h-6V44z"/><rect x="182" y="94" width="6" height="66" rx="3"/></g>
-   <circle cx="100" cy="104" r="74" fill="#fff" filter="url(#sh)"/>
-   <circle cx="100" cy="104" r="56" fill="none" stroke="#efe7fb" stroke-width="2"/>
-   <use href="#b" x="63" y="66" width="76" height="76"/>
-   <g fill="none" stroke="#c9b3ef" stroke-width="2.6" stroke-linecap="round"><path d="M88 6c-5 6 5 10 0 16"/><path d="M100 0c-5 6 5 10 0 16"/><path d="M112 6c-5 6 5 10 0 16"/></g>
-   <path d="M160 186c8-10 20-10 24-6-6 10-16 12-24 6z" fill="#3fb36b"/>
-  </symbol>
+  <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+  <linearGradient id="gb" x1="0" y1="0" x2="0" y2="549" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+  <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549"><rect width="549" height="549" fill="#fff"/><path d="M190 405q72 62 144 0" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round"/><circle cx="405" cy="198" r="20"/><circle cx="434" cy="228" r="22"/><circle cx="456" cy="267" r="22"/><circle cx="469" cy="311" r="20"/></mask>
  </defs>
-</svg>
-
-<template id="flyer">
- <div class="f">
-  <div class="top"><div class="brand"><img src="../public/landing/logo.png" alt=""><span>Bite</span></div><div class="pill"><i></i>Early stage</div></div>
-  <div class="art">
-   <svg viewBox="0 0 200 200"><use href="#plate"/></svg>
-   <div class="price"><small>Bite</small><b>€6</b><small>a plate</small></div>
-   <div class="was">takeaway <s>€15</s></div>
-  </div>
-  <div class="lbl">No. 1 · Aperitivo <i></i><em>tonight's menu</em></div>
-  <h2>Real food,<br>real people,<br><span>your neighbourhood.</span></h2>
-  <p class="sub">Home cooks open their table, you pull up a chair and everyone splits the groceries. <em>Food is better shared.</em></p>
-  <div class="ticket">
-   <div><div class="k">Save me a seat</div><h4 class="serif">Pull up <em>a chair</em> →</h4><p>sebaoperti-png.github.io/Bite</p></div>
-   <img src="img/qr-flyer.svg" alt="QR code">
-  </div>
- </div>
-</template>
-
-<div class="cut v"><b>✂</b></div><div class="cut h"><b>✂</b></div>
-<script>
- const t=document.getElementById('flyer');
- for(let i=0;i<4;i++)document.body.appendChild(t.content.cloneNode(true));
-</script>
-</body></html>
+ <g transform="translate(-60 -12) scale(0.6)"><g mask="url(#m)" fill="url(#gb)"><rect x="107" y="30" width="83" height="330" rx="41.5"/><circle cx="285" cy="340" r="178"/></g></g>
+ <text x="226" y="296" font-size="330" font-weight="900" fill="url(#g)" font-family="Inter, sans-serif" letter-spacing="-14">ite</text>
+</svg><div class="tag">Food is better shared</div></div>
+<div class="me"><div><div class="k">Founder</div><div class="n">Sebastiano Operti</div><div class="e">sebaoperti@gmail.com</div></div><div class="qr"><span>Pull up a chair<small>Scan me</small></span><img src="img/qr-flyer.svg" alt="QR code"></div></div></div><div class="p"><div class="stage"><svg class="word" viewBox="0 0 706 300" role="img" aria-label="Bite">
+ <defs>
+  <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+  <linearGradient id="gb" x1="0" y1="0" x2="0" y2="549" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+  <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549"><rect width="549" height="549" fill="#fff"/><path d="M190 405q72 62 144 0" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round"/><circle cx="405" cy="198" r="20"/><circle cx="434" cy="228" r="22"/><circle cx="456" cy="267" r="22"/><circle cx="469" cy="311" r="20"/></mask>
+ </defs>
+ <g transform="translate(-60 -12) scale(0.6)"><g mask="url(#m)" fill="url(#gb)"><rect x="107" y="30" width="83" height="330" rx="41.5"/><circle cx="285" cy="340" r="178"/></g></g>
+ <text x="226" y="296" font-size="330" font-weight="900" fill="url(#g)" font-family="Inter, sans-serif" letter-spacing="-14">ite</text>
+</svg><div class="tag">Food is better shared</div></div>
+<div class="me"><div><div class="k">Founder</div><div class="n">Sebastiano Operti</div><div class="e">sebaoperti@gmail.com</div></div><div class="qr"><span>Pull up a chair<small>Scan me</small></span><img src="img/qr-flyer.svg" alt="QR code"></div></div></div><div class="p"><div class="stage"><svg class="word" viewBox="0 0 706 300" role="img" aria-label="Bite">
+ <defs>
+  <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+  <linearGradient id="gb" x1="0" y1="0" x2="0" y2="549" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+  <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549"><rect width="549" height="549" fill="#fff"/><path d="M190 405q72 62 144 0" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round"/><circle cx="405" cy="198" r="20"/><circle cx="434" cy="228" r="22"/><circle cx="456" cy="267" r="22"/><circle cx="469" cy="311" r="20"/></mask>
+ </defs>
+ <g transform="translate(-60 -12) scale(0.6)"><g mask="url(#m)" fill="url(#gb)"><rect x="107" y="30" width="83" height="330" rx="41.5"/><circle cx="285" cy="340" r="178"/></g></g>
+ <text x="226" y="296" font-size="330" font-weight="900" fill="url(#g)" font-family="Inter, sans-serif" letter-spacing="-14">ite</text>
+</svg><div class="tag">Food is better shared</div></div>
+<div class="me"><div><div class="k">Founder</div><div class="n">Sebastiano Operti</div><div class="e">sebaoperti@gmail.com</div></div><div class="qr"><span>Pull up a chair<small>Scan me</small></span><img src="img/qr-flyer.svg" alt="QR code"></div></div></div><div class="p"><div class="stage"><svg class="word" viewBox="0 0 706 300" role="img" aria-label="Bite">
+ <defs>
+  <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+  <linearGradient id="gb" x1="0" y1="0" x2="0" y2="549" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+  <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549"><rect width="549" height="549" fill="#fff"/><path d="M190 405q72 62 144 0" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round"/><circle cx="405" cy="198" r="20"/><circle cx="434" cy="228" r="22"/><circle cx="456" cy="267" r="22"/><circle cx="469" cy="311" r="20"/></mask>
+ </defs>
+ <g transform="translate(-60 -12) scale(0.6)"><g mask="url(#m)" fill="url(#gb)"><rect x="107" y="30" width="83" height="330" rx="41.5"/><circle cx="285" cy="340" r="178"/></g></g>
+ <text x="226" y="296" font-size="330" font-weight="900" fill="url(#g)" font-family="Inter, sans-serif" letter-spacing="-14">ite</text>
+</svg><div class="tag">Food is better shared</div></div>
+<div class="me"><div><div class="k">Founder</div><div class="n">Sebastiano Operti</div><div class="e">sebaoperti@gmail.com</div></div><div class="qr"><span>Pull up a chair<small>Scan me</small></span><img src="img/qr-flyer.svg" alt="QR code"></div></div></div><div class="cut v"></div><div class="cut h"></div></body></html>
