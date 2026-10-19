@@ -58,4 +58,4 @@ If the fair Wi-Fi drops, carry on: the tablet keeps the answers and sends them a
 - Check that the privacy policy (`legal.html#privacy`) mentions the newsletter and the survey.
 
 ## 5. After the fair
-Send me the link to the Sheet (or the CSV) and I'll produce the statistics for the deck: how many people, what % would join a dinner, the average price they'd pay, the most-wanted cuisines.
+Send me the link to the Sheet (or the CSV) and I'll produce the statistics for the deck: how many people, what % would join a dinner, the average price they'd pay, the biggest everyday pains, and the list of people who agreed to a follow-up interview.

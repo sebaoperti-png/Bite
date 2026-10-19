@@ -1,11 +1,11 @@
-// The stand survey: 8 quick tap-questions + optional contact. English and German.
+// The stand survey: 8 quick tap-questions + optional contact (news and/or a follow-up interview). English and German.
 
 export type Lang = "en" | "de";
 type T = Record<Lang, string>;
 
 export interface Option { id: string; label: T; emoji?: string }
 export interface Question {
-  id: "who" | "home" | "alone" | "join" | "price" | "host" | "cuisines" | "worries";
+  id: "who" | "age" | "alone" | "pains" | "join" | "host" | "price" | "worries";
   title: T;
   hint?: T;
   multi?: number; // max selections for multi-choice
@@ -13,25 +13,29 @@ export interface Question {
 }
 
 export const QUESTIONS: Question[] = [
+  // Who we are talking to: the Gründungscampus asked for internationals (students and staff of local companies)
+  // and for different generations ("connecting cultures and generations").
   {
     id: "who",
     title: { en: "First — who are you?", de: "Zuerst — wer bist du?" },
     options: [
-      { id: "student", label: { en: "Student", de: "Student:in" } },
-      { id: "working", label: { en: "Working", de: "Berufstätig" } },
-      { id: "new-in-town", label: { en: "New in town / expat", de: "Neu in der Stadt / Expat" } },
-      { id: "other", label: { en: "Something else", de: "Etwas anderes" } },
+      { id: "int-student", label: { en: "International student", de: "Internationale:r Student:in" }, emoji: "🌍" },
+      { id: "int-work", label: { en: "International, working here", de: "International, arbeite hier" }, emoji: "💼" },
+      { id: "student", label: { en: "Local student", de: "Student:in von hier" }, emoji: "🎓" },
+      { id: "local", label: { en: "Local, working or retired", de: "Von hier, berufstätig oder in Rente" }, emoji: "🏡" },
     ],
   },
   {
-    id: "home",
-    title: { en: "Where do you live?", de: "Wo wohnst du?" },
+    id: "age",
+    title: { en: "How old are you?", de: "Wie alt bist du?" },
     options: [
-      { id: "big-city", label: { en: "In a big city", de: "In einer Großstadt" } },
-      { id: "town", label: { en: "In a smaller town", de: "In einer kleineren Stadt" } },
-      { id: "countryside", label: { en: "In the countryside", de: "Auf dem Land" } },
+      { id: "u25", label: { en: "Under 25", de: "Unter 25" } },
+      { id: "25-34", label: { en: "25 – 34", de: "25 – 34" } },
+      { id: "35-54", label: { en: "35 – 54", de: "35 – 54" } },
+      { id: "55+", label: { en: "55 or older", de: "55 oder älter" } },
     ],
   },
+  // The problem
   {
     id: "alone",
     title: { en: "How many meals a week do you eat alone?", de: "Wie viele Mahlzeiten pro Woche isst du allein?" },
@@ -43,6 +47,21 @@ export const QUESTIONS: Question[] = [
     ],
   },
   {
+    id: "pains",
+    title: { en: "What's hardest about everyday eating?", de: "Was ist im Essensalltag am schwierigsten?" },
+    hint: { en: "Pick up to 2.", de: "Bis zu 2 auswählen." },
+    multi: 2,
+    options: [
+      { id: "alone", label: { en: "Eating alone", de: "Allein essen" } },
+      { id: "meet", label: { en: "Meeting new people", de: "Neue Leute kennenlernen" } },
+      { id: "time", label: { en: "No time to cook", de: "Keine Zeit zum Kochen" } },
+      { id: "cost", label: { en: "Cooking for one costs more / food gets wasted", de: "Für eine Person kochen ist teuer / Reste landen im Müll" } },
+      { id: "home-food", label: { en: "Missing food from home", de: "Essen von zu Hause fehlt mir" } },
+      { id: "nothing", label: { en: "Nothing, it's fine", de: "Nichts, passt alles" } },
+    ],
+  },
+  // The solution
+  {
     id: "join",
     title: { en: "Would you join a dinner at a neighbour's home?", de: "Würdest du bei Nachbar:innen zum Essen vorbeikommen?" },
     hint: { en: "Home-cooked, small table, you split the cost of the groceries.", de: "Selbst gekocht, kleiner Tisch, ihr teilt die Kosten für die Zutaten." },
@@ -50,6 +69,16 @@ export const QUESTIONS: Question[] = [
       { id: "yes", label: { en: "Yes, I'd love that", de: "Ja, sehr gern" } },
       { id: "maybe", label: { en: "Maybe", de: "Vielleicht" } },
       { id: "no", label: { en: "Not for me", de: "Eher nicht" } },
+    ],
+  },
+  {
+    id: "host",
+    title: { en: "Would you cook a dish from your culture for a small table?", de: "Würdest du ein Gericht aus deiner Kultur für einen kleinen Tisch kochen?" },
+    hint: { en: "Guests split the cost of the groceries.", de: "Die Gäste teilen die Kosten für die Zutaten." },
+    options: [
+      { id: "often", label: { en: "Yes, often", de: "Ja, oft" } },
+      { id: "sometimes", label: { en: "Sometimes", de: "Ab und zu" } },
+      { id: "no", label: { en: "I'd rather just eat", de: "Ich esse lieber nur mit" } },
     ],
   },
   {
@@ -64,31 +93,6 @@ export const QUESTIONS: Question[] = [
     ],
   },
   {
-    id: "host",
-    title: { en: "Would you cook for others and split the cost?", de: "Würdest du für andere kochen und die Kosten teilen?" },
-    options: [
-      { id: "often", label: { en: "Yes, often", de: "Ja, oft" } },
-      { id: "sometimes", label: { en: "Sometimes", de: "Ab und zu" } },
-      { id: "no", label: { en: "I'd rather just eat", de: "Ich esse lieber nur mit" } },
-    ],
-  },
-  {
-    id: "cuisines",
-    title: { en: "Which cuisines would you love to share?", de: "Welche Küchen würdest du gern teilen?" },
-    hint: { en: "Pick up to 3 — to cook or to try.", de: "Bis zu 3 — zum Kochen oder Probieren." },
-    multi: 3,
-    options: [
-      { id: "italian", label: { en: "Italian", de: "Italienisch" } },
-      { id: "indian", label: { en: "Indian", de: "Indisch" } },
-      { id: "east-asian", label: { en: "East Asian", de: "Ostasiatisch" } },
-      { id: "middle-eastern", label: { en: "Middle Eastern", de: "Orientalisch" } },
-      { id: "latin", label: { en: "Latin American", de: "Lateinamerikanisch" } },
-      { id: "african", label: { en: "African", de: "Afrikanisch" } },
-      { id: "german", label: { en: "German", de: "Deutsch" } },
-      { id: "vegan", label: { en: "Vegan / veggie", de: "Vegan / vegetarisch" } },
-    ],
-  },
-  {
     id: "worries",
     title: { en: "What would hold you back?", de: "Was würde dich zurückhalten?" },
     hint: { en: "Pick up to 2.", de: "Bis zu 2 auswählen." },
@@ -97,7 +101,7 @@ export const QUESTIONS: Question[] = [
       { id: "safety", label: { en: "Safety", de: "Sicherheit" } },
       { id: "hygiene", label: { en: "Hygiene", de: "Hygiene" } },
       { id: "strangers", label: { en: "Eating with strangers", de: "Essen mit Fremden" } },
-      { id: "price", label: { en: "Price", de: "Preis" } },
+      { id: "language", label: { en: "Language barrier", de: "Sprachbarriere" } },
       { id: "time", label: { en: "Time", de: "Zeit" } },
       { id: "nothing", label: { en: "Nothing — I'm in!", de: "Nichts — ich bin dabei!" } },
     ],
@@ -134,15 +138,16 @@ export const UI = {
     back: "Back",
     skip: "Skip",
     question: (n: number, t: number) => `Question ${n} of ${t}`,
-    contactTitle: "Want to follow Bite?",
-    contactHint: "Optional — leave your email and we'll keep you posted on the startup's news.",
+    contactTitle: "Got 15 more minutes, another day?",
+    contactHint: "Optional — leave your email if you'd like a short chat with the founder about how you eat, or just Bite's news.",
     email: "Email (optional)",
+    interview: "Yes, I'm up for a 15-minute chat (in person or online)",
     updates: "Yes, keep me updated on Bite's news",
-    consent: "We only use your email for Bite news. Unsubscribe any time.",
+    consent: "We only use your email for what you ticked. Unsubscribe any time.",
     privacy: "Privacy policy",
     finish: "Finish",
     badEmail: "That email doesn't look right.",
-    needChoice: "Tick the box so we're allowed to email you — or leave the email empty.",
+    needChoice: "Tick at least one box so we're allowed to email you — or leave the email empty.",
     thanks: "Thank you!",
     thanksSub: "You just helped shape Bite.",
     grab: "Grab a sweet from the bowl",
@@ -181,15 +186,16 @@ export const UI = {
     back: "Zurück",
     skip: "Überspringen",
     question: (n: number, t: number) => `Frage ${n} von ${t}`,
-    contactTitle: "Willst du Bite verfolgen?",
-    contactHint: "Optional — hinterlass deine E-Mail und wir halten dich über Neuigkeiten des Startups auf dem Laufenden.",
+    contactTitle: "Hast du an einem anderen Tag 15 Minuten?",
+    contactHint: "Optional — hinterlass deine E-Mail für ein kurzes Gespräch mit dem Gründer darüber, wie du isst, oder einfach für Bite-Neuigkeiten.",
     email: "E-Mail (optional)",
+    interview: "Ja, ich bin für ein 15-Minuten-Gespräch dabei (vor Ort oder online)",
     updates: "Ja, haltet mich über Bite auf dem Laufenden",
-    consent: "Wir nutzen deine E-Mail nur für Bite-Neuigkeiten. Abmelden jederzeit möglich.",
+    consent: "Wir nutzen deine E-Mail nur für das, was du angekreuzt hast. Abmelden jederzeit möglich.",
     privacy: "Datenschutz",
     finish: "Fertig",
     badEmail: "Die E-Mail-Adresse sieht nicht richtig aus.",
-    needChoice: "Bitte setz den Haken, damit wir dir schreiben dürfen — oder lass die E-Mail leer.",
+    needChoice: "Bitte setz mindestens einen Haken, damit wir dir schreiben dürfen — oder lass die E-Mail leer.",
     thanks: "Danke!",
     thanksSub: "Du hast gerade Bite mitgestaltet.",
     grab: "Nimm dir etwas Süßes aus der Schale",

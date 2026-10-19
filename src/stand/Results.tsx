@@ -6,14 +6,14 @@ import { FORMS_ENDPOINT } from "../shared/forms";
 
 // Live results for a screen behind the stand: real answers only, refreshed every 15 seconds.
 
-interface Row { at: string; who?: string; home?: string; alone?: string; join?: string; price?: string; host?: string; cuisines: string[]; worries: string[] }
+interface Row { at: string; who?: string; age?: string; alone?: string; join?: string; price?: string; host?: string; pains: string[]; worries: string[] }
 
 const MIN_FOR_PERCENTAGES = 5;
 const lang: Lang = new URLSearchParams(window.location.search).get("lang") === "de" ? "de" : "en";
 
 const L = {
-  en: { title: "Live at the Bite stand", people: "people answered", today: "today", join: "would join a dinner at a neighbour's", maybe: "maybe", host: "would cook for others", alone: "eat 8+ meals a week alone", price: "What people would pay per plate", cuisines: "Most wanted cuisines", worries: "What holds people back", scan: "Your turn!", scanSub: "Scan, answer 8 quick questions —", sweet: "and grab a sweet", few: "Be one of the first to answer — results appear here live.", sourceLocal: "answers on this device", sourceLive: "live from all devices" },
-  de: { title: "Live am Bite-Stand", people: "Personen haben geantwortet", today: "heute", join: "würden bei Nachbar:innen mitessen", maybe: "vielleicht", host: "würden für andere kochen", alone: "essen 8+ Mahlzeiten pro Woche allein", price: "Was man pro Teller zahlen würde", cuisines: "Beliebteste Küchen", worries: "Was Leute zurückhält", scan: "Du bist dran!", scanSub: "Scannen, 8 kurze Fragen —", sweet: "und Süßes mitnehmen", few: "Sei eine:r der Ersten — die Ergebnisse erscheinen hier live.", sourceLocal: "Antworten auf diesem Gerät", sourceLive: "live von allen Geräten" },
+  en: { title: "Live at the Bite stand", people: "people answered", today: "today", join: "would join a dinner at a neighbour's", maybe: "maybe", host: "would cook for others", alone: "eat 8+ meals a week alone", price: "What people would pay per plate", pains: "What's hardest about everyday eating", worries: "What holds people back", scan: "Your turn!", scanSub: "Scan, answer 8 quick questions —", sweet: "and grab a sweet", few: "Be one of the first to answer — results appear here live.", sourceLocal: "answers on this device", sourceLive: "live from all devices" },
+  de: { title: "Live am Bite-Stand", people: "Personen haben geantwortet", today: "heute", join: "würden bei Nachbar:innen mitessen", maybe: "vielleicht", host: "würden für andere kochen", alone: "essen 8+ Mahlzeiten pro Woche allein", price: "Was man pro Teller zahlen würde", pains: "Was im Essensalltag am schwierigsten ist", worries: "Was Leute zurückhält", scan: "Du bist dran!", scanSub: "Scannen, 8 kurze Fragen —", sweet: "und Süßes mitnehmen", few: "Sei eine:r der Ersten — die Ergebnisse erscheinen hier live.", sourceLocal: "Antworten auf diesem Gerät", sourceLive: "live von allen Geräten" },
 }[lang];
 
 const optLabel = (qid: string, id: string) => {
@@ -24,7 +24,7 @@ const optLabel = (qid: string, id: string) => {
 function fromLocal(): Row[] {
   return localResponses().map((r) => ({
     at: r.at, ...(r.answers as Record<string, string>),
-    cuisines: ([] as string[]).concat(r.answers.cuisines ?? []),
+    pains: ([] as string[]).concat(r.answers.pains ?? []),
     worries: ([] as string[]).concat(r.answers.worries ?? []),
   }));
 }
@@ -64,7 +64,7 @@ export function Results() {
     const answered = count((r) => !!r[qid]);
     return opts.map((o) => ({ label: optLabel(qid, o.id), v: pct(count((r) => r[qid] === o.id), answered) }));
   };
-  const top = (qid: "cuisines" | "worries", k = 5) => {
+  const top = (qid: "pains" | "worries", k = 5) => {
     const tally = new Map<string, number>();
     rows.forEach((r) => r[qid].forEach((x) => tally.set(x, (tally.get(x) ?? 0) + 1)));
     const answered = count((r) => r[qid].length > 0);
@@ -102,7 +102,7 @@ export function Results() {
               <div className="rs-lbl">{L.alone}</div>
             </section>
             <Bars title={L.price} items={dist("price")} />
-            <Bars title={L.cuisines} items={top("cuisines")} />
+            <Bars title={L.pains} items={top("pains")} />
             <Bars title={L.worries} items={top("worries", 4)} />
           </>
         ) : (

@@ -11,6 +11,7 @@ export interface SurveyEntry {
   answers: Record<string, string | string[]>;
   email?: string;
   updates?: boolean;
+  interview?: boolean;
 }
 
 const ALL_KEY = "bite_stand_responses";
@@ -58,15 +59,16 @@ export function clearDevice() {
 }
 
 export function toCsv(rows: SurveyEntry[]) {
-  const cols = ["id", "at", "source", "device", "lang", "who", "home", "alone", "join", "price", "host", "cuisines", "worries", "email", "updates"];
+  const cols = ["id", "at", "source", "device", "lang", "who", "age", "alone", "pains", "join", "host", "price", "worries", "email", "updates", "interview"];
   const cell = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const lines = rows.map((r) => {
     const a = r.answers;
     const val: Record<string, unknown> = {
       ...r, ...a,
-      cuisines: ([] as string[]).concat(a.cuisines ?? []).join(", "),
+      pains: ([] as string[]).concat(a.pains ?? []).join(", "),
       worries: ([] as string[]).concat(a.worries ?? []).join(", "),
       updates: r.updates ? "yes" : "",
+      interview: r.interview ? "yes" : "",
     };
     return cols.map((c) => cell(val[c])).join(",");
   });

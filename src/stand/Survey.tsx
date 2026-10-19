@@ -28,6 +28,7 @@ export function Survey() {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [email, setEmail] = useState("");
   const [updates, setUpdates] = useState(false);
+  const [interview, setInterview] = useState(false);
   const [error, setError] = useState("");
   const [countdown, setCountdown] = useState(RESET_AFTER);
   const [admin, setAdmin] = useState(false);
@@ -57,7 +58,7 @@ export function Survey() {
   };
 
   const reset = () => {
-    setStep("start"); setAnswers({}); setEmail(""); setUpdates(false); setError(""); setCountdown(RESET_AFTER);
+    setStep("start"); setAnswers({}); setEmail(""); setUpdates(false); setInterview(false); setError(""); setCountdown(RESET_AFTER);
     setLang(initialLang());
   };
 
@@ -111,10 +112,10 @@ export function Survey() {
     e.preventDefault();
     const mail = email.trim();
     if (mail && !EMAIL_RE.test(mail)) { setError(t.badEmail); return; }
-    if (mail && !updates) { setError(t.needChoice); return; }
+    if (mail && !updates && !interview) { setError(t.needChoice); return; }
     saveEntry({
       id: uid(), at: new Date().toISOString(), source: SOURCE, device: KIOSK ? "kiosk" : "phone", lang, answers,
-      ...(mail ? { email: mail.toLowerCase(), updates } : {}),
+      ...(mail ? { email: mail.toLowerCase(), updates, interview } : {}),
     });
     go("thanks");
   };
@@ -222,6 +223,7 @@ export function Survey() {
               </label>
               {email.trim() && (
                 <div className="st-checks">
+                  <label><input type="checkbox" checked={interview} onChange={(e) => { setInterview(e.target.checked); setError(""); }} /> {t.interview}</label>
                   <label><input type="checkbox" checked={updates} onChange={(e) => { setUpdates(e.target.checked); setError(""); }} /> {t.updates}</label>
                   <p className="st-small">{t.consent} <a href="legal.html#privacy" target="_blank" rel="noopener">{t.privacy}</a></p>
                 </div>

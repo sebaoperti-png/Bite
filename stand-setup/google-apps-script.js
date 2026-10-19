@@ -15,8 +15,8 @@ const WAITLIST_SHEET = "Waitlist";
 
 const SURVEY_COLUMNS = [
   "received", "id", "answeredAt", "source", "device", "lang",
-  "who", "home", "alone", "join", "price", "host", "cuisines", "worries",
-  "email", "updates",
+  "who", "age", "alone", "pains", "join", "host", "price", "worries",
+  "email", "updates", "interview",
 ];
 const WAITLIST_COLUMNS = ["received", "email", "role", "area", "at", "source"];
 
@@ -58,9 +58,9 @@ function doPost(e) {
     const a = data.answers || {};
     sh.appendRow([
       new Date(), data.id, data.at, data.source || "", data.device || "", data.lang || "",
-      a.who || "", a.home || "", a.alone || "", a.join || "", a.price || "", a.host || "",
-      (a.cuisines || []).join(", "), (a.worries || []).join(", "),
-      data.email || "", data.updates ? "yes" : "",
+      a.who || "", a.age || "", a.alone || "", (a.pains || []).join(", "),
+      a.join || "", a.host || "", a.price || "", (a.worries || []).join(", "),
+      data.email || "", data.updates ? "yes" : "", data.interview ? "yes" : "",
     ]);
     return json_({ ok: true });
   } catch (err) {
@@ -80,9 +80,9 @@ function doGet(e) {
   const rows = values.map(function (r) {
     return {
       at: r[col("answeredAt")], source: r[col("source")],
-      who: r[col("who")], home: r[col("home")], alone: r[col("alone")], join: r[col("join")],
+      who: r[col("who")], age: r[col("age")], alone: r[col("alone")], join: r[col("join")],
       price: r[col("price")], host: r[col("host")],
-      cuisines: String(r[col("cuisines")] || "").split(", ").filter(String),
+      pains: String(r[col("pains")] || "").split(", ").filter(String),
       worries: String(r[col("worries")] || "").split(", ").filter(String),
       contact: !!r[col("email")],
     };
