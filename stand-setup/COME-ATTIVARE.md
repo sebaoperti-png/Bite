@@ -2,6 +2,9 @@
 
 ## What's in this folder
 - `bite-poster-A1.pdf`: **A1 (59×84 cm)** brand poster to hang behind the stand: “BlaBlaCar shares a ride. Bite shares a table.” Its small QR code opens the website (not the survey).
+- `bite-poster-A1-name.pdf`: **A1** simple poster: logo, the site headline, your name and email.
+- `bite-steckbrief-A4.pdf`: A4 sheet for the table (who you are + what Bite is + survey QR).
+- `bite-flyers-A6.pdf`: 4 A6 hand-out flyers per A4 sheet (QR to the landing page).
 - `bite-poster-A4.pdf`: A4 poster with QR code, for the table (print it in colour).
 - `bite-qr-cards-A4.pdf`: 4 QR cards per sheet, to cut out and leave on the table.
 - `google-apps-script.js`: the script that saves the answers into a Google Sheet.

@@ -251,7 +251,7 @@ function cleanup() {
  * - saves the AIM print files (A4 table sheet + flyers) into the "Bite Startup" Drive folder.
  */
 const DRIVE_FOLDER_ID = "1ksvUHrJHJyR0dEPP1F4sh5-z2LR_uyeJ"; // "Bite Startup"
-const PRINT_FILES = ["bite-steckbrief-A4.pdf", "bite-flyers-A6.pdf", "bite-poster-A1.pdf", "bite-qr-cards-A4.pdf"];
+const PRINT_FILES = ["bite-steckbrief-A4.pdf", "bite-flyers-A6.pdf", "bite-poster-A1-name.pdf", "bite-poster-A1.pdf", "bite-qr-cards-A4.pdf"];
 
 function setup() {
   sheet_(SURVEY_SHEET, SURVEY_COLUMNS);
