@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ThinkingOrb } from "thinking-orbs";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, Mail, Lock, User, Eye, EyeOff, Sparkles } from "lucide-react";
 import logoImg from "../logo.png";
@@ -116,7 +117,7 @@ export function AuthScreen({ initialMode, onBack, onDone }: { initialMode: AuthM
 
           <motion.button type="submit" disabled={loading} className="mt-2 w-full py-4 rounded-2xl flex items-center justify-center gap-2" style={{ background: "linear-gradient(135deg, #6b21d9, #9b4aff)", boxShadow: "0 12px 28px rgba(107,33,217,0.35)" }} whileTap={{ scale: 0.97 }}>
             {loading ? (
-              <motion.span className="w-4 h-4 rounded-full border-2 border-white" style={{ borderTopColor: "transparent" }} animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} />
+              <ThinkingOrb state="connecting" size={20} theme="dark" aria-label={t("Loading…")} />
             ) : (
               <span style={{ color: "#fff", fontWeight: 800, fontSize: 15 }}>{mode === "signup" ? t("Create account") : t("Log in")}</span>
             )}

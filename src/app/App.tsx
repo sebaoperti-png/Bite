@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { EmptyPlate } from "../shared/Restaurant";
 import { AnimatePresence, motion } from "motion/react";
 import { CheckCircle } from "lucide-react";
 import { OnboardingScreen } from "./components/OnboardingScreen";
@@ -15,7 +16,7 @@ import { useIsDesktop } from "./useIsDesktop";
 import { StoreProvider, useStore } from "./store";
 import { DEFAULT_CRITERIA, type Meal, type SearchCriteria } from "./data";
 import { useLang } from "../shared/i18n";
-import { t } from "../shared/i18n";
+import { t, locale } from "../shared/i18n";
 
 export type { ServiceType, Meal } from "./data";
 export { MEALS, dayLabel } from "./data";
@@ -24,16 +25,20 @@ export type Screen = "splash" | "onboarding" | "auth" | "cook-profile" | "start-
 
 const SCREEN_ORDER: Screen[] = ["splash", "onboarding", "auth", "cook-profile", "start-hosting", "home", "listings", "detail", "checkout", "chat"];
 
-// Phone: screens slide sideways like a native app. Desktop: a quick cross-fade, like a web page.
+// Phones: native-style push (transitions.dev "page side-by-side"): the new page slides in over the old one,
+// which moves back only a third of the way and dims. Going back plays it in reverse.
+const EASE = [0.22, 1, 0.36, 1] as const;
 const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? "100%" : "-100%", opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0 }),
+  enter: (dir: number) => (dir > 0 ? { x: "100%", opacity: 1, zIndex: 2, filter: "brightness(1)" } : { x: "-30%", opacity: 1, zIndex: 1, filter: "brightness(0.92)" }),
+  // no filter left behind: it would trap the fixed bottom sheets inside the page
+  center: { x: 0, opacity: 1, filter: "brightness(1)", transitionEnd: { filter: "none", transform: "none" } },
+  exit: (dir: number) => (dir > 0 ? { x: "-30%", zIndex: 1, filter: "brightness(0.92)" } : { x: "100%", zIndex: 2, filter: "brightness(1)" }),
 };
+// Desktop: a short fade with a hint of blur and lift
 const fadeVariants = {
-  enter: { opacity: 0, y: 8 },
-  center: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 0 },
+  enter: { opacity: 0, y: 8, filter: "blur(3px)" },
+  center: { opacity: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none", transform: "none" } },
+  exit: { opacity: 0, y: 0, filter: "blur(2px)" },
 };
 
 // Focused flows without the desktop top bar
@@ -124,8 +129,11 @@ function AppInner() {
 
   const openDetail = (meal: Meal) => navigate({ screen: "detail", mealId: meal.id });
   const openChat = (conversationId: string, bookingId?: string, replace = false) => navigate({ screen: "chat", conversationId, bookingId }, replace);
+  // When a search was just started (the listings screen shows its "kitchen check" if it opens right after)
+  const [searchedAt, setSearchedAt] = useState(0);
   const search = (patch?: Partial<SearchCriteria>) => {
     if (patch) setCriteria((c) => ({ ...c, ...patch }));
+    setSearchedAt(Date.now());
     if (screen !== "listings") navigate("listings");
   };
 
@@ -147,8 +155,10 @@ function AppInner() {
   const dark = screen === "splash" || screen === "onboarding" || screen === "auth";
 
   const missing = (
-    <div className="h-full flex flex-col items-center justify-center gap-3" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <p style={{ fontSize: 15, fontWeight: 700, color: "#160a2e" }}>{t("This page is no longer available.")}</p>
+    <div className="h-full flex flex-col items-center justify-center gap-3 px-6 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <EmptyPlate size={110} />
+      <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 34, lineHeight: 1.05, color: "#160a2e" }}>{t("This dish is off the menu.")}</p>
+      <p style={{ fontSize: 14, color: "#7c6fa0", maxWidth: 300 }}>{t("This page is no longer available.")} {t("The kitchen has plenty of other tables tonight.")}</p>
       <button onClick={() => navigate("home", true)} className="px-4 py-2 rounded-xl" style={{ background: "#6b21d9", color: "#fff", fontWeight: 700, fontSize: 14 }}>{t("Back to home")}</button>
     </div>
   );
@@ -173,7 +183,7 @@ function AppInner() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={isDesktop ? { duration: 0.18, ease: "easeOut" } : { type: "spring", stiffness: 380, damping: 34 }}
+            transition={isDesktop ? { duration: 0.25, ease: EASE } : { duration: 0.36, ease: EASE }}
             className="absolute inset-0"
           >
             <div className={narrow ? "relative h-full mx-auto w-full max-w-[760px]" : "relative h-full"} style={narrow ? { boxShadow: "0 0 0 1px rgba(107,33,217,0.06)" } : undefined}>
@@ -231,7 +241,7 @@ function AppInner() {
                 />
               )}
               {screen === "listings" && (
-                <ListingsScreen criteria={criteria} setCriteria={setCriteria} onBack={() => goBack("home")} onSelect={openDetail} onNavigate={onNav} />
+                <ListingsScreen criteria={criteria} setCriteria={setCriteria} onBack={() => goBack("home")} onSelect={openDetail} onNavigate={onNav} searchedAt={searchedAt} />
               )}
               {screen === "detail" && (meal ? (
                 <DetailScreen
@@ -270,21 +280,29 @@ function AppInner() {
   );
 }
 
+/** Notifications as kitchen tickets: the ticket drops onto the rail, swings, and is torn away */
 function Toast({ message }: { message: string | null }) {
+  const time = new Date().toLocaleTimeString(locale(), { hour: "2-digit", minute: "2-digit" });
   return (
-    <div className="pointer-events-none absolute left-0 right-0 z-[60] flex justify-center px-4" style={{ bottom: 96 }} aria-live="polite">
+    <div className="tk-zone" aria-live="polite">
       <AnimatePresence>
+        {message && (
+          <motion.div key="rail" className="tk-rail" initial={{ opacity: 0, scaleX: 0.6 }} animate={{ opacity: 1, scaleX: 1 }} exit={{ opacity: 0, transition: { delay: 0.2 } }} transition={{ duration: 0.25 }} />
+        )}
+      </AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {message && (
           <motion.div
             key={message}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl"
-            style={{ background: "#160a2e", boxShadow: "0 12px 32px rgba(22,10,46,0.35)", fontFamily: "'Inter', sans-serif" }}
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8 }}
+            className="tk"
+            style={{ transformOrigin: "50% 0" }}
+            initial={{ y: -46, rotate: -7, opacity: 0 }}
+            animate={{ y: 0, rotate: 0, opacity: 1, transition: { type: "spring", stiffness: 260, damping: 11 } }}
+            exit={{ y: -30, rotate: 5, opacity: 0, transition: { duration: 0.35, ease: EASE } }}
           >
-            <CheckCircle size={16} color="#b87fff" strokeWidth={2.4} />
-            <span style={{ fontSize: 13.5, fontWeight: 600, color: "#fff" }}>{message}</span>
+            <span className="tk-clip" aria-hidden />
+            <span className="tk-head"><b>BITE</b><span>{time}</span></span>
+            <span className="tk-msg"><CheckCircle size={15} color="#0a9c62" strokeWidth={2.6} />{message}</span>
           </motion.div>
         )}
       </AnimatePresence>

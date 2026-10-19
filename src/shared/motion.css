@@ -1,0 +1,149 @@
+/* Motion pieces from the transitions.dev skill (src/app/components/Motion.tsx). Tokens as tuned on transitions.dev. */
+:root {
+  --like-pop: 350ms;
+  --like-pop-ease: cubic-bezier(0.34, 1.96, 0.64, 1);
+  --like-particle-dur: 600ms;
+  --like-particle-size: 2.5px;
+  --reel-dur: 1000ms;
+  --reel-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --check-dur: 500ms;
+  --check-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-bob: cubic-bezier(0.34, 1.35, 0.64, 1);
+}
+
+/* 23 · like button */
+.t-like { position: relative; display: inline-flex; }
+.t-like-icon { display: inline-flex; }
+.t-like[data-liked="true"] .t-like-icon { animation: t-like-pop var(--like-pop) var(--like-pop-ease); }
+@keyframes t-like-pop { 0% { transform: scale(1); } 30% { transform: scale(0.72); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.t-like-particles { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; color: #e9345a; }
+.t-like-particles i { position: absolute; left: calc(var(--like-particle-size) * var(--psize, 1) / -2); top: calc(var(--like-particle-size) * var(--psize, 1) / -2); width: calc(var(--like-particle-size) * var(--psize, 1)); height: calc(var(--like-particle-size) * var(--psize, 1)); border-radius: 50%; background: currentColor; opacity: 0; animation: t-like-burst var(--like-particle-dur) ease-out var(--pdelay, 0ms) forwards; }
+.t-like-particles i:nth-child(even) { color: #b87fff; background: #b87fff; }
+@keyframes t-like-burst {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  20% { opacity: 1; transform: translate(calc(var(--px) * 0.25), calc(var(--py) * 0.25)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0.6); }
+}
+
+/* 26 · spinning counter */
+.t-reel { display: inline-flex; align-items: center; height: var(--reel-cell); font-variant-numeric: tabular-nums; line-height: 1; }
+.t-reel-col { position: relative; height: var(--reel-cell); overflow: hidden; padding: 0 .05em; margin: 0 -.03em; /* room for heavy glyphs and negative letter-spacing, so digits aren't clipped */ -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%); }
+.t-reel-strip { display: flex; flex-direction: column; will-change: transform; }
+.t-reel-strip.spinning { transition: transform var(--reel-dur) var(--reel-ease); }
+.t-reel-digit, .t-reel-static { height: var(--reel-cell); display: flex; align-items: center; justify-content: center; }
+.t-reel-digit { letter-spacing: 0; }
+.t-reel-static { white-space: pre; }
+
+/* 10 · success check */
+.t-success-check { display: inline-block; transform-origin: center; opacity: 0; will-change: transform, opacity, filter; }
+.t-success-check svg { display: block; overflow: visible; }
+.t-success-check svg path { stroke-dasharray: 32; stroke-dashoffset: 32; }
+.t-success-check[data-state="in"] { animation: t-check-fade var(--check-dur) var(--check-ease-out) forwards, t-check-rotate var(--check-dur) var(--check-ease-out) forwards, t-check-blur var(--check-dur) var(--check-ease-out) forwards, t-check-bob var(--check-dur) var(--check-ease-bob) forwards; }
+.t-success-check[data-state="in"] svg path { animation: t-check-draw var(--check-dur) var(--check-ease-out) 80ms forwards; }
+@keyframes t-check-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes t-check-rotate { from { transform: rotate(80deg); } to { transform: rotate(0deg); } }
+@keyframes t-check-blur { from { filter: blur(8px); } to { filter: blur(0); } }
+@keyframes t-check-bob { from { translate: 0 40px; } to { translate: 0 0; } }
+@keyframes t-check-draw { to { stroke-dashoffset: 0; } }
+
+/* the "table booked" moment in the checkout */
+.bk-done { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; background: rgba(245,244,249,0.94); backdrop-filter: blur(6px); animation: bkIn .3s ease both; }
+.bk-done h2 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 40px; line-height: 1; color: #160a2e; margin-top: 8px; animation: bkUp .5s var(--check-ease-out) .35s both; }
+.bk-done p { font-size: 14px; color: #6b5a8e; max-width: 300px; animation: bkUp .5s var(--check-ease-out) .5s both; }
+@keyframes bkIn { from { opacity: 0; } }
+@keyframes bkUp { from { opacity: 0; transform: translateY(10px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-like-icon, .t-like-particles i { animation: none !important; }
+  .t-reel-strip { transition: none !important; }
+  .t-success-check[data-state="in"], .t-success-check[data-state="in"] svg path { animation-duration: 1ms !important; }
+}
+
+/* 19 · card hover tilt (Tilt in Motion.tsx) */
+:root { --tilt-perspective: 1000px; --tilt-return: 1000ms; --tilt-follow: 400ms; --tilt-ease: cubic-bezier(0.22, 1, 0.36, 1); --tilt-glare-opacity: 0.32; }
+.t-tilt-card { position: relative; height: 100%; border-radius: inherit; transform: perspective(var(--tilt-perspective)) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg)); transform-style: preserve-3d; transition: transform var(--tilt-return) var(--tilt-ease); will-change: transform; }
+.t-tilt-card.is-tilting { transition: transform var(--tilt-follow) var(--tilt-ease); }
+.t-tilt-glare { position: absolute; inset: 0; z-index: 5; border-radius: inherit; pointer-events: none; opacity: 0; mix-blend-mode: screen; transition: opacity 300ms var(--tilt-ease);
+  background: radial-gradient(circle 95px at var(--tilt-gx, 50%) var(--tilt-gy, 50%), rgba(255,255,255,0.48), rgba(255,255,255,0.06) 52%, rgba(255,255,255,0) 84%), radial-gradient(circle 200px at var(--tilt-gx, 50%) var(--tilt-gy, 50%), rgba(255,255,255,0.22), rgba(255,255,255,0.04) 58%, rgba(255,255,255,0) 78%), radial-gradient(circle 360px at var(--tilt-gx, 50%) var(--tilt-gy, 50%), rgba(255,255,255,0.10), rgba(255,255,255,0) 88%); }
+.t-tilt.is-hover .t-tilt-glare { opacity: var(--tilt-glare-opacity); }
+@media (prefers-reduced-motion: reduce) { .t-tilt-card { transform: none !important; transition: none !important; } }
+
+/* texts reveal (RevealWords in Motion.tsx) */
+.rw-w { display: inline-block; opacity: 0; transform: translateY(12px); filter: blur(3px); transition: opacity .5s ease-in-out, transform .5s ease-in-out, filter .5s ease-in-out; transition-delay: calc(var(--rw-delay, 0ms) + var(--i) * var(--rw-step, 45ms)); }
+.rw.in .rw-w { opacity: 1; transform: none; filter: blur(0); }
+@media (prefers-reduced-motion: reduce) { .rw-w { opacity: 1; transform: none; filter: none; transition: none; } }
+
+/* 24 · learn-more hover: the underline draws in, the arrow nudges forward */
+.lm .lm-text { background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0% 1.5px; padding-bottom: 1px; transition: background-size .25s cubic-bezier(0.22, 1, 0.36, 1); }
+.lm:hover .lm-text, .lm:focus-visible .lm-text { background-size: 100% 1.5px; }
+.lm .lm-arrow { display: inline-block; transition: transform .25s cubic-bezier(0.22, 1, 0.36, 1); }
+.lm:hover .lm-arrow, .lm:focus-visible .lm-arrow { transform: translateX(4px); }
+@media (prefers-reduced-motion: reduce) { .lm .lm-text, .lm .lm-arrow { transition: none; } }
+
+/* 30 · streaming text */
+.st-word { opacity: 0; filter: blur(3px); transition: opacity .25s ease, filter .25s ease; }
+.st-word.in { opacity: 1; filter: blur(0); }
+@media (prefers-reduced-motion: reduce) { .st-word { opacity: 1; filter: none; transition: none; } }
+
+/* chat: the host is writing */
+.ch-typing { display: flex; align-items: center; gap: 8px; padding: 9px 14px 9px 10px; border-radius: 18px; border-bottom-left-radius: 6px; background: #fff; box-shadow: 0 2px 8px rgba(107,33,217,0.06); }
+.ch-typing span { font-size: 12.5px; font-weight: 600; background: linear-gradient(90deg, #7c6fa0 30%, #d6c9f0 50%, #7c6fa0 70%) 0 0 / 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: chShimmer 1.4s linear infinite; }
+@keyframes chShimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .ch-typing span { animation: none; color: #7c6fa0; } }
+
+/* checkout: terms checkbox (25 checkbox check) + shake when forgotten (12 error state shake) */
+.terms { position: relative; }
+.tick-input { position: absolute; opacity: 0; width: 18px; height: 18px; margin: 0; cursor: pointer; }
+.tick-box { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; border-radius: 6px; border: 1.8px solid #b39ddb; background: #fff; display: inline-flex; align-items: center; justify-content: center; transition: background .2s, border-color .2s, transform .2s cubic-bezier(.34,1.56,.64,1); }
+.tick-box svg { width: 13px; height: 13px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.tick-box path { stroke-dasharray: 14; stroke-dashoffset: 14; transition: stroke-dashoffset .3s cubic-bezier(.22,1,.36,1) .05s; }
+.tick-input:checked + .tick-box { background: #6b21d9; border-color: #6b21d9; transform: scale(1.08); }
+.tick-input:checked + .tick-box path { stroke-dashoffset: 0; }
+.tick-input:focus-visible + .tick-box { outline: 3px solid rgba(155,74,255,0.4); outline-offset: 2px; }
+.terms.is-error .tick-box { border-color: #e9345a; }
+.terms.shake { animation: tShake .42s cubic-bezier(.36,.07,.19,.97); }
+@keyframes tShake { 10%, 90% { transform: translateX(-1px); } 20%, 80% { transform: translateX(3px); } 30%, 50%, 70% { transform: translateX(-6px); } 40%, 60% { transform: translateX(6px); } }
+
+/* tooltip (17 tooltip): grows from its "?" */
+.tip-wrap { position: relative; display: inline-flex; }
+.tip-btn { width: 16px; height: 16px; border-radius: 50%; border: 0; background: #ede8fb; color: #6b21d9; font-size: 10.5px; font-weight: 900; line-height: 16px; cursor: pointer; }
+.tip { position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: 20; width: 230px; margin-left: -115px; padding: 10px 12px; border-radius: 12px; background: #160a2e; color: #fff; font-size: 12px; line-height: 1.45; font-weight: 500; box-shadow: 0 12px 26px rgba(22,10,46,0.3);
+  opacity: 0; transform: translateY(4px) scale(.98); transform-origin: 50% 100%; pointer-events: none; transition: opacity .15s ease-out, transform .15s ease-out; }
+.tip::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -6px; border: 6px solid transparent; border-top-color: #160a2e; }
+.tip.on { opacity: 1; transform: none; transition-delay: 80ms; } /* intent delay on open only */
+
+/* where the money goes (35 donut chart) */
+.split-ring { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: #faf8fd; }
+.split-ring svg { width: 46px; height: 46px; flex-shrink: 0; rotate: -90deg; }
+.split-ring circle { fill: none; stroke-width: 6; }
+.sr-track { stroke: #efe8fb; }
+.sr-host { stroke: #6b21d9; stroke-linecap: round; transition: stroke-dasharray .6s cubic-bezier(.22,1,.36,1); animation: srDraw .9s cubic-bezier(.22,1,.36,1) both; }
+.sr-fee { stroke: #e3c77a; transition: stroke-dasharray .6s, stroke-dashoffset .6s; animation: srDraw .9s cubic-bezier(.22,1,.36,1) .3s both; }
+@keyframes srDraw { from { stroke-dasharray: 0 100; } }
+.split-ring p { margin: 0; font-size: 12px; color: #6b5a8e; line-height: 1.6; }
+.split-ring b { color: #160a2e; }
+.split-ring .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; }
+.split-ring .dot.host { background: #6b21d9; } .split-ring .dot.fee { background: #e3c77a; }
+@media (prefers-reduced-motion: reduce) { .terms.shake, .sr-host, .sr-fee { animation: none; } }
+
+/* 13 · input clear dissolve: the cleared text drifts up and blurs away letter by letter */
+.clear-ghost { position: absolute; left: 38px; top: 50%; transform: translateY(-50%); pointer-events: none; white-space: pre; color: #160a2e; animation: cgDone .6s linear forwards; }
+.clear-ghost i { display: inline-block; font-style: normal; animation: cgOut .45s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(var(--i) * 12ms); }
+@keyframes cgOut { to { opacity: 0; filter: blur(4px); transform: translateY(-6px) scale(.9); } }
+@keyframes cgDone { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .clear-ghost { display: none; } }
+
+/* touch screens: the tilt plays as a wave with a sweeping glare (on view + on tap) */
+@property --tilt-gx { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+@property --tilt-gy { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+.t-wave > .t-tilt-card { animation: tWave 1.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.t-wave > .t-tilt-card > .t-tilt-glare { animation: tGlare 1.5s ease-in-out both; }
+@keyframes tWave {
+  0% { transform: perspective(var(--tilt-perspective)) rotateX(0) rotateY(0); }
+  25% { transform: perspective(var(--tilt-perspective)) rotateX(calc(var(--tilt-max) * 0.4)) rotateY(calc(var(--tilt-max) * -1)); }
+  55% { transform: perspective(var(--tilt-perspective)) rotateX(calc(var(--tilt-max) * -0.3)) rotateY(var(--tilt-max)); }
+  80% { transform: perspective(var(--tilt-perspective)) rotateX(0) rotateY(calc(var(--tilt-max) * -0.25)); }
+  100% { transform: perspective(var(--tilt-perspective)) rotateX(0) rotateY(0); }
+}
+@keyframes tGlare { 0% { opacity: 0; --tilt-gx: 0%; --tilt-gy: 20%; } 30% { opacity: .45; } 70% { opacity: .45; } 100% { opacity: 0; --tilt-gx: 100%; --tilt-gy: 80%; } }
+@media (prefers-reduced-motion: reduce) { .t-wave > .t-tilt-card, .t-wave > .t-tilt-card > .t-tilt-glare { animation: none; } }

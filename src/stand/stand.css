@@ -226,3 +226,24 @@ body:has(.st-page) { background: radial-gradient(ellipse 70% 45% at 50% 0%, rgba
   .rs-wide { grid-column: span 2; }
   .rs-meta { display: none; }
 }
+
+/* results: bars grow in, numbers roll (SpinningText) */
+.rs-bar-track span { transform-origin: left; animation: rsGrow 1.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.rs-bar:nth-child(3) .rs-bar-track span { animation-delay: .1s; } .rs-bar:nth-child(4) .rs-bar-track span { animation-delay: .2s; }
+.rs-bar:nth-child(5) .rs-bar-track span { animation-delay: .3s; } .rs-bar:nth-child(6) .rs-bar-track span { animation-delay: .4s; }
+@keyframes rsGrow { from { transform: scaleX(0); } }
+.rs-num .t-reel { height: 1em; }
+@media (prefers-reduced-motion: reduce) { .rs-bar-track span { animation: none; } }
+
+/* ── Kiosk "waiting" screen: a breathing orb invites people walking past ── */
+.st-attract { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 30px; border: 0; cursor: pointer; text-align: center; color: #fff;
+  background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(155,74,255,0.45), transparent 70%), #160a2e; animation: stAttractIn .6s ease both; }
+@keyframes stAttractIn { from { opacity: 0; } }
+.st-attract-orb { display: block; width: 64px; height: 64px; transform: scale(2.6); margin: 40px 0 70px; filter: drop-shadow(0 0 30px rgba(184,127,255,0.6)); }
+.st-attract-eyebrow { font-size: 14px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; color: #b87fff; }
+.st-attract-title { font-family: 'Instrument Serif', serif; font-style: italic; font-size: clamp(54px, 9vw, 96px); line-height: 1; }
+.st-attract-sub { max-width: 520px; font-size: clamp(18px, 2.4vw, 22px); line-height: 1.45; color: rgba(255,255,255,0.75); }
+.st-attract-count { margin-top: 6px; padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,0.1); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 15px; color: #e3d0ff; }
+.st-attract-tap { margin-top: 30px; padding: 16px 30px; border-radius: 999px; background: #fff; color: #160a2e; font-size: 18px; font-weight: 900; animation: stTap 1.8s ease-in-out infinite; }
+@keyframes stTap { 50% { transform: scale(1.05); box-shadow: 0 0 0 14px rgba(255,255,255,0.08); } }
+@media (prefers-reduced-motion: reduce) { .st-attract, .st-attract-tap { animation: none; } }

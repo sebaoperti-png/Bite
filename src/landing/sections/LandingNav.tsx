@@ -1,19 +1,37 @@
-// NAV — sticky header; under 820px the links move into a menu button
-import { useEffect, useState } from "react";
+// NAV — sticky header, read like the index of a menu: each link carries its course number, and a little fork
+// travels along the bottom edge as you scroll through the dinner. Under 820px the links move into a menu button.
+import { useEffect, useRef, useState } from "react";
 import { asset } from "../asset";
 import { t } from "../../shared/i18n";
 import { LangSwitch } from "../../shared/LangSwitch";
 
 const LINKS = [
-  { href: "#savings", label: "Why Bite" },
-  { href: "#how", label: "How it works" },
-  { href: "#become-host", label: "For cooks" },
-  { href: "#safety", label: "Safety" },
-  { href: "#help", label: "Help" },
+  { href: "#savings", label: "Why Bite", n: 2 },
+  { href: "#how", label: "How it works", n: 3 },
+  { href: "#cooks", label: "For cooks", n: 5 },
+  { href: "#safety", label: "Safety", n: 6 },
+  { href: "#help", label: "Help", n: 7 },
 ];
 
 export function LandingNav() {
   const [open, setOpen] = useState(false);
+  const barRef = useRef<HTMLDivElement>(null);
+
+  // How far through the page we are, written straight to a CSS variable (no re-render on scroll)
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        barRef.current?.style.setProperty("--p", String(max > 0 ? Math.min(1, window.scrollY / max) : 0));
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); cancelAnimationFrame(raf); };
+  }, []);
 
   // Close the menu with Escape or when the screen gets wide again
   useEffect(() => {
@@ -35,7 +53,7 @@ export function LandingNav() {
 
         <nav aria-label={t("Main")} style={{ display: "flex", alignItems: "center", gap: "22px" }}>
           {LINKS.map((l) => (
-            <a key={l.href} className={`r-navlink ${l.href === "#help" ? "r-nav-extra" : ""}`} href={l.href} style={{ fontSize: "14.5px", fontWeight: "600", color: "#4b3a6b" }}>{t(l.label)}</a>
+            <a key={l.href} className={`r-navlink nv-link ${l.href === "#help" ? "r-nav-extra" : ""}`} href={l.href} style={{ fontSize: "14.5px", fontWeight: "600", color: "#4b3a6b" }}><sup className="nv-no">{l.n}</sup>{t(l.label)}</a>
           ))}
           <a className="r-navlink r-nav-extra" href="#waitlist" style={{ fontSize: "14.5px", fontWeight: "700", color: "#6b21d9" }}>{t("Stay updated")}</a>
           <LangSwitch />
@@ -55,11 +73,18 @@ export function LandingNav() {
         </nav>
       </div>
 
+      {/* the fork that travels through the dinner */}
+      <div ref={barRef} className="nv-progress" aria-hidden>
+        <span className="nv-progress-fill" />
+        <svg className="nv-fork" viewBox="0 0 24 24"><path d="M7 2v7a3 3 0 0 0 6 0V2M10 2v20M17 2c-2 0-3 4-3 7h3v13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </div>
+
       {open && (
         <div id="mobile-menu" style={{ borderTop: "1px solid rgba(107,33,217,0.08)", background: "#f3eefb", padding: "8px 24px 20px" }}>
-          {[...LINKS, { href: "#waitlist", label: "Stay updated" }].map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)} style={{ display: "block", padding: "14px 0", fontSize: "17px", fontWeight: 700, color: "#160a2e", borderBottom: "1px solid rgba(107,33,217,0.07)" }}>
-              {t(l.label)}
+          <span className="nv-menu-title">{t("Tonight's menu")}</span>
+          {[...LINKS, { href: "#waitlist", label: "Stay updated", n: 0 }].map((l) => (
+            <a key={l.href} className="nv-menu-line" href={l.href} onClick={() => setOpen(false)}>
+              <span>{t(l.label)}</span><i />{l.n ? <em>No. {l.n}</em> : <em>{t("in the hero")}</em>}
             </a>
           ))}
           <a href="bite.html?host" onClick={() => setOpen(false)} style={{ display: "block", marginTop: "16px", textAlign: "center", padding: "14px", borderRadius: "14px", border: "1.5px solid rgba(22,10,46,0.14)", fontWeight: 800, color: "#160a2e" }}>{t("I want to host")}</a>

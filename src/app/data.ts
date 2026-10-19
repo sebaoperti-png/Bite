@@ -1,4 +1,5 @@
 import { getLang, t } from "../shared/i18n";
+import { CITIES, coordsOf, distanceKm, type Place } from "./geo";
 // Demo content: the meals shown in the app and the date helper they use.
 
 export type ServiceType = "pickup" | "eat-together" | "cook-together";
@@ -433,7 +434,12 @@ export const feeFor = (contribution: number) => round2(contribution * SERVICE_FE
 export const withFee = (contribution: number) => round2(contribution * (1 + SERVICE_FEE));
 /** €6 or €6.72 */
 /** Prices: "€6" / "€6.72" (German: "€6,72") */
-export const euro = (n: number) => `€${Number.isInteger(n) ? n : getLang() === "de" ? n.toFixed(2).replace(".", ",") : n.toFixed(2)}`;
+/** €4 / €4.48 in English, 4 € / 4,48 € in German (non-breaking space, so the sign never wraps alone) */
+export const euro = (n: number) => {
+  const de = getLang() === "de";
+  const v = Number.isInteger(n) ? String(n) : de ? n.toFixed(2).replace(".", ",") : n.toFixed(2);
+  return de ? `${v}\u00a0€` : `€${v}`;
+};
 
 /* ── Search ── */
 
@@ -453,9 +459,27 @@ export interface SearchCriteria {
   guests: number;
   cuisine: string | null;
   query: string;
+  /** km around the place (0 = the whole city) — like Kleinanzeigen's "Umkreis" */
+  radius: number;
+  /** a postcode or "my location" to search around, instead of a city */
+  origin: Place | null;
 }
 
-export const DEFAULT_CRITERIA: SearchCriteria = { service: "all", area: ANY_AREA, date: ANY_DAY, time: ANY_TIME, guests: 1, cuisine: null, query: "" };
+export const DEFAULT_CRITERIA: SearchCriteria = { service: "all", area: ANY_AREA, date: ANY_DAY, time: ANY_TIME, guests: 1, cuisine: null, query: "", radius: 0, origin: null };
+
+/** The point the search measures from (a postcode / my location, or the chosen city's centre), if any */
+export function searchCenter(c: SearchCriteria): [number, number] | null {
+  if (c.origin) return [c.origin.lat, c.origin.lng];
+  return c.area !== ANY_AREA ? CITIES[c.area] ?? null : null;
+}
+/** How far a meal is from the search point, in km (null when there is no point or we don't know where the meal is) */
+export function mealDistance(meal: Meal, c: SearchCriteria): number | null {
+  const centre = searchCenter(c);
+  const at = coordsOf(meal.location);
+  return centre && at ? distanceKm(centre, at) : null;
+}
+/** The radius actually used: a postcode or "my location" always has one (10 km unless chosen) */
+export const effectiveRadius = (c: SearchCriteria) => (c.origin ? c.radius || 10 : c.radius);
 
 function inTimeSlot(time: string, slot: string) {
   if (slot === ANY_TIME) return true;
@@ -470,7 +494,11 @@ function inTimeSlot(time: string, slot: string) {
 
 export function matchesCriteria(meal: Meal, c: SearchCriteria, seatsLeft: number) {
   if (c.service !== "all" && meal.serviceType !== c.service) return false;
-  if (c.area !== ANY_AREA && !meal.location.toLowerCase().includes(c.area.toLowerCase())) return false;
+  const r = effectiveRadius(c);
+  if (r > 0) {
+    const d = mealDistance(meal, c);
+    if (d === null || d > r) return false;
+  } else if (c.area !== ANY_AREA && !meal.location.toLowerCase().includes(c.area.toLowerCase())) return false;
   if (c.date !== ANY_DAY && meal.date !== c.date) return false;
   if (!inTimeSlot(meal.time, c.time)) return false;
   if (seatsLeft < c.guests) return false;

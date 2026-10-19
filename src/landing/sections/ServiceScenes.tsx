@@ -1,5 +1,5 @@
-// Animated illustrations for the "four ways to eat" panels (pure SVG + CSS, animations in landing.css under .sc-*).
-// They only animate while their panel is open (.ws-panel.on).
+// Animated illustrations for the "four ways to eat" specials (pure SVG + CSS, animations in landing.css under .sc-*).
+// Only the scene of the picked way is mounted, served on the plate in LandingServices.
 import { t } from "../../shared/i18n";
 
 const FOOD = { tomato: "#ff5a6e", carrot: "#ffa04d", leaf: "#4fd18b", yolk: "#ffd36b", cream: "#fff6e8" };

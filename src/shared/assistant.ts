@@ -62,7 +62,7 @@ const FAQ: { test: (q: string) => boolean; reply: () => AssistantReply }[] = [
   {
     test: (q) => has(q, "hello", "hi ", "hey", "hallo", "ciao", "servus", "moin", "guten tag") || q.trim() === "hi",
     reply: () => ({
-      text: t("Hi! 👋 I'm the Bite assistant. Tell me what you feel like eating — or ask me anything about how Bite works."),
+      text: t("Good evening! I'm your maître d' at Bite. Tell me what you feel like eating — or ask me anything about how Bite works."),
       chips: [t("Something warm and vegan"), t("Cheap dinner tonight"), t("Is it safe?")],
     }),
   },
@@ -172,13 +172,13 @@ export function answer(input: string): AssistantReply {
   if (has(q, "something else", "etwas anderes")) return { text: t("Sure — tell me a city, a cuisine, a diet or a time of day. For example: “Italian dinner in Munich” or “vegan lunch tomorrow”.") };
 
   return {
-    text: t("I'm still a young assistant 🙂 I can find meals for you (try “vegan dinner in Berlin”) and answer questions about costs, safety, hosting or cancellations."),
+    text: t("I'm still new on the job. I can find meals for you (try “vegan dinner in Berlin”) and answer questions about costs, safety, hosting or cancellations."),
     chips: [t("Something warm and vegan"), t("How does cost sharing work?"), t("Is it safe?")],
   };
 }
 
 /** First message in the chat (a function so it follows the current language) */
 export const greeting = (): AssistantReply => ({
-  text: t("Hi! 👋 I'm the Bite assistant. Looking for something to eat, or curious how Bite works?"),
+  text: t("Welcome to Bite! I'm your maître d'. Looking for a table tonight, or curious how Bite works?"),
   chips: [t("Something warm and vegan"), t("Cheap dinner in Berlin"), t("How does cost sharing work?"), t("Is it safe?")],
 });

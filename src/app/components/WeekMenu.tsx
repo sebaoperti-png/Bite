@@ -1,15 +1,35 @@
 // "Cooking this week" as a restaurant menu: a closed tri-fold menu that unfolds when it scrolls into view
-// (or on click) and then "prints" its dishes line by line, grouped by day. Hovering a dish shows a polaroid.
+// (or on click) and then "prints" its dishes line by line. Each panel is one way to eat — Pick-up,
+// Eat together, Cook together — with a line saying what it means, the dishes soonest first (day as a small
+// tag), and a link to see all of that kind. The panel matching the service picked above is highlighted.
 import { useEffect, useRef, useState } from "react";
-import { ChevronRight, X } from "lucide-react";
-import { dayLabel, euro, type Meal } from "../data";
+import { motion } from "motion/react";
+import { ChevronRight, X, ShoppingBag, Utensils, ChefHat } from "lucide-react";
+import { dayLabel, euro, type Meal, type ServiceType } from "../data";
 import { t, tMaybe, dateLabel } from "../../shared/i18n";
 
 const dayIndex = (label: string) => { for (let i = 0; i < 30; i++) if (dayLabel(i) === label) return i; return 99; };
+const PER_PANEL = 4;
 
-const SERVICE: Record<string, string> = { pickup: "Pick-up", "eat-together": "Eat Together", "cook-together": "Cook Together" };
+const PANELS: { id: ServiceType; title: string; what: string; all: string; Icon: React.ElementType }[] = [
+  { id: "pickup", title: "Pick-up", what: "Collect a home-cooked dish and eat it at home", all: "See all pick-ups", Icon: ShoppingBag },
+  { id: "eat-together", title: "Eat together", what: "Pull up a chair at a neighbour's table", all: "See all tables", Icon: Utensils },
+  { id: "cook-together", title: "Cook together", what: "Cook side by side, then eat what you made", all: "See all cooking evenings", Icon: ChefHat },
+];
 
-export function WeekMenu({ meals, onSelectMeal, onSeeAll }: { meals: Meal[]; onSelectMeal: (m: Meal) => void; onSeeAll: () => void }) {
+/** "Today" / "Tomorrow" stay words; other days become their short weekday ("Thu") */
+const dayTag = (label: string) => {
+  const i = dayIndex(label);
+  if (i <= 1) return dateLabel(label).split(",")[0];
+  return dateLabel(label).split(",")[0].slice(0, 3);
+};
+
+export function WeekMenu({ meals, active, onSelectMeal, onSeeService }: {
+  meals: Meal[];
+  active?: ServiceType;
+  onSelectMeal: (m: Meal) => void;
+  onSeeService: (s: ServiceType) => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
 
@@ -22,10 +42,6 @@ export function WeekMenu({ meals, onSelectMeal, onSeeAll }: { meals: Meal[]; onS
     return () => io.disconnect();
   }, []);
 
-  // Sort by day and time, then split across the three panels of the menu
-  const sorted = meals.slice().sort((a, b) => dayIndex(a.date) - dayIndex(b.date) || a.time.localeCompare(b.time));
-  const per = Math.ceil(sorted.length / 3);
-  const panels = [sorted.slice(0, per), sorted.slice(per, per * 2), sorted.slice(per * 2)];
   let row = 0; // running index for the "printing" delay
 
   return (
@@ -44,43 +60,90 @@ export function WeekMenu({ meals, onSelectMeal, onSeeAll }: { meals: Meal[]; onS
           </span>
         </button>
 
-        {panels.map((list, p) => {
-          let lastDay = "";
+        {PANELS.map(({ id, title, what, all, Icon }, p) => {
+          const list = meals
+            .filter((m) => m.serviceType === id)
+            .sort((a, b) => dayIndex(a.date) - dayIndex(b.date) || a.time.localeCompare(b.time));
+          const shown = list.slice(0, PER_PANEL);
+          const headRow = row++;
           return (
-            <div key={p} className={`wm-panel wm-p${p}`}>
+            <div key={id} className={`wm-panel wm-p${p} ${active === id ? "is-active" : ""}`}>
               <div className="wm-paper">
-                {p === 0 && <div className="wm-head"><span>BITE</span><b>{t("Menu of the week")}</b></div>}
-                {p === 1 && <div className="wm-head"><span>{t("Home-cooked")}</span><b>{t("Neighbours' kitchens")}</b></div>}
-                {p === 2 && <div className="wm-head"><span>{t("Prices per plate")}</span><b>{t("Split fairly")}</b></div>}
-                {list.map((m) => {
-                  const newDay = m.date !== lastDay;
-                  lastDay = m.date;
+                <div className="wm-head" style={{ ["--d" as string]: `${0.85 + headRow * 0.05}s` }}>
+                  <span className="wm-head-icon"><Icon size={18} strokeWidth={2} /></span>
+                  <b>{t(title)}</b>
+                  <p>{t(what)}</p>
+                </div>
+                {shown.length === 0 && <p className="wm-none">{t("Nothing on this part of the menu yet this week.")}</p>}
+                {shown.map((m) => {
                   const i = row++;
                   return (
-                    <div key={m.id}>
-                      {newDay && <div className="wm-day" style={{ ["--d" as string]: `${0.9 + i * 0.12}s` }}>{dateLabel(m.date).split(",")[0]}<i /></div>}
-                      <button className="wm-dish" onClick={() => onSelectMeal(m)} style={{ ["--d" as string]: `${0.95 + i * 0.12}s` }}>
-                        <span className="wm-line">
-                          <b>{tMaybe(m.title)}</b>
-                          <i />
-                          <em>{euro(m.price)}</em>
-                        </span>
-                        <span className="wm-meta">{m.host} · {m.time} · {t(m.location.split(", ").pop() ?? "")} · {t(SERVICE[m.serviceType])}</span>
-                        <img className="wm-pop" src={m.image} alt="" loading="lazy" />
-                      </button>
-                    </div>
+                    <button key={m.id} className="wm-dish" onClick={() => onSelectMeal(m)} style={{ ["--d" as string]: `${0.95 + i * 0.08}s` }}>
+                      <span className="wm-line">
+                        <b>{tMaybe(m.title)}</b>
+                        <i />
+                        <em>{euro(m.price)}</em>
+                      </span>
+                      <span className="wm-meta">
+                        <span className="wm-when">{dayTag(m.date)} {m.time}</span>
+                        {m.host} · {t(m.location.split(", ").pop() ?? "")}
+                      </span>
+                      <img className="wm-pop" src={m.image} alt="" loading="lazy" />
+                    </button>
                   );
                 })}
-                {p === 2 && (
-                  <button className="wm-all" onClick={onSeeAll} style={{ ["--d" as string]: `${1 + meals.length * 0.12}s` }}>
-                    {t("See the full menu")} <ChevronRight size={15} />
-                  </button>
-                )}
+                <button className="wm-all" onClick={() => onSeeService(id)} style={{ ["--d" as string]: `${1 + (headRow + PER_PANEL) * 0.08}s` }}>
+                  {t(all)} {list.length > 0 && <span className="wm-count">{list.length}</span>} <ChevronRight size={15} />
+                </button>
               </div>
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/** Phones: the same menu as one card, with the three ways to eat as tabs (and a small photo per dish, since
+    there is no hover to show it) */
+export function MobileWeekMenu({ meals, active, onSelectMeal, onSeeService }: {
+  meals: Meal[];
+  active?: ServiceType;
+  onSelectMeal: (m: Meal) => void;
+  onSeeService: (s: ServiceType) => void;
+}) {
+  const [tab, setTab] = useState<ServiceType>(active ?? "eat-together");
+  useEffect(() => { if (active) setTab(active); }, [active]);
+  const panel = PANELS.find((p) => p.id === tab)!;
+  const list = meals.filter((m) => m.serviceType === tab).sort((a, b) => dayIndex(a.date) - dayIndex(b.date) || a.time.localeCompare(b.time));
+
+  return (
+    <div className="mwm">
+      <div className="mwm-head"><span>BITE</span><b>{t("Menu of the week")}</b></div>
+      <div className="mwm-tabs" role="tablist">
+        {PANELS.map(({ id, title, Icon }) => (
+          <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? "on" : ""} onClick={() => setTab(id)}>
+            {tab === id && <motion.span layoutId="mwm-pill" className="mwm-pill" transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}
+            <span><Icon size={14} strokeWidth={2.2} /> {t(title)}</span>
+          </button>
+        ))}
+      </div>
+      <p className="mwm-what">{t(panel.what)}</p>
+      <div key={tab}>
+        {list.length === 0 && <p className="wm-none">{t("Nothing on this part of the menu yet this week.")}</p>}
+        {list.slice(0, PER_PANEL).map((m, i) => (
+          <button key={m.id} className="mwm-dish" onClick={() => onSelectMeal(m)} style={{ ["--i" as string]: i }}>
+            <img src={m.image} alt="" loading="lazy" />
+            <span className="mwm-body">
+              <span className="wm-line"><b>{tMaybe(m.title)}</b><i /><em>{euro(m.price)}</em></span>
+              <span className="wm-meta"><span className="wm-when">{dayTag(m.date)} {m.time}</span>{m.host} · {t(m.location.split(", ").pop() ?? "")}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+      <button className="wm-all mwm-all" onClick={() => onSeeService(tab)}>
+        {t(panel.all)} {list.length > 0 && <span className="wm-count">{list.length}</span>} <ChevronRight size={15} />
+      </button>
     </div>
   );
 }

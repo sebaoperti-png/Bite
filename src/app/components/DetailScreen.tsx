@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { ChevronLeft, Star, MapPin, Clock, Users, Heart, Share2, CheckCircle, ChevronDown, ShoppingBag, Utensils, ChefHat, Leaf, MessageCircle, Link2, Mail, Send, ExternalLink, Trash2, ShieldCheck } from "lucide-react";
+import { LikeHeart } from "../../shared/Motion";
+import { Cloche, TableSeats } from "../../shared/Restaurant";
+import { PrepChecklist } from "./PrepChecklist";
+import { ChevronLeft, Star, MapPin, Clock, Users, Heart, Share2, CheckCircle, ChevronDown, ShoppingBag, Utensils, ChefHat, Leaf, MessageCircle, Link2, Mail, Send, ExternalLink, Trash2, ShieldCheck, ConciergeBell } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { withFee, euro, type Meal } from "../data";
 import { useStore, copyText } from "../store";
@@ -69,18 +72,18 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         <Share2 size={15} color="#160a2e" strokeWidth={2} />
       </motion.button>
       <motion.button aria-label={liked ? t("Remove from saved") : t("Save meal")} aria-pressed={liked} className="w-10 h-10 flex items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.92)", boxShadow: isDesktop ? "0 0 0 1px rgba(107,33,217,0.12)" : undefined }} whileTap={{ scale: 0.75 }} onClick={() => store.toggleLike(meal.id)}>
-        <motion.div animate={{ scale: liked ? [1, 1.5, 1] : 1 }} transition={{ duration: 0.28 }}>
-          <Heart size={15} fill={liked ? "#e9345a" : "none"} color={liked ? "#e9345a" : "#160a2e"} strokeWidth={2} />
-        </motion.div>
+          <LikeHeart liked={liked} size={15} />
       </motion.button>
     </div>
   );
 
   const gallery = (height: number, rounded: boolean) => (
     <div className={`relative flex-shrink-0 overflow-hidden ${rounded ? "rounded-3xl" : ""}`} style={{ height }}>
+      <Cloche auto delay={250} className="cl-fill" key={meal.id}>
       <AnimatePresence mode="wait">
         <motion.img key={activeImage} src={images[activeImage]} alt={tMaybe(meal.title)} className="absolute inset-0 w-full h-full object-cover" initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} />
       </AnimatePresence>
+      </Cloche>
       <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(22,10,46,0.3) 0%, transparent 40%, rgba(22,10,46,0.55) 100%)" }} />
       {images.length > 1 && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
@@ -189,6 +192,16 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
   );
 
   const seatsBooked = meal.seats - left;
+  // The table from above (not for pick-up: there is no table to sit at)
+  const tableSeats = meal.serviceType !== "pickup" && !meal.ownedByMe && (
+    <TableSeats
+      seats={meal.seats}
+      taken={seatsBooked}
+      mine={myBooking?.guests ?? 0}
+      hostAvatar={meal.hostAvatar}
+      caption={left === 0 ? t("This table is full") : <><em>{left === 1 ? t("1 seat free") : t("{n} seats free", { n: left })}</em> · {t("{name} sits at the head of the table", { name: meal.host.split(" ")[0] })}</>}
+    />
+  );
   const whoIsComing = meal.ownedByMe && section(t("Who's coming · {booked}/{seats} seats booked", { booked: seatsBooked, seats: meal.seats }), (
     <div className="rounded-2xl overflow-hidden" style={{ background: "#fff", boxShadow: "0 2px 12px rgba(107,33,217,0.07)" }}>
       {guestBookings.length === 0 ? (
@@ -198,7 +211,25 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         </div>
       ) : (
         <AnimatePresence initial={false}>
-          {guestBookings.map((b) => (
+          {guestBookings.map((b) => (store.pending ?? []).includes(b.id) ? (
+            // a neighbour asks to join: the host decides (Beautiful UI "approval card" idea)
+            <motion.div key={b.id} className="rq" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }}>
+              <span className="rq-badge">{t("New request")}</span>
+              <div className="flex items-center gap-3">
+                <img src={b.guest!.avatar} alt="" className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p style={{ fontSize: 14.5, fontWeight: 800, color: "#160a2e" }}>{b.guest!.name}</p>
+                  <p style={{ fontSize: 12, color: "#7c6fa0" }}>{b.guests === 1 ? t("wants to join with 1 seat") : t("wants to join with {n} seats", { n: b.guests })}</p>
+                </div>
+                <span className="rq-chip"><ShieldCheck size={12} /> {t("Verified · ID checked")}</span>
+              </div>
+              {(() => { const hello = store.conversations.find((c) => c.id === b.conversationId)?.messages[0]?.text; return hello ? <p className="rq-msg">“{tMaybe(hello)}”</p> : null; })()}
+              <div className="rq-actions">
+                <motion.button whileTap={{ scale: 0.95 }} className="rq-no" onClick={() => store.answerRequest(b.id, false)}>{t("Decline")}</motion.button>
+                <motion.button whileTap={{ scale: 0.95 }} className="rq-yes" onClick={() => store.answerRequest(b.id, true)}><CheckCircle size={15} /> {t("Accept")}</motion.button>
+              </div>
+            </motion.div>
+          ) : (
             <motion.div key={b.id} className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: "1px solid rgba(107,33,217,0.06)" }} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
               <img src={b.guest!.avatar} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               <div className="flex-1 min-w-0">
@@ -235,7 +266,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
     <div className="rounded-2xl p-4" style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(107,33,217,0.07)" }}>
       <div className="flex items-center gap-2 mb-3">
         <span className="px-2.5 py-1 rounded-full" style={{ fontSize: 12, fontWeight: 800, background: proof.kind === "receipt" ? "#e5f7f0" : "#ede8fb", color: proof.kind === "receipt" ? "#0a7c4e" : "#6b21d9" }}>
-          {proof.kind === "receipt" ? t("🧾 Receipt-backed") : t("🤖 Estimated by Bite")}
+          {proof.kind === "receipt" ? t("Receipt-backed") : t("Estimated by Bite")}
         </span>
         <span style={{ fontSize: 12, color: "#7c6fa0" }}>{proof.kind === "receipt" ? t("Host scanned the grocery receipt") : t("Based on the menu and table size")}</span>
       </div>
@@ -246,7 +277,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         <span style={{ color: "#a99cc8" }}>=</span>
         <span className="px-2.5 py-1 rounded-lg" style={{ background: "#6b21d9", color: "#fff", fontWeight: 900 }}>{t("{price} each", { price: euro(meal.price) })}</span>
       </div>
-      <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 10, lineHeight: 1.5 }}>{t("🔒 Price cap: hosts can't charge more than the real cost per person — nobody makes a profit, everyone eats for less.")}</p>
+      <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 10, lineHeight: 1.5 }}>{t("Price cap: hosts can't charge more than the real cost per person — nobody makes a profit, everyone eats for less.")}</p>
     </div>
   ));
 
@@ -313,7 +344,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
       whileTap={{ scale: 0.97 }}
       whileHover={{ scale: 1.01 }}
     >
-      {meal.ownedByMe ? <Trash2 size={16} color="#e9345a" /> : myBooking ? <MessageCircle size={16} color="#fff" /> : null}
+      {meal.ownedByMe ? <Trash2 size={16} color="#e9345a" /> : myBooking ? <MessageCircle size={16} color="#fff" /> : left > 0 ? <span className="bell"><ConciergeBell size={17} color="#fff" strokeWidth={2.2} /></span> : null}
       <span style={{ color: meal.ownedByMe ? "#e9345a" : "#fff", fontWeight: 800, fontSize: 16 }}>{ctaLabel}</span>
     </motion.button>
   );
@@ -350,6 +381,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
             <div className="flex flex-col gap-7">
               {titleBlock}
               {whoIsComing}
+                {meal.ownedByMe && <PrepChecklist meal={meal} />}
               {hostCard}
               {description}
               {costBox}
@@ -365,6 +397,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
                 </div>
                 <p style={{ fontSize: 13, color: "#7c6fa0" }}>{t("Shares the cost of the ingredients · + 12% Bite service fee")}</p>
                 <div className="my-4">{infoPills}</div>
+                {tableSeats && <div className="mb-4">{tableSeats}</div>}
                 {ctaButton}
                 <p className="flex items-center justify-center gap-1.5 mt-3" style={{ fontSize: 12.5, color: "#7c6fa0" }}>
                   <ShieldCheck size={14} color="#0a7c4e" />{" "}{t("Free cancellation up to 24h before")}</p>
@@ -393,19 +426,25 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
       <div className="flex-1 overflow-y-auto px-5 pt-5 flex flex-col gap-4 [&>*]:flex-shrink-0" style={{ scrollbarWidth: "none" }}>
         {titleBlock}
         {whoIsComing}
+        {meal.ownedByMe && <PrepChecklist meal={meal} />}
         {hostCard}
         {infoPills}
+        {tableSeats}
         {location}
         {dietary}
         {description}
         {costBox}
         {ingredients}
         {reviews}
-        <div style={{ height: 96, flexShrink: 0 }} />
+        <div style={{ height: 116, flexShrink: 0 }} />
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 px-5 pt-4" style={{ background: "linear-gradient(to top, #f5f4f9 75%, transparent)", paddingBottom: "max(env(safe-area-inset-bottom), 20px)" }}>
+      <div className="absolute bottom-0 left-0 right-0 px-5 pt-4" style={{ background: "linear-gradient(to top, #f5f4f9 80%, transparent)", paddingBottom: "max(env(safe-area-inset-bottom), 14px)" }}>
         {ctaButton}
+        {!meal.ownedByMe && (
+          <p className="flex items-center justify-center gap-1.5 mt-2" style={{ fontSize: 11.5, color: "#7c6fa0" }}>
+            <ShieldCheck size={13} color="#0a7c4e" />{" "}{t("Free cancellation up to 24h before")}</p>
+        )}
       </div>
 
       {shareSheet}

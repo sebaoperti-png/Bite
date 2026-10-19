@@ -14,7 +14,8 @@
     "motion": "12.23.24",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "tesseract.js": "^5.1.1"
+    "tesseract.js": "^5.1.1",
+    "thinking-orbs": "^0.3.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",

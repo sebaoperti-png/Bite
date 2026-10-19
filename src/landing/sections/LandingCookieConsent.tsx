@@ -1,5 +1,6 @@
 // COOKIE CONSENT (converted from the original design; edit freely)
 import { asset } from "../asset";
+import { Arrowed } from "../../shared/Motion";
 import { t } from "../../shared/i18n";
 
 export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnalytics, prefFunctional, prefMarketing, rejectAll, savePrefs, showCookies, showPrefs, toggleAnalytics, toggleFunctional, toggleMarketing }: any) {
@@ -8,22 +9,29 @@ export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnal
       {showCookies && (
         <>
           <div style={{ position: "fixed", inset: "0", zIndex: "900", background: "rgba(9,3,15,0.5)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-            <div style={{ width: "100%", maxWidth: "560px", margin: "18px", background: "#fff", borderRadius: "22px", boxShadow: "0 30px 70px rgba(9,3,15,0.4)", overflow: "hidden" }}>
+            <div className="cc-card" style={{ width: "100%", maxWidth: "560px", margin: "18px", background: "#fffdf7", borderRadius: "22px", boxShadow: "0 30px 70px rgba(9,3,15,0.4)", overflow: "hidden" }}>
               <div style={{ padding: "26px 26px 20px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-                  <span style={{ display: "inline-flex" }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b21d9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 3l7 2.5v5c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9v-5L12 3z" />
-                      <path d="M9 12l2 2 4-4" />
-                    </svg>
-                  </span>
-                  {" "}
-                  <h3 style={{ fontSize: "19px", fontWeight: "900", margin: "0", letterSpacing: "-0.02em", color: "#160a2e" }}>{t("Your privacy, your choice")}</h3>
+                <div className="cc-head">
+                  {/* a biscuit with a bite taken out of it */}
+                  <svg className="cc-biscuit" viewBox="0 0 64 64" aria-hidden>
+                    <defs><mask id="cc-bite"><rect width="64" height="64" fill="#fff" /><circle cx="56" cy="12" r="9" /><circle cx="47" cy="5" r="7" /><circle cx="61" cy="22" r="7" /></mask></defs>
+                    <g mask="url(#cc-bite)">
+                      <circle cx="32" cy="32" r="27" fill="#e3b77a" />
+                      <circle cx="32" cy="32" r="27" fill="none" stroke="#c9944f" strokeWidth="2.5" />
+                      <ellipse cx="22" cy="24" rx="4" ry="3" fill="#5b3a26" /><ellipse cx="38" cy="40" rx="4.5" ry="3.2" fill="#5b3a26" />
+                      <ellipse cx="24" cy="43" rx="3" ry="2.4" fill="#5b3a26" /><ellipse cx="40" cy="22" rx="3" ry="2.2" fill="#5b3a26" /><ellipse cx="31" cy="33" rx="2.4" ry="2" fill="#5b3a26" />
+                    </g>
+                    <circle className="cc-crumb c1" cx="58" cy="30" r="1.6" fill="#c9944f" /><circle className="cc-crumb c2" cx="52" cy="22" r="1.2" fill="#c9944f" />
+                  </svg>
+                  <div>
+                    <h3>{t("Before you order…")}</h3>
+                    <span>{t("a word about cookies — the digital kind")}</span>
+                  </div>
                 </div>
                 {" "}
                 <p style={{ fontSize: "14px", lineHeight: "1.6", color: "#5c4a7c", margin: "0 0 6px" }}>{t("We use strictly necessary cookies to run Bite. With your consent we also use functional, analytics and marketing cookies to improve the experience. You can change this anytime under Cookie settings.")}</p>
                 {" "}
-                <a href="legal.html#cookies" style={{ fontSize: "13px", fontWeight: "700" }}>{t("Read our Cookie Policy →")}</a>
+                <a className="lm" href="legal.html#cookies" style={{ fontSize: "13px", fontWeight: "700" }}><Arrowed text={t("Read our Cookie Policy →")} /></a>
                 {" "}
                 {showPrefs && (
                   <>

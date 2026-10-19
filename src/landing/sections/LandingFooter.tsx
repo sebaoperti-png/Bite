@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { asset } from "../asset";
 import { LogoWord } from "./LogoWord";
+import { Course } from "../../shared/Restaurant";
 import { t } from "../../shared/i18n";
 
 const CRUMBS = Array.from({ length: 16 }, (_, i) => {
@@ -36,11 +37,12 @@ function FooterWordmark() {
 export function LandingFooter() {
   return (
     <>
-      <footer className="ft-fade" style={{ padding: "230px 24px 0", overflow: "hidden" }}>
+      <footer className="ft-fade" style={{ padding: "230px 24px 0", overflow: "hidden", position: "relative", isolation: "isolate", ["--dust-top" as string]: "260px", ["--dust-bottom" as string]: "0px" }}>
+        <div className="chalk-dust" aria-hidden />
         <div style={{ maxWidth: "1160px", margin: "0 auto" }}>
           {/* Closing statement, sitting in the fade so the footer starts with something to read */}
           <div className="ft-hero">
-            <span className="ft-eyebrow">{t("food is better shared")}</span>
+            <Course n={8} name={t("Coffee & the bill")} light size={28}>{t("food is better shared")}</Course>
             <h2 className="ft-title">{t("See you at the table.")}</h2>
             <p className="ft-sub">{t("Bite is a young startup building a new way to eat with your neighbours. Try the demo, tell us what you think, or just say hi.")}</p>
             <div className="ft-ctas">
@@ -67,21 +69,21 @@ export function LandingFooter() {
             </div>
             {" "}
             <div>
-              <h4 style={{ fontSize: "14px", fontWeight: "800", color: "#fff", letterSpacing: "0.08em", margin: "0 0 18px" }}>{t("PRODUCT")}</h4>
+              <h4 className="ft-h4">{t("PRODUCT")}</h4>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#how" style={{ fontSize: "16px", color: "#a897c8" }}>{t("How it works")}</a>
                 {" "}
                 <a href="#services" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Ways to eat")}</a>
                 {" "}
-                <a href="#become-host" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Become a host")}</a>
+                <a href="#cooks" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Become a host")}</a>
                 {" "}
                 <a href="#waitlist" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Stay updated")}</a>
               </div>
             </div>
             {" "}
             <div>
-              <h4 style={{ fontSize: "14px", fontWeight: "800", color: "#fff", letterSpacing: "0.08em", margin: "0 0 18px" }}>{t("SUPPORT")}</h4>
+              <h4 className="ft-h4">{t("SUPPORT")}</h4>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#help" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Help Center")}</a>
@@ -97,7 +99,7 @@ export function LandingFooter() {
             </div>
             {" "}
             <div>
-              <h4 style={{ fontSize: "14px", fontWeight: "800", color: "#fff", letterSpacing: "0.08em", margin: "0 0 18px" }}>{t("LEGAL")}</h4>
+              <h4 className="ft-h4">{t("LEGAL")}</h4>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="legal.html#terms" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Terms of Service")}</a>
@@ -115,16 +117,19 @@ export function LandingFooter() {
             </div>
           </div>
           {" "}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "14px", paddingTop: "28px" }}>
-            <span style={{ fontSize: "13px", color: "#8b7bb5" }}>{t("© 2026 Bite · Germany")}</span>
-            {" "}
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-              <a href="#" data-cookie-settings="1" style={{ fontSize: "13px", color: "#8b7bb5" }}>{t("Cookie settings")}</a>
-              {" "}
-              <a href="legal.html#accessibility" style={{ fontSize: "13px", color: "#8b7bb5" }}>{t("Accessibility")}</a>
-              {" "}
-              <a href="legal.html#slavery" style={{ fontSize: "13px", color: "#8b7bb5" }}>{t("Modern Slavery Statement")}</a>
+          {/* the bill: a receipt torn off at the bottom of the dinner */}
+          <div className="ft-bill">
+            <div className="ft-bill-row">
+              <span>{t("TABLE 01 · SERVICE INCLUDED")}</span>
+              <b>{t("Thank you for visiting")}</b>
+              <span>{t("© 2026 Bite · Germany")}</span>
             </div>
+            <div className="ft-bill-links">
+              <a href="#" data-cookie-settings="1">{t("Cookie settings")}</a>
+              <a href="legal.html#accessibility">{t("Accessibility")}</a>
+              <a href="legal.html#slavery">{t("Modern Slavery Statement")}</a>
+            </div>
+            <div className="ft-bill-total"><span>{t("Total")}</span><i /><b>{t("a seat at the table")}</b></div>
           </div>
         </div>
         <FooterWordmark />

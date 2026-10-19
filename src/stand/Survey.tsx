@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { QUESTIONS, UI, type Lang } from "./questions";
 import { saveEntry, startAutoSync, localResponses, outboxSize, flush, clearDevice, toCsv } from "./store";
 import { FORMS_ENDPOINT } from "../shared/forms";
+import { ThinkingOrb } from "thinking-orbs";
 
 const params = new URLSearchParams(window.location.search);
 const KIOSK = params.has("kiosk");
@@ -9,6 +10,7 @@ const SOURCE = params.get("ref") || (KIOSK ? "stand-tablet" : "direct");
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const RESET_AFTER = 12;      // seconds on the thank-you screen (kiosk)
 const IDLE_RESET = 75_000;   // abandoned survey goes back to the start (kiosk)
+const ATTRACT_AFTER = 20_000; // start page untouched this long → the "waiting" screen (kiosk)
 
 type Step = "start" | number | "contact" | "thanks";
 const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -34,6 +36,17 @@ export function Survey() {
   const t = UI[lang];
 
   useEffect(() => startAutoSync(), []);
+
+  // Kiosk: when nobody has touched the tablet for a while on the start page, show the "waiting" screen
+  const [waiting, setWaiting] = useState(KIOSK);
+  useEffect(() => {
+    if (!KIOSK || step !== "start" || waiting) return;
+    let id = window.setTimeout(() => setWaiting(true), ATTRACT_AFTER);
+    const poke = () => { window.clearTimeout(id); id = window.setTimeout(() => setWaiting(true), ATTRACT_AFTER); };
+    window.addEventListener("pointerdown", poke);
+    return () => { window.clearTimeout(id); window.removeEventListener("pointerdown", poke); };
+  }, [step, waiting]);
+  const todayCount = localResponses().filter((r) => new Date(r.at).toDateString() === new Date().toDateString()).length;
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
 
   // The current page of the pad tears off, then the next one is shown
@@ -111,6 +124,16 @@ export function Survey() {
 
   return (
     <div className="st-page">
+      {waiting && step === "start" && (
+        <button className="st-attract" onClick={() => { setWaiting(false); go(0); }} aria-label={t.start}>
+          <span className="st-attract-orb"><ThinkingOrb state="breathing" size={64} theme="dark" /></span>
+          <span className="st-attract-eyebrow">{t.eyebrow}</span>
+          <span className="st-attract-title">{t.attractTitle}</span>
+          <span className="st-attract-sub">{t.attractSub}</span>
+          {todayCount > 0 && <span className="st-attract-count">{t.attractCount(todayCount)}</span>}
+          <span className="st-attract-tap">{t.attractTap}</span>
+        </button>
+      )}
       <Decor />
       <header className="st-top">
         <button className="st-logo" onClick={tapLogo} aria-label="Bite">

@@ -7,6 +7,8 @@ import { useStore, type Booking } from "../store";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
 import { t, tMaybe, dateLabel } from "../../shared/i18n";
+import { ThinkingOrb } from "thinking-orbs";
+import { SpinningText, SuccessCheck } from "../../shared/Motion";
 
 
 /** Booking step between the meal page and the confirmation chat: guests, note to host, price, (demo) payment. */
@@ -19,6 +21,9 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
   const [agree, setAgree] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
+  const [booked, setBooked] = useState<Booking | null>(null);
+  const [shake, setShake] = useState(0); // bumps to replay the "you forgot the terms" shake
+  const [tip, setTip] = useState(false);
 
   const subtotal = meal.price * guests;
   const fees = Math.round(feeFor(meal.price) * guests * 100) / 100;
@@ -26,14 +31,16 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
   const unit = meal.serviceType === "pickup" ? "order" : meal.serviceType === "eat-together" ? "seat" : "spot";
 
   const pay = () => {
-    if (!agree) { setError(t("Please accept the booking terms to continue.")); return; }
+    if (!agree) { setError(t("Please accept the booking terms to continue.")); setShake((n) => n + 1); return; }
     if (guests > left) { setError(t("Not enough seats left.")); return; }
     setError("");
     setPaying(true);
     setTimeout(() => {
       const b = store.book(meal, guests, note);
-      confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 }, colors: ["#6b21d9", "#b87fff", "#ffffff", "#9b4aff"] });
-      onBooked(b);
+      // the "table booked" moment: drawn check + confetti, then on to the chat with the host
+      setBooked(b);
+      window.setTimeout(() => confetti({ particleCount: 110, spread: 80, origin: { y: 0.42 }, colors: ["#6b21d9", "#b87fff", "#ffffff", "#9b4aff", "#0a9c62"] }), 250);
+      window.setTimeout(() => onBooked(b), 2000);
     }, 1100);
   };
 
@@ -52,10 +59,31 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
       </div>
       <div className="px-4 pb-4 pt-1" style={{ borderTop: "1px solid rgba(107,33,217,0.07)" }}>
         <Line label={`${euro(meal.price)} × ${guests === 1 ? t(`1 ${unit}`) : t(`{n} ${unit}s`, { n: guests })}`} value={euro(subtotal)} />
-        <Line label={t("Bite service fee (12%)")} value={euro(fees)} />
+        <div className="flex items-center justify-between py-1.5">
+          <span className="flex items-center gap-1.5" style={{ fontSize: 13, color: "#7c6fa0" }}>
+            {t("Bite service fee (12%)")}
+            <span className="tip-wrap" onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
+              <button type="button" className="tip-btn" aria-label={t("What is the service fee for?")} aria-expanded={tip} onClick={() => setTip((v) => !v)} onBlur={() => setTip(false)}>?</button>
+              <span className={`tip ${tip ? "on" : ""}`} role="tooltip">{t("It keeps every dinner safe: in-app payments, host checks, insurance and support. Your host gets the full contribution for the groceries.")}</span>
+            </span>
+          </span>
+          <span style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{euro(fees)}</span>
+        </div>
         <div className="flex items-center justify-between pt-3 mt-2" style={{ borderTop: "1px dashed rgba(107,33,217,0.15)" }}>
           <span style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{t("Total")}</span>
-          <motion.span key={total} initial={{ scale: 1.15 }} animate={{ scale: 1 }} style={{ fontSize: 20, fontWeight: 900, color: "#6b21d9" }}>{euro(total)}</motion.span>
+          <span style={{ fontSize: 20, fontWeight: 900, color: "#6b21d9" }}><SpinningText text={euro(total)} cell={26} /></span>
+        </div>
+        {/* where the money goes: a small ring, host share vs Bite fee */}
+        <div className="split-ring">
+          <svg viewBox="0 0 42 42" aria-hidden>
+            <circle cx="21" cy="21" r="15.9" className="sr-track" />
+            <circle cx="21" cy="21" r="15.9" className="sr-host" pathLength={100} style={{ strokeDasharray: `${(subtotal / total) * 100} 100` }} />
+            <circle cx="21" cy="21" r="15.9" className="sr-fee" pathLength={100} style={{ strokeDasharray: `${(fees / total) * 100} 100`, strokeDashoffset: -(subtotal / total) * 100 }} />
+          </svg>
+          <div>
+            <p><i className="dot host" /><b>{euro(subtotal)}</b> {t("to {name} for the groceries", { name: meal.host.split(" ")[0] })}</p>
+            <p><i className="dot fee" /><b>{euro(fees)}</b> {t("to Bite, to keep it safe")}</p>
+          </div>
         </div>
         <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 6 }}>{t("Your contribution covers the ingredients — not a restaurant bill. Free cancellation up to 24h before.")}</p>
       </div>
@@ -104,8 +132,9 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
           </div>
           <CheckCircle size={18} color="#6b21d9" />
         </div>
-        <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
-          <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setError(""); }} className="mt-0.5 w-4 h-4 accent-[#6b21d9]" />
+        <label key={shake} className={`flex items-start gap-2.5 mt-3 cursor-pointer terms ${shake ? "shake" : ""} ${error ? "is-error" : ""}`}>
+          <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setError(""); }} className="tick-input" />
+          <span className="tick-box" aria-hidden><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" /></svg></span>
           <span style={{ fontSize: 12.5, color: "#4a3a6e", lineHeight: 1.5 }}>{t("I agree to the")}{" "}<a href="legal.html#terms" target="_blank" rel="noopener" style={{ color: "#6b21d9", fontWeight: 700 }}>{t("booking terms")}</a>{" "}{t("and the host's house rules.")}</span>
         </label>
         <AnimatePresence>
@@ -127,7 +156,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
     >
       {paying ? (
         <>
-          <motion.span className="w-4 h-4 rounded-full border-2 border-white" style={{ borderTopColor: "transparent" }} animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} />
+          <ThinkingOrb state="working" size={20} theme="dark" aria-label={t("Confirming…")} />
           <span style={{ color: "#fff", fontWeight: 800, fontSize: 15 }}>{t("Confirming…")}</span>
         </>
       ) : (
@@ -145,7 +174,14 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
   );
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex flex-col h-full relative" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+      {booked && (
+        <div className="bk-done" role="status">
+          <SuccessCheck size={84} />
+          <h2>{t("Your table is booked!")}</h2>
+          <p>{t("{meal} with {name}, {date} · {time}", { meal: tMaybe(meal.title), name: meal.host, date: dateLabel(meal.date), time: meal.time })}</p>
+        </div>
+      )}
       {!isDesktop && <div style={{ height: "max(env(safe-area-inset-top), 14px)", background: "#fff", flexShrink: 0 }} />}
       <div className={isDesktop ? "mx-auto w-full max-w-[1040px] px-8 pt-8" : "px-4 pt-2 pb-3 flex items-center gap-3"} style={isDesktop ? undefined : { background: "#fff", borderBottom: "1px solid rgba(107,33,217,0.08)" }}>
         <div className="flex items-center gap-3">

@@ -6,6 +6,8 @@ import { useStore, timeLabel, type ChatMessage } from "../store";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
 import { t, tMaybe, dateLabel } from "../../shared/i18n";
+import { ThinkingOrb } from "thinking-orbs";
+import { StreamText } from "../../shared/Motion";
 
 const QUICK_REPLIES = [
   { icon: Leaf,   label: "I'm vegetarian" },
@@ -112,7 +114,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
       <AnimatePresence initial={false}>
         {conv.messages.map((msg) => (
           <motion.div key={msg.id} initial={{ opacity: 0, y: 12, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 380, damping: 28 }}>
-            <ChatBubble message={msg} avatar={conv.avatar} />
+            <ChatBubble message={msg} avatar={conv.avatar} stream={msg.sender === "them" && Date.now() - msg.at < 1500} />
           </motion.div>
         ))}
       </AnimatePresence>
@@ -120,10 +122,9 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
         {typing && (
           <motion.div className="flex items-end gap-2" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <img src={conv.avatar} alt="" className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
-            <div className="flex items-center gap-1 px-4 py-3 rounded-2xl" style={{ background: "#ffffff", borderBottomLeftRadius: 6 }}>
-              {[0, 1, 2].map((i) => (
-                <motion.div key={i} className="w-2 h-2 rounded-full" style={{ background: "#c4b8de" }} animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 0.7, repeat: Infinity, delay: i * 0.18 }} />
-              ))}
+            <div className="ch-typing">
+              <ThinkingOrb state="composing" size={20} theme="light" aria-label={t("{name} is writing…", { name: conv.name.split(" ")[0] })} />
+              <span>{t("{name} is writing…", { name: conv.name.split(" ")[0] })}</span>
             </div>
           </motion.div>
         )}
@@ -209,7 +210,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   );
 }
 
-function ChatBubble({ message, avatar }: { message: ChatMessage; avatar: string }) {
+function ChatBubble({ message, avatar, stream = false }: { message: ChatMessage; avatar: string; stream?: boolean }) {
   const isMe = message.sender === "me";
   return (
     <div className={`flex items-end gap-2 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
@@ -224,7 +225,7 @@ function ChatBubble({ message, avatar }: { message: ChatMessage; avatar: string 
             boxShadow: isMe ? "0 2px 12px rgba(107,33,217,0.28)" : "0 2px 8px rgba(107,33,217,0.06)",
           }}
         >
-          <p style={{ fontSize: 14, color: isMe ? "#fff" : "#160a2e", lineHeight: 1.5, overflowWrap: "anywhere" }}>{tMaybe(message.text)}</p>
+          <p style={{ fontSize: 14, color: isMe ? "#fff" : "#160a2e", lineHeight: 1.5, overflowWrap: "anywhere" }}><StreamText text={tMaybe(message.text)} play={stream} /></p>
         </div>
         <p className={`mt-1 ${isMe ? "text-right" : "text-left"}`} style={{ fontSize: 10, color: "#7c6fa0" }}>
           {timeLabel(message.at)}{isMe && <span style={{ marginLeft: 4, color: "#9b4aff" }}>✓✓</span>}

@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import { Survey } from "./Survey";
 import { Results } from "./Results";
 import "../shared/fonts.css";
+import "../shared/motion.css";
+import "../shared/restaurant.css";
 import "./stand.css";
 
 // stand.html          → survey (phones, from the QR code)

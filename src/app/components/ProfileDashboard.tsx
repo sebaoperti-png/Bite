@@ -4,11 +4,12 @@
 // what the user does in the demo (booking a meal, publishing one, guests joining).
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { Pencil, Share2, ChefHat, ArrowRight, ChevronRight, Lock, Utensils, Star, Leaf, Globe2, Check } from "lucide-react";
+import { Pencil, Share2, ChefHat, ArrowRight, ChevronRight, Lock, Utensils, Star, Leaf, Globe2, Check, Camera } from "lucide-react";
 import { dayLabel, euro, type Meal } from "../data";
 import { useStore } from "../store";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
+import { usePhotoPicker } from "./Avatar";
 import { t, tMaybe, dateLabel, dec, getLang } from "../../shared/i18n";
 
 export interface ProfileRow { Icon: React.ElementType; label: string; sub: string; onClick: () => void }
@@ -133,18 +134,26 @@ function TrustSticker({ score }: { score: number }) {
   );
 }
 
-/** Initial on a plate, with fork and knife either side */
-function PlateAvatar({ letter }: { letter: string }) {
+/** On the plate, a disc that turns like a plate being spun: your photo on one side, your initial on the other
+    (no photo yet: the other side invites you to add one). Click it, or the camera, to choose a photo. */
+function PlateAvatar({ letter, photo, onPick }: { letter: string; photo?: string; onPick: () => void }) {
   return (
-    <div className="pd-plate" aria-hidden>
-      <svg viewBox="0 0 200 140">
+    <div className="pd-plate">
+      <svg viewBox="0 0 200 140" aria-hidden>
         <path className="pd-fork" d="M22 26v30M15 26v16a7 7 0 0 0 14 0V26M22 56v60" />
         <path className="pd-knife" d="M178 26c-8 0-11 20-11 34h11v56" />
         <circle cx="100" cy="70" r="62" fill="#fff" />
         <circle cx="100" cy="70" r="62" fill="none" stroke="rgba(107,33,217,0.14)" strokeWidth="2" />
         <circle cx="100" cy="70" r="46" fill="none" stroke="rgba(107,33,217,0.1)" strokeWidth="2" />
       </svg>
-      <span>{letter}</span>
+      <button type="button" className={`pd-disc ${photo ? "has-photo" : ""}`} onClick={onPick} aria-label={photo ? t("Change profile photo") : t("Add a profile photo")}>
+        {/* key: a new photo restarts the spin, so it lands on the photo side first */}
+        <span className="pd-disc-inner" key={photo ? photo.length : 0}>
+          <span className="pd-face front">{photo ? <img src={photo} alt="" /> : letter}</span>
+          <span className="pd-face back">{photo ? letter : <><Camera size={20} strokeWidth={2} /><em>{t("Add photo")}</em></>}</span>
+        </span>
+      </button>
+      <button type="button" className="pd-cam" onClick={onPick} aria-label={photo ? t("Change profile photo") : t("Add a profile photo")}><Camera size={15} strokeWidth={2.4} /></button>
     </div>
   );
 }
@@ -166,6 +175,7 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
   const isDesktop = useIsDesktop();
   const store = useStore();
   const { profile } = store;
+  const picker = usePhotoPicker();
 
   /* ── Demo numbers: a believable history + what happened in this demo ── */
   const myBookings = store.bookings.filter((b) => !b.guest && b.status === "confirmed");
@@ -200,7 +210,8 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
     <div className={`pd ${isDesktop ? "pd-desk" : ""}`}>
       {/* ── Place card: "Reserved for" ── */}
       <section className="pd-placecard">
-        <PlateAvatar letter={profile.name.charAt(0)} />
+        <PlateAvatar letter={profile.name.charAt(0)} photo={profile.photo} onPick={picker.open} />
+        {picker.input}
         <div className="pd-pc-body">
           <span className="pd-pc-eyebrow">{t("Reserved for")}</span>
           <h1>{profile.name}</h1>
@@ -263,7 +274,7 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
                 <span className="pp-back">
                   <span className="pp-page-title">{t("Holder")}</span>
                   <span className="pp-id">
-                    <span className="pp-photo">{profile.name.charAt(0)}</span>
+                    <span className="pp-photo">{profile.photo ? <img src={profile.photo} alt="" /> : profile.name.charAt(0)}</span>
                     <span className="pp-fields">
                       <span><em>{t("Name")}</em><b>{profile.name}</b></span>
                       <span><em>{t("Lives in")}</em><b>{localPlace(profile.neighbourhood)}</b></span>

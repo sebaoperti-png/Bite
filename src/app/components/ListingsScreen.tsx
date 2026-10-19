@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { placeSummary, fmtKm } from "./LocationPicker";
+import { BiteLoader, EmptyPlate } from "../../shared/Restaurant";
+import { LikeHeart } from "../../shared/Motion";
 import {
   ChevronLeft, Star, SlidersHorizontal, Heart, MapPin, Search,
   ShoppingBag, Utensils, ChefHat, X, Check, Wheat, Fish,
   Milk, Egg, Nut, Leaf, FlameKindling, Sprout, ArrowUpDown,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { ANY_AREA, ANY_DAY, ANY_TIME, DEFAULT_CRITERIA, matchesCriteria, euro, type Meal, type ServiceType, type SearchCriteria } from "../data";
+import { ANY_AREA, ANY_DAY, ANY_TIME, DEFAULT_CRITERIA, matchesCriteria, mealDistance, searchCenter, euro, type Meal, type ServiceType, type SearchCriteria } from "../data";
 import { BottomNav, SheetHeader } from "./HomeScreen";
 import type { NavTab } from "./DesktopTopBar";
 import { Sheet } from "./Sheet";
@@ -54,15 +57,26 @@ interface ListingsScreenProps {
   onBack: () => void;
   onSelect: (m: Meal) => void;
   onNavigate: (tab: NavTab) => void;
+  searchedAt?: number;
 }
 
-export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavigate }: ListingsScreenProps) {
+export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavigate, searchedAt = 0 }: ListingsScreenProps) {
   const isDesktop = useIsDesktop();
   const store = useStore();
   const [showFilters, setShowFilters]   = useState(false);
   const [dietary, setDietary]           = useState<Set<string>>(new Set());
   const [allergens, setAllergens]       = useState<Set<string>>(new Set());
-  const [sort, setSort]                 = useState<"default" | "price" | "rating">("default");
+  const [sort, setSort]                 = useState<"default" | "distance" | "price" | "rating">("default");
+  // "Kitchen check": a short reasoning moment when the screen opens straight after a search
+  const [ghost, setGhost] = useState(""); // the text that dissolves when the search is cleared
+  const [checking, setChecking] = useState(() => Date.now() - searchedAt < 1500);
+  const [checkStep, setCheckStep] = useState(0);
+  useEffect(() => {
+    if (!checking) return;
+    const ids = [380, 760, 1140].map((ms, i) => window.setTimeout(() => setCheckStep(i + 1), ms));
+    ids.push(window.setTimeout(() => setChecking(false), 1600));
+    return () => ids.forEach((id) => window.clearTimeout(id));
+  }, [checking]);
 
   const set = (patch: Partial<SearchCriteria>) => setCriteria((c) => ({ ...c, ...patch }));
   const toggleSet = (s: Set<string>, id: string): Set<string> => {
@@ -77,12 +91,12 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
     .filter((m) => matchesCriteria(m, criteria, store.seatsLeft(m)))
     .filter((m) => [...dietary, ...allergens].every((f) => m.tags.includes(f)))
     .slice()
-    .sort((a, b) => sort === "price" ? a.price - b.price : sort === "rating" ? b.rating - a.rating : 0);
+    .sort((a, b) => sort === "price" ? a.price - b.price : sort === "rating" ? b.rating - a.rating : sort === "distance" ? (mealDistance(a, criteria) ?? 1e9) - (mealDistance(b, criteria) ?? 1e9) : 0);
 
   // Search criteria coming from Home, shown as removable chips
   const criteriaChips: { label: string; clear: () => void }[] = [
     criteria.cuisine && { label: t(criteria.cuisine), clear: () => set({ cuisine: null }) },
-    criteria.area !== ANY_AREA && { label: t(criteria.area), clear: () => set({ area: ANY_AREA }) },
+    (criteria.area !== ANY_AREA || criteria.origin) && { label: placeSummary(criteria, ""), clear: () => set({ area: ANY_AREA, origin: null, radius: 0 }) },
     criteria.date !== ANY_DAY && { label: dateLabel(criteria.date), clear: () => set({ date: ANY_DAY }) },
     criteria.time !== ANY_TIME && { label: t(criteria.time).split(" · ")[0], clear: () => set({ time: ANY_TIME }) },
     criteria.guests > 1 && { label: t("{n}+ seats", { n: criteria.guests }), clear: () => set({ guests: 1 }) },
@@ -90,12 +104,14 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
 
   const clearFilters = () => { setDietary(new Set()); setAllergens(new Set()); };
   const clearEverything = () => { clearFilters(); setCriteria(() => DEFAULT_CRITERIA); };
-  const sortLabel = sort === "price" ? t("Price") : sort === "rating" ? t("Rating") : t("Sort");
-  const cycleSort = () => setSort((s) => s === "default" ? "price" : s === "price" ? "rating" : "default");
+  const sortLabel = sort === "price" ? t("Price") : sort === "rating" ? t("Rating") : sort === "distance" ? t("Nearest") : t("Sort");
+  // "Nearest" joins the cycle only when there is a place to measure from
+  const cycleSort = () => setSort((s) => s === "default" ? (searchCenter(criteria) ? "distance" : "price") : s === "distance" ? "price" : s === "price" ? "rating" : "default");
 
   const searchBox = (
-    <div className="flex items-center gap-2 px-3.5 rounded-2xl" style={{ background: isDesktop ? "#fff" : "#f5f4f9", border: "1.5px solid rgba(107,33,217,0.12)", height: isDesktop ? 46 : 40 }}>
+    <div className="relative flex items-center gap-2 px-3.5 rounded-2xl" style={{ background: isDesktop ? "#fff" : "#f5f4f9", border: "1.5px solid rgba(107,33,217,0.12)", height: isDesktop ? 46 : 40 }}>
       <Search size={16} color="#7c6fa0" />
+      {ghost && <span key={ghost} className="clear-ghost" aria-hidden onAnimationEnd={() => setGhost("")} style={{ fontSize: isDesktop ? 14.5 : 13.5 }}>{ghost.split("").map((c, i) => <i key={i} style={{ ["--i" as string]: i }}>{c}</i>)}</span>}
       <input
         value={criteria.query}
         onChange={(e) => set({ query: e.target.value })}
@@ -105,7 +121,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
         style={{ fontSize: isDesktop ? 14.5 : 13.5, color: "#160a2e" }}
       />
       {criteria.query && (
-        <button onClick={() => set({ query: "" })} aria-label={t("Clear search")} className="p-1"><X size={14} color="#7c6fa0" /></button>
+        <button onClick={() => { setGhost(criteria.query); set({ query: "" }); }} aria-label={t("Clear search")} className="p-1"><X size={14} color="#7c6fa0" /></button>
       )}
     </div>
   );
@@ -129,9 +145,27 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
     </div>
   );
 
+  const checkLines = [
+    t("Checking tonight's kitchens"),
+    criteria.cuisine ? t("Looking for {what}", { what: t(criteria.cuisine).toLowerCase() }) : t("Matching your day, time and guests"),
+    filtered.length === 1 ? t("Found 1 table") : t("Found {n} tables", { n: filtered.length }),
+  ];
+  const kitchenCheck = (
+    <div className="kc" role="status">
+      <BiteLoader size={64} />
+      <ol>
+        {checkLines.map((l, i) => i <= checkStep && (
+          <li key={l} className={i < checkStep ? "done" : "now"}>
+            {i < checkStep ? <svg viewBox="0 0 16 16" aria-hidden><path d="M3 8.5l3 3 7-7" /></svg> : <i />}{l}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+
   const empty = (
     <div className="flex flex-col items-center justify-center py-16 gap-3 rounded-3xl" style={{ background: isDesktop ? "#fff" : "transparent" }}>
-      <Utensils size={36} color="#c4b8de" strokeWidth={1.2} />
+      <EmptyPlate size={96} />
       <p style={{ color: "#7c6fa0", fontWeight: 600, fontSize: 14.5, textAlign: "center" }}>{t("No meals match your search")}</p>
       <button onClick={clearEverything} className="px-4 py-2 rounded-full" style={{ background: "#ede8fb", fontSize: 13, color: "#6b21d9", fontWeight: 700 }}>{t("Show all meals")}</button>
     </div>
@@ -165,7 +199,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
           <section className="flex flex-col gap-4">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p style={{ fontSize: 14, color: "#7c6fa0", fontWeight: 600 }}>{t("{area} · this week", { area: t(criteria.area) })}</p>
+                <p style={{ fontSize: 14, color: "#7c6fa0", fontWeight: 600 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
                 <h1 style={{ fontSize: 30, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.02em" }}>
                   {filtered.length === 1 ? t("1 meal available") : t("{n} meals available", { n: filtered.length })}</h1>
               </div>
@@ -176,11 +210,11 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
             </div>
             {searchBox}
             {chips}
-            {filtered.length === 0 ? empty : (
+            {checking ? kitchenCheck : filtered.length === 0 ? empty : (
               <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((meal, i) => (
                   <motion.div key={meal.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03 }}>
-                    <MealCard meal={meal} onSelect={onSelect} />
+                    <MealCard meal={meal} onSelect={onSelect} distance={mealDistance(meal, criteria)} />
                   </motion.div>
                 ))}
               </div>
@@ -202,7 +236,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
             <ChevronLeft size={18} color="#6b21d9" strokeWidth={2.5} />
           </motion.button>
           <div className="flex-1">
-            <p style={{ fontSize: 11, color: "#7c6fa0", fontWeight: 500 }}>{t("{area} · this week", { area: t(criteria.area) })}</p>
+            <p style={{ fontSize: 11, color: "#7c6fa0", fontWeight: 500 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
             <p style={{ fontSize: 16, fontWeight: 700, color: "#160a2e" }}>{filtered.length === 1 ? t("1 meal available") : t("{n} meals available", { n: filtered.length })}</p>
           </div>
           <div className="flex gap-2">
@@ -235,14 +269,15 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
 
       {/* Meal list */}
       <div className="flex-1 overflow-y-auto px-4 py-4" style={{ scrollbarWidth: "none" }}>
+        {checking && kitchenCheck}
         <AnimatePresence>
-          {filtered.map((meal, i) => (
+          {!checking && filtered.map((meal, i) => (
             <motion.div key={meal.id} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ delay: Math.min(i, 6) * 0.05, type: "spring", stiffness: 280, damping: 26 }} className="mb-3">
-              <MealCard meal={meal} onSelect={onSelect} />
+              <MealCard meal={meal} onSelect={onSelect} distance={mealDistance(meal, criteria)} />
             </motion.div>
           ))}
         </AnimatePresence>
-        {filtered.length === 0 && empty}
+        {!checking && filtered.length === 0 && empty}
         <div style={{ height: 12 }} />
       </div>
 
@@ -297,9 +332,11 @@ function FilterSection({ title, subtitle, options, selected, onToggle, columns =
   );
 }
 
-export function MealCard({ meal, onSelect, compact = false }: {
+export function MealCard({ meal, onSelect, compact = false, distance = null }: {
   meal: Meal;
   onSelect: (m: Meal) => void;
+  /** km from the place being searched around, shown next to the date */
+  distance?: number | null;
   /** Smaller card for home grids: no tag row */
   compact?: boolean;
 }) {
@@ -325,6 +362,7 @@ export function MealCard({ meal, onSelect, compact = false }: {
       <div className="relative" style={{ height: 160 }}>
         <img src={meal.image} alt={tMaybe(meal.title)} loading="lazy" className="w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(22,10,46,0.35), transparent 55%)" }} />
+        <span className="steam" aria-hidden><i /><i /><i /></span>
 
         <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full" style={{ background: svc.bg }}>
           <Icon size={11} color={svc.color} strokeWidth={2.5} />
@@ -344,9 +382,7 @@ export function MealCard({ meal, onSelect, compact = false }: {
           aria-label={liked ? t("Remove from saved") : t("Save meal")}
           aria-pressed={liked}
         >
-          <motion.div animate={{ scale: liked ? [1, 1.4, 1] : 1 }} transition={{ duration: 0.25 }}>
-            <Heart size={14} fill={liked ? "#e9345a" : "none"} color={liked ? "#e9345a" : "#160a2e"} strokeWidth={2} />
-          </motion.div>
+          <LikeHeart liked={liked} size={14} />
         </motion.button>
 
         <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full" style={{ background: "#6b21d9" }}>
@@ -378,7 +414,7 @@ export function MealCard({ meal, onSelect, compact = false }: {
         <div className="flex items-center justify-between mt-2.5 pt-2.5" style={{ borderTop: "1px solid rgba(107,33,217,0.07)" }}>
           <div className="flex items-center gap-1 min-w-0">
             <MapPin size={10} color="#7c6fa0" strokeWidth={2} className="flex-shrink-0" />
-            <span className="truncate" style={{ fontSize: 11, color: "#7c6fa0" }}>{dateLabel(meal.date)}</span>
+            <span className="truncate" style={{ fontSize: 11, color: "#7c6fa0" }}>{distance != null && <b style={{ color: "#6b21d9", fontWeight: 800 }}>{fmtKm(distance)} · </b>}{dateLabel(meal.date)}</span>
           </div>
           <span className="flex-shrink-0" style={{ fontSize: 11, fontWeight: left <= 1 ? 800 : 500, color: left === 0 ? "#e9345a" : left <= 1 ? "#c05e00" : "#7c6fa0" }}>
             {left === 0 ? t("Sold out") : left === 1 ? t("1 seat left") : t("{n} seats left", { n: left })}

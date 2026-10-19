@@ -1,9 +1,11 @@
-// ASK BITE — floating assistant on the landing page (bottom-right).
+// ASK BITE — the maître d' of the landing page (bottom-right): finds tables, answers questions. While it thinks
+// it shows what it is doing (a short reasoning list), then serves its suggestions on a small menu card.
 import { useEffect, useRef, useState } from "react";
+import { ThinkingOrb } from "thinking-orbs";
 import { answer, greeting, type AssistantReply } from "../../shared/assistant";
 import { withFee, euro } from "../../app/data";
 import { asset } from "../asset";
-import { t, tMaybe, dateLabel } from "../../shared/i18n";
+import { t, t as tr, tMaybe, dateLabel } from "../../shared/i18n";
 
 interface Msg { id: number; from: "bot" | "me"; reply?: AssistantReply; text: string; done: boolean }
 
@@ -13,11 +15,26 @@ const LINK_CHIPS: Record<string, string> = {
 
 let nextId = 1;
 
+/** A small bow tie: the maître d's mark */
+function BowTie({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 32 18" aria-hidden>
+      <path d="M2 2.5c0-1 1-1.5 2-1L14 7v4L4 16.5c-1 .5-2 0-2-1z" fill="currentColor" />
+      <path d="M30 2.5c0-1-1-1.5-2-1L18 7v4l10 5.5c1 .5 2 0 2-1z" fill="currentColor" />
+      <rect x="13" y="5.5" width="6" height="7" rx="2" fill="currentColor" />
+      <path d="M5 5l6 3.5M27 5l-6 3.5" stroke="rgba(255,255,255,0.35)" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function LandingAssistant() {
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
+  // The reasoning lines shown while the maître d' thinks, and how many are already done
+  const [steps, setSteps] = useState<string[]>([]);
+  const [stepDone, setStepDone] = useState(0);
   const [nudge, setNudge] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -38,10 +55,15 @@ export function LandingAssistant() {
   }, [msgs, thinking]);
 
   // Bot messages appear word by word, like a chat assistant typing
-  const pushBot = (reply: AssistantReply, delay = 650) => {
+  const pushBot = (reply: AssistantReply, delay = 1100, lines?: string[]) => {
     setThinking(true);
+    const ls = lines ?? [];
+    setSteps(ls);
+    setStepDone(0);
+    ls.forEach((_, i) => window.setTimeout(() => setStepDone(i + 1), ((i + 1) * delay) / (ls.length + 0.4)));
     window.setTimeout(() => {
       setThinking(false);
+      setSteps([]);
       const id = nextId++;
       const words = reply.text.split(" ");
       setMsgs((m) => [...m, { id, from: "bot", reply, text: "", done: false }]);
@@ -60,20 +82,24 @@ export function LandingAssistant() {
     if (!t || thinking) return;
     setInput("");
     setMsgs((m) => [...m, { id: nextId++, from: "me", text: t, done: true }]);
-    pushBot(answer(t), 600 + Math.min(900, t.length * 12));
+    const reply = answer(t);
+    const lines = reply.meals
+      ? [tr("Checking tonight's kitchens"), tr("Matching what you asked"), reply.meals.length === 1 ? tr("Found 1 table") : tr("Found {n} tables", { n: reply.meals.length })]
+      : [tr("Reading your question"), tr("Asking the kitchen")];
+    pushBot(reply, 1300 + Math.min(700, t.length * 10), lines);
   };
 
   return (
     <>
       {!open && nudge && (
-        <button className="as-nudge" onClick={() => setOpen(true)}>{t("Hungry? Ask me what's cooking 🍲")}</button>
+        <button className="as-nudge" onClick={() => setOpen(true)}>{t("Hungry? Let me find you a table.")}</button>
       )}
       <button className={`as-fab ${open ? "open" : ""}`} onClick={() => setOpen((o) => !o)} aria-label={open ? t("Close the Bite assistant") : t("Open the Bite assistant")} aria-expanded={open}>
         {open ? (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" /></svg>
         ) : (
           <>
-            <span className="as-spark" aria-hidden>✨</span>
+            <BowTie className="as-spark" />
             <span className="as-fab-label">{t("Ask Bite")}</span>
           </>
         )}
@@ -82,10 +108,10 @@ export function LandingAssistant() {
       {open && (
         <div className="as-panel" role="dialog" aria-label={t("Bite assistant")}>
           <header className="as-head">
-            <img src={asset("landing/logo.png")} alt="" />
+            <span className="as-avatar"><img src={asset("landing/logo.png")} alt="" /><BowTie className="as-avatar-tie" /></span>
             <div>
-              <b>{t("Bite assistant")}</b>
-              <span><i className="as-online" />{" "}{t("Finds meals · answers questions")}</span>
+              <b>{t("Your maître d'")}</b>
+              <span><i className="as-online" />{" "}{t("Finds you a table · answers questions")}</span>
             </div>
             <button onClick={() => setOpen(false)} aria-label={t("Close")}>✕</button>
           </header>
@@ -96,6 +122,7 @@ export function LandingAssistant() {
                 <div className="as-bubble">{m.text}{m.from === "bot" && !m.done && <span className="as-caret" />}</div>
                 {m.from === "bot" && m.done && m.reply?.meals && (
                   <div className="as-meals">
+                    <span className="as-menu-title">{t("The maître d' suggests")}</span>
                     {m.reply.meals.map((meal) => (
                       <a key={meal.id} className="as-meal" href={`bite.html?meal=${meal.id}`}>
                         <img src={asset(meal.image)} alt="" />
@@ -122,7 +149,20 @@ export function LandingAssistant() {
               </div>
             ))}
             {thinking && (
-              <div className="as-msg bot"><div className="as-bubble as-typing"><span /><span /><span /></div></div>
+              <div className="as-msg bot">
+                <div className="as-bubble as-thinking">
+                  <ThinkingOrb state="searching" size={20} theme="light" aria-label={t("Looking for tables…")} />
+                  {steps.length ? (
+                    <ol className="as-steps">
+                      {steps.map((st, i) => (
+                        i <= stepDone && <li key={st} className={i < stepDone ? "done" : "now"}>
+                          {i < stepDone ? <svg viewBox="0 0 16 16" aria-hidden><path d="M3 8.5l3 3 7-7" /></svg> : <i />}{st}
+                        </li>
+                      ))}
+                    </ol>
+                  ) : <span>{t("Looking for tables…")}</span>}
+                </div>
+              </div>
             )}
           </div>
 

@@ -4,9 +4,9 @@ import { LandingIntro, AppTransition, APP_TRANSITION_MS } from "./sections/Landi
 import { LandingAssistant } from "./sections/LandingAssistant";
 import { LandingHero } from "./sections/LandingHero";
 import { LandingLogoMarquee } from "./sections/LandingLogoMarquee";
-import { LandingHowItWorks } from "./sections/LandingHowItWorks";
 import { LandingServices } from "./sections/LandingServices";
-import { LandingForCooks } from "./sections/LandingForCooks";
+import { LandingSousChef } from "./sections/LandingSousChef";
+import { LandingLaptop } from "./sections/LandingLaptop";
 import { LandingSafety } from "./sections/LandingSafety";
 import { LandingHelpCustomerService } from "./sections/LandingHelpCustomerService";
 import { LandingTestimonial } from "./sections/LandingTestimonial";
@@ -99,9 +99,9 @@ export function Landing() {
       <LandingHero />
       <LandingLogoMarquee />
       <LandingSavings />
-      <LandingHowItWorks />
+      <LandingLaptop />
       <LandingServices />
-      <LandingForCooks />
+      <LandingSousChef />
       <LandingBecomeAHost />
       <LandingSafety />
       <LandingTestimonial />

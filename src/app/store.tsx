@@ -8,7 +8,7 @@ import { t, tMaybe, locale } from "../shared/i18n";
  * real product across reloads. "Reset demo data" in Profile → Settings puts everything back.
  */
 
-const STORAGE_KEY = "bite_demo_v3";
+const STORAGE_KEY = "bite_demo_v4"; // bumped when the seed messages change, so old saved demos start fresh
 
 export interface ChatMessage { id: string; sender: "me" | "them"; text: string; at: number }
 export interface Conversation { id: string; name: string; avatar: string; mealId?: string; messages: ChatMessage[]; unread: number }
@@ -18,7 +18,7 @@ export interface Booking {
   /** Set when someone else booked one of *your* listings */
   guest?: { name: string; avatar: string };
 }
-export interface Profile { name: string; bio: string; dietary: string[]; neighbourhood: string; country?: string; city?: string; postalCode?: string; notifications: boolean; news?: boolean }
+export interface Profile { name: string; bio: string; /** square photo as a data URL, chosen in the browser */ photo?: string; dietary: string[]; neighbourhood: string; country?: string; city?: string; postalCode?: string; notifications: boolean; news?: boolean }
 export interface Account { name: string; email: string }
 
 interface Data {
@@ -29,6 +29,8 @@ interface Data {
   profile: Profile;
   /** Demo sign-in: nothing leaves the browser, the password is never stored */
   account: Account | null;
+  /** Guest bookings on your listings that wait for you to accept them ("you choose who sits at your table") */
+  pending?: string[];
 }
 
 const ago = (min: number) => Date.now() - min * 60_000;
@@ -39,9 +41,9 @@ const SEED_CONVERSATIONS: Conversation[] = [
     id: "c-maria", name: "Maria K.", mealId: "1", unread: 2,
     avatar: "app/img/1556911073-160x160.jpg",
     messages: [
-      { id: "m1", sender: "me", text: "Hi Maria! Is the green curry very spicy? 🙂", at: ago(70) },
+      { id: "m1", sender: "me", text: "Hi Maria! Is the green curry very spicy?", at: ago(70) },
       { id: "m2", sender: "them", text: "Medium! I can make yours milder, just tell me.", at: ago(62) },
-      { id: "m3", sender: "them", text: "Hi! So excited you're joining 🌿", at: ago(60) },
+      { id: "m3", sender: "them", text: "Hi! So excited you're joining", at: ago(60) },
     ],
   },
   {
@@ -56,7 +58,7 @@ const SEED_CONVERSATIONS: Conversation[] = [
     id: "c-yuki", name: "Yuki T.", mealId: "7", unread: 1,
     avatar: "app/img/1534528741775-160x160.jpg",
     messages: [
-      { id: "m1", sender: "them", text: "Your poke bowl will be ready at 12:30 🥢", at: ago(60 * 50) },
+      { id: "m1", sender: "them", text: "Your poke bowl will be ready at 12:30", at: ago(60 * 50) },
     ],
   },
 ];
@@ -94,11 +96,11 @@ export function shortName(full: string) {
 // Replies are stored in English and translated when shown (ChatScreen renders t(message.text)); German messages are understood too
 function replyFor(text: string, fallbackIdx: number) {
   const t = text.toLowerCase();
-  if (/(wine|beer|drink|bring|wein|bier|getränk|mitbring)/.test(t)) return "Of course! A bottle of wine is always welcome 🍷 — I'll have glasses ready.";
+  if (/(wine|beer|drink|bring|wein|bier|getränk|mitbring)/.test(t)) return "Of course! A bottle of wine is always welcome — I'll have glasses ready.";
   if (/(vegetarian|vegetarisch|vegetarier|vegan|allerg|gluten|nut|nuss|lactose|laktose|dairy|halal)/.test(t)) return "Thanks for telling me! I'll prepare yours accordingly and keep everything separate.";
   if (/(time|when|late|early|uhr|zeit|wann|spät|früh|\d{1,2}[:.]\d{2})/.test(t)) return "That time works perfectly — just message me if you're running late.";
   if (/(where|address|ring|bell|floor|parking|wo |adresse|klingel|stock|parken)/.test(t)) return "I'll send the exact doorbell name the day before. It's 2 minutes from the U-Bahn.";
-  if (/(thank|danke|grazie|great|perfect|see you|bis dann|super|perfekt)/.test(t)) return "See you soon! 😊";
+  if (/(thank|danke|grazie|great|perfect|see you|bis dann|super|perfekt)/.test(t)) return "See you soon!";
   if (/(friend|freund|begleitung|plus one|\+1|extra seat)/.test(t)) return "Happy to have them! Just add a seat on the booking so they're covered too.";
   return HOST_REPLIES[fallbackIdx % HOST_REPLIES.length];
 }
@@ -108,13 +110,13 @@ const HOST_REPLIES = [
   "Perfect, I'll make sure everything is ready for you.",
   "Of course — just let me know if anything changes.",
   "Lovely! I'll send you the exact doorbell name the day before.",
-  "Great question — yes, that's totally fine 😊",
+  "Great question — yes, that's totally fine",
 ];
 
 /** Demo neighbours who book the listings you publish */
 const DEMO_GUESTS = [
-  { name: "Clara S.", avatar: "app/img/1529626455594-160x160.jpg", seats: 2, delay: 6000, hello: (title: string) => t("Hi! We just booked 2 seats for {title} — so excited. Is it OK if my partner is vegetarian?", { title: t(title) }) },
-  { name: "Ben K.", avatar: "app/img/1507003211169-160x160.jpg", seats: 1, delay: 15000, hello: (title: string) => t("Hey, booked a seat for {title}! Can I bring dessert? 🍰", { title: t(title) }) },
+  { name: "Clara S.", avatar: "app/img/1529626455594-160x160.jpg", seats: 2, delay: 6000, hello: (title: string) => t("Hi! We'd love to join {title} with 2 seats — so excited. Is it OK if my partner is vegetarian?", { title: t(title) }) },
+  { name: "Ben K.", avatar: "app/img/1507003211169-160x160.jpg", seats: 1, delay: 15000, hello: (title: string) => t("Hey, booked a seat for {title}! Can I bring dessert?", { title: t(title) }) },
 ];
 
 function load(): Data {
@@ -141,6 +143,8 @@ interface Store extends Data {
   toggleLike: (id: string) => void;
   book: (meal: Meal, guests: number, note: string) => Booking;
   cancelBooking: (id: string) => void;
+  /** Accept or decline a guest's request to join one of your listings */
+  answerRequest: (bookingId: string, accept: boolean) => void;
   rateBooking: (id: string, stars: number) => void;
   publish: (meal: Omit<Meal, "id">) => Meal;
   unpublish: (id: string) => void;
@@ -236,8 +240,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           : [{ id: conversationId, name: meal.host, avatar: meal.hostAvatar, mealId: meal.id, messages: [intro], unread: 0 }, ...d.conversations];
         return { ...d, bookings: [booking, ...d.bookings], conversations };
       });
-      hostReply(conversationId, t("Hi! So happy you're joining for {title} 🎉 Any allergies I should know about? The address is {address}.", { title: tMaybe(meal.title), address: meal.location }), 2400);
+      hostReply(conversationId, t("Hi! So happy you're joining for {title} Any allergies I should know about? The address is {address}.", { title: tMaybe(meal.title), address: meal.location }), 2400);
       return booking;
+    },
+    answerRequest: (bookingId, accept) => {
+      const b = data.bookings.find((x) => x.id === bookingId);
+      setData((d) => ({
+        ...d,
+        pending: (d.pending ?? []).filter((x) => x !== bookingId),
+        bookings: accept ? d.bookings : d.bookings.map((x) => (x.id === bookingId ? { ...x, status: "cancelled" } : x)),
+      }));
+      if (b?.guest) showToast(accept ? t("You said yes to {name} — say hi in the chat", { name: b.guest.name.split(" ")[0] }) : t("Request declined — {name} gets a full refund", { name: b.guest.name.split(" ")[0] }));
     },
     cancelBooking: (id) => {
       setData((d) => ({ ...d, bookings: d.bookings.map((b) => b.id === id ? { ...b, status: "cancelled" } : b) }));
@@ -252,7 +265,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setData((d) => ({ ...d, published: [meal, ...d.published] }));
       // A couple of neighbours book the new listing a few seconds later, so the host side comes alive
       let seatsLeft = meal.seats;
-      DEMO_GUESTS.forEach((g) => {
+      DEMO_GUESTS.forEach((g, gi) => {
         if (g.seats > seatsLeft) return;
         seatsLeft -= g.seats;
         window.setTimeout(() => {
@@ -261,9 +274,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             const conversationId = `c-${uid()}`;
             const booking: Booking = { id: `b-${uid()}`, mealId: meal.id, guests: g.seats, total: Math.round(withFee(meal.price) * g.seats * 100) / 100, note: "", at: Date.now(), status: "confirmed", conversationId, guest: { name: g.name, avatar: g.avatar } };
             const conv: Conversation = { id: conversationId, name: g.name, avatar: g.avatar, mealId: meal.id, unread: 1, messages: [{ id: uid(), sender: "them", text: g.hello(meal.title), at: Date.now() }] };
-            return { ...d, bookings: [booking, ...d.bookings], conversations: [conv, ...d.conversations] };
+            // the first neighbour asks to join: the host decides
+            return { ...d, bookings: [booking, ...d.bookings], conversations: [conv, ...d.conversations], pending: gi === 0 ? [...(d.pending ?? []), booking.id] : d.pending };
           });
-          showToast(g.seats > 1 ? t("🎉 {name} booked {n} seats for {title}", { name: g.name, n: g.seats, title: tMaybe(meal.title) }) : t("🎉 {name} booked 1 seat for {title}", { name: g.name, title: tMaybe(meal.title) }));
+          showToast(gi === 0 ? t("{name} would like to join {title}", { name: g.name, title: tMaybe(meal.title) }) : g.seats > 1 ? t("{name} booked {n} seats for {title}", { name: g.name, n: g.seats, title: tMaybe(meal.title) }) : t("{name} booked 1 seat for {title}", { name: g.name, title: tMaybe(meal.title) }));
         }, g.delay);
       });
       return meal;

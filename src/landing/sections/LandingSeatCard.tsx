@@ -2,8 +2,10 @@
 // a coffee cup and a few ingredients floating around it. After sending, a "RESERVED" table sign pops up.
 // Same data flow as before: Google Apps Script endpoint if set (src/shared/forms.ts), otherwise kept in this browser.
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { FORMS_ENDPOINT, postForm } from "../../shared/forms";
 import { t } from "../../shared/i18n";
+import { Tilt, Arrowed } from "../../shared/Motion";
 
 const ROLES = [
   { id: "eat", label: "To eat" },
@@ -78,10 +80,11 @@ export function LandingSeatCard() {
       <svg className="rs-leaf" viewBox="0 0 40 40" aria-hidden><path d="M6 34C6 16 18 6 34 6c0 16-10 28-28 28z" fill="#4fd18b" /><path d="M8 32L30 10" stroke="#2f9e67" strokeWidth="2" /></svg>
 
       <div className="rs-tabs" role="tablist">
-        <button role="tab" aria-selected={front === "survey"} className={front === "survey" ? "on" : ""} onClick={() => setFront("survey")}>{t("60-sec survey")}</button>
-        <button role="tab" aria-selected={front === "seat"} className={front === "seat" ? "on" : ""} onClick={() => setFront("seat")}>{t("Save a seat")}</button>
+        <button role="tab" aria-selected={front === "survey"} className={front === "survey" ? "on" : ""} onClick={() => setFront("survey")}>{front === "survey" && <motion.span layoutId="rs-pill" className="rs-pill" transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}<span>{t("60-sec survey")}</span></button>
+        <button role="tab" aria-selected={front === "seat"} className={front === "seat" ? "on" : ""} onClick={() => setFront("seat")}>{front === "seat" && <motion.span layoutId="rs-pill" className="rs-pill" transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}<span>{t("Save a seat")}</span></button>
       </div>
 
+      <Tilt max={5} className="rs-tilt">
       <div className="rs-deck">
       {/* Card 1: the 60-second survey, styled like a waiter's order pad */}
       <div className={`rs-card rs-survey ${front === "survey" ? "front" : "back"}`} onClick={front === "survey" ? undefined : () => setFront("survey")}>
@@ -128,8 +131,8 @@ export function LandingSeatCard() {
             <h3>{t("Your seat is saved.")}</h3>
             <p>{t("We'll keep")} <b>{email.trim()}</b> {t("updated on Bite's news.")}</p>
             <div className="rs-links">
-              <a href="bite.html">{t("Try the demo app →")}</a>
-              <a href="stand.html?ref=landing">{t("Got 60 seconds? Take our survey →")}</a>
+              <a className="lm" href="bite.html"><Arrowed text={t("Try the demo app →")} /></a>
+              <a className="lm" href="stand.html?ref=landing"><Arrowed text={t("Got 60 seconds? Take our survey →")} /></a>
             </div>
           </div>
         ) : (
@@ -168,6 +171,7 @@ export function LandingSeatCard() {
         )}
       </div>
       </div>
+      </Tilt>
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import { ChefHat, Home, MessageCircle, Search, User } from "lucide-react";
+import { Avatar } from "./Avatar";
+import { motion } from "motion/react";
 import logoImg from "../logo.png";
 import { t } from "../../shared/i18n";
 import { LangSwitch } from "../../shared/LangSwitch";
@@ -36,13 +38,14 @@ export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting
                 key={id}
                 onClick={() => onNavigate(id)}
                 aria-current={isActive ? "page" : undefined}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl transition-colors hover:bg-[#f5f0ff]"
-                style={{ background: isActive ? "#ede8fb" : undefined }}
+                className="relative flex items-center gap-2 px-3.5 py-2 rounded-xl transition-colors hover:bg-[#f5f0ff]"
               >
-                <Icon size={16} color={isActive ? "#6b21d9" : "#7c6fa0"} strokeWidth={isActive ? 2.4 : 1.9} />
-                <span style={{ fontSize: 14, fontWeight: 700, color: isActive ? "#6b21d9" : "#4b3a6b" }}>{t(label)}</span>
+                {/* one pill that slides to the active tab (transitions.dev "sliding tabs") */}
+                {isActive && <motion.span layoutId="top-pill" className="absolute inset-0 rounded-xl" style={{ background: "#ede8fb" }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}
+                <Icon size={16} color={isActive ? "#6b21d9" : "#7c6fa0"} strokeWidth={isActive ? 2.4 : 1.9} style={{ position: "relative" }} />
+                <span style={{ position: "relative", fontSize: 14, fontWeight: 700, color: isActive ? "#6b21d9" : "#4b3a6b", transition: "color .25s" }}>{t(label)}</span>
                 {id === "messages" && unread > 0 && (
-                  <span className="px-1.5 rounded-full" style={{ background: "#e9345a", fontSize: 11, fontWeight: 800, color: "#fff", lineHeight: "18px", minWidth: 18, textAlign: "center" }}>{unread}</span>
+                  <motion.span key={unread} initial={{ scale: 0.2 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 520, damping: 14 }} className="relative px-1.5 rounded-full" style={{ background: "#e9345a", fontSize: 11, fontWeight: 800, color: "#fff", lineHeight: "18px", minWidth: 18, textAlign: "center" }}>{unread}</motion.span>
                 )}
               </button>
             );
@@ -60,7 +63,7 @@ export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting
             <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff", whiteSpace: "nowrap" }}>{t("Start hosting")}</span>
           </button>
           <button onClick={() => onNavigate("profile")} className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full" style={{ background: "#ede8fb" }} aria-label={t("Your profile")}>
-            <span className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#6b21d9", fontSize: 11, color: "#fff", fontWeight: 800 }}>{name.charAt(0).toUpperCase()}</span>
+            <Avatar size={28} fontSize={11} />
             <span style={{ fontSize: 13.5, color: "#6b21d9", fontWeight: 700 }}>{name.split(" ")[0]}</span>
           </button>
         </div>

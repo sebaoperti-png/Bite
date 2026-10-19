@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { ThinkingOrb } from "thinking-orbs";
+import { generate } from "../../lib/ui-generation.js";
 import { useStore } from "../store";
 import { labelForISO, euro, type Meal, type ServiceType } from "../data";
 import { writeDescription, TONES, type Tone } from "../descriptionWriter";
@@ -9,10 +11,12 @@ import {
   Utensils, Leaf, Wheat, Apple, Fish, Egg, CheckCircle, BadgeCheck,
   Cigarette, Wine, PawPrint, Footprints, Camera, ImageIcon, Plus, Minus,
   Home, Sun, Lock, Unlock, Bean,
-  DollarSign, AlertCircle, Flame, Globe, Save, Eye, ShieldCheck,
+  DollarSign, AlertCircle, Flame, Globe, Save, Eye, ShieldCheck, Sparkles, Receipt,
 } from "lucide-react";
 import { t, dateLabel, dec } from "../../shared/i18n";
 import { localPlace } from "../location";
+import { resizeImage } from "../image";
+import { Avatar, usePhotoPicker } from "./Avatar";
 
 interface StartHostingFlowProps {
   onBack: () => void;
@@ -142,25 +146,6 @@ function initialAvatar(name: string) {
 }
 
 /** Shrinks an uploaded photo so it fits comfortably in localStorage */
-function resizeImage(file: File, max = 1000): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = reject;
-      img.onload = () => {
-        const k = Math.min(1, max / Math.max(img.width, img.height));
-        const c = document.createElement("canvas");
-        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
-        c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
-        resolve(c.toDataURL("image/jpeg", 0.8));
-      };
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
 
 /* ── Shared primitives ── */
 
@@ -282,23 +267,35 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
   const { profile } = useStore();
   const [tone, setTone] = useState<Tone | null>(null);
   const [writing, setWriting] = useState(false);
+  // Before the words arrive the assistant "thinks" for a moment (0 reading the dish, 1 choosing words)
+  const [thinking, setThinking] = useState<0 | 1 | null>(null);
   const timer = useRef<number>();
+  const pause = useRef<number[]>([]);
   const canWrite = !!(form.mealName.trim() || form.eventTitle.trim() || form.cuisineType);
 
-  useEffect(() => () => window.clearInterval(timer.current), []);
+  useEffect(() => () => { window.clearInterval(timer.current); pause.current.forEach((id) => window.clearTimeout(id)); }, []);
 
   const write = (t: Tone) => {
     window.clearInterval(timer.current);
+    pause.current.forEach((id) => window.clearTimeout(id));
     setTone(t);
     setWriting(true);
+    setThinking(0);
     const text = writeDescription({ mealName: form.mealName, eventTitle: form.eventTitle, cuisine: form.cuisineType, serviceType: form.serviceType, firstName: profile.name.split(" ")[0] }, t);
     const words = text.split(" ");
-    let i = 0;
-    timer.current = window.setInterval(() => {
-      i += 2;
-      set("description", words.slice(0, i).join(" ").slice(0, 400));
-      if (i >= words.length) { window.clearInterval(timer.current); setWriting(false); }
-    }, 40);
+    pause.current = [
+      window.setTimeout(() => setThinking(1), 650),
+      window.setTimeout(() => {
+        setThinking(null);
+        set("description", "");
+        let i = 0;
+        timer.current = window.setInterval(() => {
+          i += 1;
+          set("description", words.slice(0, i).join(" ").slice(0, 400));
+          if (i >= words.length) { window.clearInterval(timer.current); setWriting(false); }
+        }, 38);
+      }, 1350),
+    ];
   };
 
   return (
@@ -314,7 +311,7 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
           whileTap={{ scale: 0.94 }}
           title={canWrite ? t("Draft a description from your title, dish and cuisine") : t("Add a title, meal name or cuisine first")}
         >
-          <span style={{ fontSize: 13 }}>✨</span>
+          {writing ? <ThinkingOrb state="composing" size={20} theme="dark" aria-label={t("Writing…")} /> : <Sparkles size={13} color={canWrite ? "#fff" : "#a99cc8"} strokeWidth={2.4} />}
           <span style={{ fontSize: 12, fontWeight: 800, color: canWrite ? "#fff" : "#a99cc8" }}>{writing ? t("Writing…") : tone ? t("Try another") : t("Write it for me")}</span>
         </motion.button>
       </div>
@@ -327,16 +324,24 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
           ))}
         </div>
       )}
+      <div style={{ position: "relative" }}>
+      {thinking !== null && (
+        <div className="hf-thinking" aria-live="polite">
+          <ThinkingOrb state={thinking === 0 ? "searching" : "composing"} size={64} theme="light" />
+          <span key={thinking}>{thinking === 0 ? t("Tasting your idea…") : t("Finding the right words…")}</span>
+        </div>
+      )}
       <textarea
-        style={{ ...inputStyle, resize: "none", lineHeight: 1.6, borderColor: writing ? "#9b4aff" : undefined }}
+        style={{ ...inputStyle, resize: "none", lineHeight: 1.6, borderColor: writing ? "#9b4aff" : undefined, boxShadow: writing ? "0 0 0 4px rgba(155,74,255,0.12)" : undefined, transition: "box-shadow .3s, border-color .3s" }}
         rows={5}
         placeholder={t("Describe the experience — the atmosphere, the story behind the dish, what guests can expect…")}
         value={form.description}
         maxLength={400}
-        onChange={e => { window.clearInterval(timer.current); setWriting(false); set("description", e.target.value); }}
+        onChange={e => { window.clearInterval(timer.current); pause.current.forEach((id) => window.clearTimeout(id)); setThinking(null); setWriting(false); set("description", e.target.value); }}
       />
+      </div>
       <p style={{ fontSize: 11, color: "#c4b8de", textAlign: "right", marginTop: 4 }}>
-        {tone && !writing && <span style={{ float: "left", color: "#7c6fa0" }}>{t("✨ Drafted by the Bite assistant — edit it as you like")}</span>}
+        {tone && !writing && <span style={{ float: "left", color: "#7c6fa0" }}>{t("Drafted by the Bite assistant — edit it as you like")}</span>}
         {form.description.length}/400
       </p>
     </>
@@ -345,6 +350,7 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
 
 function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
   const { profile } = useStore();
+  const picker = usePhotoPicker();
   return (
     <div className="flex flex-col gap-4">
       <SectionTitle>{t("Tell guests about your event")}</SectionTitle>
@@ -353,14 +359,13 @@ function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       <Card>
         <Label>{t("Your hosting profile")}</Label>
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg, ${purple}, #9b4aff)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>{profile.name.charAt(0)}</span>
-            </div>
+          <button type="button" className="relative" onClick={picker.open} aria-label={profile.photo ? t("Change profile photo") : t("Add a profile photo")}>
+            <Avatar size={56} fontSize={22} />
             <div style={{ position: "absolute", bottom: 0, right: 0, width: 20, height: 20, background: purple, borderRadius: "50%", border: "2px solid #fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Camera size={10} color="#fff" strokeWidth={2.5} />
             </div>
-          </div>
+          </button>
+          {picker.input}
           <div>
             <div className="flex items-center gap-1.5">
               <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{profile.name}</p>
@@ -740,7 +745,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
     </div>
   );
 
-  const Option = ({ id, icon, title, sub }: { id: CostSource; icon: string; title: string; sub: string }) => {
+  const Option = ({ id, Icon, title, sub }: { id: CostSource; Icon: React.ElementType; title: string; sub: string }) => {
     const on = form.costSource === id;
     return (
       <motion.button
@@ -749,7 +754,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         style={{ background: on ? lightPurple : "#fff", border: `2px solid ${on ? purple : "rgba(107,33,217,0.12)"}` }}
         whileTap={{ scale: 0.97 }}
       >
-        <div style={{ fontSize: 26 }}>{icon}</div>
+        <span className="flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 12, background: on ? "#fff" : lightPurple, color: purple }}><Icon size={20} strokeWidth={2} /></span>
         <p style={{ fontSize: 14.5, fontWeight: 800, color: "#160a2e", marginTop: 6 }}>{t(title)}</p>
         <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 2, lineHeight: 1.4 }}>{t(sub)}</p>
       </motion.button>
@@ -771,8 +776,8 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           <div>
             <Label>{t("How should guests see the cost?")}</Label>
             <div className="flex gap-3">
-              <Option id="receipt" icon="🧾" title={t("Scan your receipt")} sub="Most transparent — guests see “receipt-backed”" />
-              <Option id="estimate" icon="🤖" title={t("Let Bite estimate")} sub="From your menu and the number of people" />
+              <Option id="receipt" Icon={Receipt} title={t("Scan your receipt")} sub="Most transparent — guests see “receipt-backed”" />
+              <Option id="estimate" Icon={Sparkles} title={t("Let Bite estimate")} sub="From your menu and the number of people" />
             </div>
           </div>
           <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={e => { const f = e.target.files?.[0]; if (f) scan(f); e.target.value = ""; }} />
@@ -781,14 +786,19 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
             <Card>
               <div className="flex items-start gap-3">
                 {form.receiptPreview ? (
-                  <img src={form.receiptPreview} alt={t("Your receipt")} style={{ width: 74, height: 96, objectFit: "cover", objectPosition: "top", borderRadius: 10, border: "1px solid rgba(107,33,217,0.15)", flexShrink: 0 }} />
+                  <div style={{ position: "relative", flexShrink: 0 }}>
+                    <img src={form.receiptPreview} alt={t("Your receipt")} style={{ width: 74, height: 96, objectFit: "cover", objectPosition: "top", borderRadius: 10, border: "1px solid rgba(107,33,217,0.15)", display: "block" }} />
+                    {reading !== null && (
+                      <div className="hf-scan"><ThinkingOrb state="searching" size={64} theme="dark" /></div>
+                    )}
+                  </div>
                 ) : (
-                  <div className="flex items-center justify-center" style={{ width: 74, height: 96, borderRadius: 10, background: "#f5f4f9", border: `2px dashed ${purple}`, flexShrink: 0, fontSize: 28 }}>🧾</div>
+                  <div className="flex items-center justify-center" style={{ width: 74, height: 96, borderRadius: 10, background: "#f5f4f9", border: `2px dashed ${purple}`, flexShrink: 0, color: purple }}><Receipt size={28} strokeWidth={1.8} /></div>
                 )}
                 <div className="flex-1 min-w-0">
                   {reading !== null ? (
                     <>
-                      <p style={{ fontSize: 14, fontWeight: 800, color: "#160a2e" }}>{t("Reading your receipt…")}</p>
+                      <p className="hf-shimmer" style={{ fontSize: 14, fontWeight: 800 }}>{t("Reading your receipt…")}</p>
                       <div style={{ height: 6, background: lightPurple, borderRadius: 6, marginTop: 10, overflow: "hidden" }}>
                         <motion.div style={{ height: "100%", background: `linear-gradient(90deg, ${purple}, #9b4aff)` }} animate={{ width: `${Math.max(8, reading * 100)}%` }} />
                       </div>
@@ -808,7 +818,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                         </div>
                       </label>
                       <div className="flex gap-3 mt-3 flex-wrap">
-                        <button onClick={() => fileRef.current?.click()} style={{ fontSize: 12.5, fontWeight: 800, color: purple }}>📷 {form.receiptPreview ? t("Scan another") : t("Take a photo")}</button>
+                        <button onClick={() => fileRef.current?.click()} style={{ fontSize: 12.5, fontWeight: 800, color: purple }}>{form.receiptPreview ? t("Scan another") : t("Take a photo")}</button>
                         <button onClick={() => scan("app/sample-receipt.jpg")} style={{ fontSize: 12.5, fontWeight: 700, color: "#7c6fa0" }}>{t("Try a sample receipt")}</button>
                       </div>
                     </>
@@ -843,7 +853,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                 <Stepper value={form.pricePerGuest} onChange={v => set("pricePerGuest", v)} min={1} max={cap} big />
                 <div className="flex gap-2 mt-3 flex-wrap">
                   <span className="px-2.5 py-1 rounded-full" style={{ background: "#e5f7f0", fontSize: 12, fontWeight: 800, color: "#0a7c4e" }}>{t("Fair share {price}", { price: euro(share) })}</span>
-                  <span className="px-2.5 py-1 rounded-full" style={{ background: "#fff0f3", fontSize: 12, fontWeight: 800, color: "#e9345a" }}>{t("🔒 Price cap {price}", { price: euro(cap) })}</span>
+                  <span className="px-2.5 py-1 rounded-full" style={{ background: "#fff0f3", fontSize: 12, fontWeight: 800, color: "#e9345a" }}>{t("Price cap {price}", { price: euro(cap) })}</span>
                 </div>
                 <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 8, lineHeight: 1.5 }}>{form.costSource === "receipt" ? t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: at most the real cost per person (+5% for rounding).") : t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: at most the real cost per person (+15% because it's an estimate).")}</p>
               </Card>
@@ -1075,6 +1085,26 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
 function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () => void; publishing: boolean }) {
   const { profile } = useStore();
   const covered = form.pricePerGuest * form.maxGuests;
+  // The preview card draws itself like the assistant is assembling the listing, once, when the step opens
+  const cardRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    let run: { cancel: () => void } | null = null;
+    let gone = false;
+    const img = el.querySelector("img");
+    Promise.all([document.fonts.ready, img && !img.complete ? img.decode().catch(() => {}) : null]).then(() => {
+      if (gone) return;
+      run = generate(el, {
+        mode: "skeleton-texts",
+        duration: 2200,
+        delay: 380, // let the step finish sliding in first
+        steps: [t("Reading your answers"), t("Laying out the card"), t("Adding the photo"), t("Setting the price")],
+        done: t("Your listing is ready"),
+      });
+    });
+    return () => { gone = true; run?.cancel(); };
+  }, []);
 
   const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
     <div className="flex items-center justify-between py-2.5" style={{ borderBottom: "1px solid rgba(107,33,217,0.06)" }}>
@@ -1088,7 +1118,7 @@ function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () 
       <SectionTitle>{t("Review your event")}</SectionTitle>
 
       {/* Event preview card */}
-      <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 24px rgba(107,33,217,0.12)" }}>
+      <div ref={cardRef} style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 24px rgba(107,33,217,0.12)" }}>
         <img
           src={form.photos[form.coverIdx] ?? MOCK_PHOTOS[0]}
           alt={t("cover")}
@@ -1121,9 +1151,7 @@ function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () 
       <Card>
         <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", marginBottom: 12 }}>{t("Your hosting profile")}</p>
         <div className="flex items-center gap-3">
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg, ${purple}, #9b4aff)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{profile.name.charAt(0)}</span>
-          </div>
+          <Avatar size={44} fontSize={18} />
           <div className="flex-1">
             <div className="flex items-center gap-1.5">
               <span style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{profile.name}</span>
@@ -1152,7 +1180,7 @@ function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () 
       {!form.freeEvent && (
         <Card>
           <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", marginBottom: 4 }}>{t("Cost sharing")}</p>
-          <Row label={t("Groceries")} value={`${euro(form.groceryCost)} · ${form.costSource === "receipt" ? t("🧾 receipt") : t("🤖 estimate")}`} />
+          <Row label={t("Groceries")} value={`${euro(form.groceryCost)} · ${form.costSource === "receipt" ? t("receipt") : t("estimate")}`} />
           <Row label={t("Contribution per guest")} value={euro(form.pricePerGuest)} />
           <Row label={t("Price cap per guest")} value={form.costSource ? euro(priceCap(form.groceryCost, form.maxGuests + 1, form.costSource)) : "—"} />
           <Row label={t("Your share")} value={euro(Math.round(Math.max(0, form.groceryCost - covered) * 100) / 100)} />
@@ -1189,6 +1217,7 @@ function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () 
           transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
         />
         <Flame size={18} color="#fff" strokeWidth={2} />
+        {publishing && <ThinkingOrb state="shaping" size={20} theme="dark" />}
         <span style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{publishing ? t("Publishing…") : t("Publish event")}</span>
       </motion.button>
       <p style={{ textAlign: "center", fontSize: 11, color: "#7c6fa0" }}>{t("You can edit or unpublish at any time after going live")}</p>
@@ -1202,7 +1231,15 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
   const store = useStore();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [form, setForm] = useState<FormData>(INITIAL);
+  const [form, setForm] = useState<FormData>(() => {
+    // the "+" menu on Home can pre-pick the type of event
+    try {
+      const preset = sessionStorage.getItem("bite_host_service");
+      sessionStorage.removeItem("bite_host_service");
+      if (preset === "pickup" || preset === "eat-together" || preset === "cook-together") return { ...INITIAL, serviceType: preset };
+    } catch { /* ignore */ }
+    return INITIAL;
+  });
   const [savedDraft, setSavedDraft] = useState(false);
   const [error, setError] = useState("");
   const [publishing, setPublishing] = useState(false);
@@ -1256,7 +1293,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
     const meal: Omit<Meal, "id"> = {
       title: form.mealName.trim() || form.eventTitle.trim(),
       host: name,
-      hostAvatar: initialAvatar(name),
+      hostAvatar: store.profile.photo || initialAvatar(name),
       rating: 5,
       reviews: 0,
       price: form.freeEvent ? 0 : form.pricePerGuest,
@@ -1277,7 +1314,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
     setTimeout(() => {
       const created = store.publish(meal);
       try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
-      store.showToast(t("🎉 Your meal is live — neighbours can book it now"));
+      store.showToast(t("Your meal is live — neighbours can book it now"));
       onPublished(created);
     }, 900);
   };

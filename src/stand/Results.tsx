@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SpinningText } from "../shared/Motion";
 import { QUESTIONS, type Lang } from "./questions";
 import { localResponses } from "./store";
 import { FORMS_ENDPOINT } from "../shared/forms";
@@ -80,7 +81,7 @@ export function Results() {
 
       <div className="rs-grid">
         <section className="rs-tile rs-big">
-          <div className="rs-num">{n}</div>
+          <div className="rs-num"><SpinningText text={String(n)} cell="1em" /></div>
           <div className="rs-lbl">{L.people}</div>
           <div className="rs-sub">{today} {L.today}</div>
         </section>
@@ -88,16 +89,16 @@ export function Results() {
         {enough ? (
           <>
             <section className="rs-tile rs-accent">
-              <div className="rs-num">{pct(count((r) => r.join === "yes"), answeredJoin)}%</div>
+              <div className="rs-num"><SpinningText text={`${pct(count((r) => r.join === "yes"), answeredJoin)}%`} cell="1em" /></div>
               <div className="rs-lbl">{L.join}</div>
               <div className="rs-sub">+ {pct(count((r) => r.join === "maybe"), answeredJoin)}% {L.maybe}</div>
             </section>
             <section className="rs-tile">
-              <div className="rs-num">{pct(count((r) => r.host === "often" || r.host === "sometimes"), answeredHost)}%</div>
+              <div className="rs-num"><SpinningText text={`${pct(count((r) => r.host === "often" || r.host === "sometimes"), answeredHost)}%`} cell="1em" /></div>
               <div className="rs-lbl">{L.host}</div>
             </section>
             <section className="rs-tile">
-              <div className="rs-num">{pct(count((r) => r.alone === "8-14" || r.alone === "almost-all"), answeredAlone)}%</div>
+              <div className="rs-num"><SpinningText text={`${pct(count((r) => r.alone === "8-14" || r.alone === "almost-all"), answeredAlone)}%`} cell="1em" /></div>
               <div className="rs-lbl">{L.alone}</div>
             </section>
             <Bars title={L.price} items={dist("price")} />
