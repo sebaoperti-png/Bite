@@ -32,7 +32,11 @@ function fromLocal(): Row[] {
 }
 
 export function Results() {
-  const [rows, setRows] = useState<Row[]>(fromLocal);
+  // With the Google Sheet connected, show nothing until its answers arrive (this device's own answers are only a
+  // fallback when the Sheet can't be reached), so the counter never flashes a local number and then jumps
+  const [data, setRows] = useState<Row[] | null>(() => (FORMS_ENDPOINT ? null : fromLocal()));
+  const rows = data ?? [];
+  const loading = data === null;
   const [live, setLive] = useState(false);
   const [updated, setUpdated] = useState(new Date());
 
@@ -95,8 +99,8 @@ export function Results() {
           {/* the order counter as a long kitchen ticket */}
           <section className="pz-ticket">
             <span className="pz-k">{L.orders}</span>
-            <div className="pz-count"><SpinningText text={String(n).padStart(3, "0")} cell="1em" /></div>
-            <span className="pz-today">{today} {L.today}</span>
+            <div className="pz-count">{loading ? <span className="pz-loading">···</span> : <SpinningText text={String(n).padStart(3, "0")} cell="1em" />}</div>
+            <span className="pz-today">{loading ? "\u00a0" : `${today} ${L.today}`}</span>
           </section>
           {/* the QR as a reservation card */}
           <section className="pz-qr">
