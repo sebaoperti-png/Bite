@@ -17,6 +17,8 @@ const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice
 const initialLang = (): Lang => (params.get("lang") === "de" || (!params.get("lang") && navigator.language.toLowerCase().startsWith("de")) ? "de" : "en");
 
 const LETTERS = "ABCDEFGH";
+// Which consent wording people saw: saved with every email so the consent can be proven (Art. 7(1) GDPR)
+const CONSENT_VERSION = "survey-2026-10-20";
 const ONLINE = SOURCE === "landing";
 // The order number on the pad: the visitor's place in line, counted across all devices when the Google Sheet
 // is reachable (the first answer ever is № 001), otherwise on this device
@@ -37,7 +39,8 @@ export function Survey() {
   const [leaving, setLeaving] = useState(false);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [email, setEmail] = useState("");
-  const [updates, setUpdates] = useState(false);
+  const [newsletter, setNewsletter] = useState(false);
+  const [interview, setInterview] = useState(false);
   const [error, setError] = useState("");
   const [countdown, setCountdown] = useState(RESET_AFTER);
   const [admin, setAdmin] = useState(false);
@@ -70,7 +73,7 @@ export function Survey() {
   };
 
   const reset = () => {
-    setStep("start"); setAnswers({}); setEmail(""); setUpdates(false); setError(""); setCountdown(RESET_AFTER);
+    setStep("start"); setAnswers({}); setEmail(""); setNewsletter(false); setInterview(false); setError(""); setCountdown(RESET_AFTER);
     setLang(initialLang());
   };
 
@@ -124,10 +127,10 @@ export function Survey() {
     e.preventDefault();
     const mail = email.trim();
     if (mail && !EMAIL_RE.test(mail)) { setError(t.badEmail); return; }
-    if (mail && !updates) { setError(t.needChoice); return; }
+    if (mail && !newsletter && !interview) { setError(t.needChoice); return; }
     saveEntry({
       id: uid(), at: new Date().toISOString(), source: SOURCE, device: KIOSK ? "kiosk" : "phone", lang, answers,
-      ...(mail ? { email: mail.toLowerCase(), updates } : {}),
+      ...(mail ? { email: mail.toLowerCase(), newsletter, interview, consentVersion: CONSENT_VERSION } : {}),
     });
     go("thanks");
   };
@@ -188,6 +191,7 @@ export function Survey() {
                 ))}
               </div>
               <button className="st-primary" onClick={() => go(0)}>{t.start} <span aria-hidden>→</span></button>
+              <p className="st-small st-start-privacy">{t.startPrivacy} <a href="legal.html#survey" target="_blank" rel="noopener">{t.privacy}</a>.</p>
             </section>
           )}
 
@@ -235,8 +239,9 @@ export function Survey() {
               </label>
               {email.trim() && (
                 <div className="st-checks">
-                  <label><input type="checkbox" checked={updates} onChange={(e) => { setUpdates(e.target.checked); setError(""); }} /> {t.updates}</label>
-                  <p className="st-small">{t.consent} <a href="legal.html#privacy" target="_blank" rel="noopener">{t.privacy}</a></p>
+                  <label><input type="checkbox" checked={interview} onChange={(e) => { setInterview(e.target.checked); setError(""); }} /> <span>{t.interview}</span></label>
+                  <label><input type="checkbox" checked={newsletter} onChange={(e) => { setNewsletter(e.target.checked); setError(""); }} /> <span>{t.newsletter}</span></label>
+                  <p className="st-small">{t.privacyShort} <a href="legal.html#survey" target="_blank" rel="noopener">{t.privacy}</a></p>
                 </div>
               )}
               {error && <p className="st-error" role="alert">{error}</p>}
@@ -270,6 +275,7 @@ export function Survey() {
               <span className="st-stamp">{t.paid}</span>
               <h1 className="st-h1 small">{t.thanks}</h1>
               <p className="st-lead">{ONLINE ? t.thanksOnline : t.thanksSub}</p>
+              {newsletter && email.trim() && <p className="st-inbox">✉️ {t.checkInbox}</p>}
               {!ONLINE && <div className="st-grab">{KIOSK ? t.grab : t.grabPhone}</div>}
               {KIOSK ? (
                 <button className="st-ghost" onClick={reset}>{t.reset(countdown)} · {t.again}</button>

@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { FORMS_ENDPOINT, postForm } from "../../shared/forms";
-import { t } from "../../shared/i18n";
+import { getLang, t } from "../../shared/i18n";
 import { Tilt, Arrowed } from "../../shared/Motion";
 
 const ROLES = [
@@ -40,7 +40,7 @@ export function LandingSeatCard() {
     try {
       if (FORMS_ENDPOINT) {
         const source = new URLSearchParams(window.location.search).get("ref") || "landing";
-        if (!(await postForm({ type: "waitlist", ...entry, source }))) throw new Error("not saved");
+        if (!(await postForm({ type: "waitlist", ...entry, source, newsletter: true, lang: getLang(), consentVersion: "waitlist-2026-10-20" }))) throw new Error("not saved");
       } else {
         try {
           const list = JSON.parse(localStorage.getItem("bite_waitlist") || "[]");
@@ -129,7 +129,7 @@ export function LandingSeatCard() {
               <span className="rs-tent-front"><b>{t("RESERVED")}</b><em>BITE</em></span>
             </div>
             <h3>{t("Your seat is saved.")}</h3>
-            <p>{t("We'll keep")} <b>{email.trim()}</b> {t("updated on Bite's news.")}</p>
+            <p>{t("Last step: we sent an email to")} <b>{email.trim()}</b>{t(". Click the link inside to confirm.")}</p>
             <div className="rs-links">
               <a className="lm" href="bite.html"><Arrowed text={t("Try the demo app →")} /></a>
               <a className="lm" href="stand.html?ref=landing"><Arrowed text={t("Got 60 seconds? Take our survey →")} /></a>
@@ -158,7 +158,7 @@ export function LandingSeatCard() {
 
             <label className="rs-consent">
               <input type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); setError(""); }} />
-              <span>{t("Yes, keep me updated on Bite's news. I can unsubscribe any time — see the")} <a href="legal.html#privacy">{t("privacy policy")}</a>.</span>
+              <span>{t("Yes, send me Bite news by email (at most once a month). I'll first get an email to confirm. I can withdraw my consent any time with the link in every email. I'm at least 16. Details in the")} <a href="legal.html#survey">{t("privacy policy")}</a>.</span>
             </label>
 
             {(error || state === "error") && <p className="rs-error" role="alert">{error || t("Something went wrong — please try again in a moment.")}</p>}
