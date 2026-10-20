@@ -1,3 +1,4 @@
+/** @OnlyCurrentDoc  Limits the script to this one spreadsheet. */
 /**
  * Bite — receives the stand survey and the landing-page waitlist into this Google Sheet.
  *
@@ -15,7 +16,7 @@ const WAITLIST_SHEET = "Waitlist";
 
 const SURVEY_COLUMNS = [
   "received", "id", "answeredAt", "source", "device", "lang",
-  "who", "home", "alone", "join", "price", "host", "cuisines", "worries",
+  "who", "format", "alone", "join", "price", "host", "cuisines", "worries",
   "email", "updates",
 ];
 const WAITLIST_COLUMNS = ["received", "email", "role", "area", "at", "source"];
@@ -56,9 +57,11 @@ function doPost(e) {
       if (ids.indexOf(data.id) !== -1) return json_({ ok: true, duplicate: true });
     }
     const a = data.answers || {};
+    // A leading apostrophe keeps answers like "3-5" or "8-14" as text: otherwise Sheets turns them into dates
+    const txt = function (v) { return v ? "'" + v : ""; };
     sh.appendRow([
       new Date(), data.id, data.at, data.source || "", data.device || "", data.lang || "",
-      a.who || "", a.home || "", a.alone || "", a.join || "", a.price || "", a.host || "",
+      txt(a.who), txt(a.format), txt(a.alone), txt(a.join), txt(a.price), txt(a.host),
       (a.cuisines || []).join(", "), (a.worries || []).join(", "),
       data.email || "", data.updates ? "yes" : "",
     ]);
@@ -80,7 +83,7 @@ function doGet(e) {
   const rows = values.map(function (r) {
     return {
       at: r[col("answeredAt")], source: r[col("source")],
-      who: r[col("who")], home: r[col("home")], alone: r[col("alone")], join: r[col("join")],
+      who: r[col("who")], format: r[col("format")], alone: r[col("alone")], join: r[col("join")],
       price: r[col("price")], host: r[col("host")],
       cuisines: String(r[col("cuisines")] || "").split(", ").filter(String),
       worries: String(r[col("worries")] || "").split(", ").filter(String),

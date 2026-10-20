@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Bite – front sign A2</title>
+<link rel="stylesheet" href="../src/shared/fonts.css">
+<!-- The sign for the front of the stand table (A2 portrait, 42 × 59.4 cm): logo, the tagline and who to talk to.
+     Logo, tagline, what Bite does and the name all sit in the top half (the part seen while walking past). No QR on purpose: it is read from a distance; the QR is on the A4 profile for people who come closer.
+     ?lang=de gives the German version. PDFs: bite-sign-A2-en.pdf / bite-sign-A2-de.pdf -->
+<style>
+@page { size: 420mm 594mm; margin: 0 }
+* { box-sizing: border-box; margin: 0 }
+body { width: 420mm; height: 594mm; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; font-family: Inter, sans-serif; color: #fbf8ff;
+  background: radial-gradient(ellipse 80% 50% at 50% 38%, #3a1a7a 0%, #22104a 45%, #160a2e 80%); -webkit-print-color-adjust: exact; print-color-adjust: exact }
+/* a little chalk dust, like the chalkboard sections of the site */
+body::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.07) .5mm, transparent .6mm); background-size: 9mm 9mm; pointer-events: none }
+.frame { position: absolute; inset: 14mm; border: 1.2mm solid rgba(184,127,255,.45); border-radius: 6mm; box-shadow: inset 0 0 0 4mm transparent, inset 0 0 0 4.6mm rgba(184,127,255,.25) }
+.logo { position: relative; width: 330mm; margin-top: 62mm }
+.logo svg { display: block; width: 100% }
+.tag { position: relative; margin-top: 26mm; white-space: nowrap; text-align: center; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 46mm; line-height: 1; color: #e9dcff }
+.underline { display: block; width: 300mm; height: 12mm; margin: 6mm auto 0 }
+.underline path { fill: none; stroke: #b87fff; stroke-width: 3; stroke-linecap: round }
+.what { margin-top: 12mm; text-align: center; font-size: 15mm; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; color: #fbf8ff }
+.what span { color: #c9a8ff }
+.who { position: relative; margin-top: 24mm; transform: rotate(-1.5deg); width: 300mm; padding: 14mm 18mm 15mm; text-align: center; color: #2a1553; background: #fbf6ec; border-radius: 3mm;
+  box-shadow: 3mm 4mm 0 #0b0518, inset 0 0 0 3mm #fbf6ec, inset 0 0 0 3.6mm rgba(107,33,217,.4) } /* blur-free shadows: blurred ones print as grey boxes */
+.who .k { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 7mm; letter-spacing: .22em; text-transform: uppercase; color: #7c6aa3 }
+.who b { display: block; margin-top: 3mm; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 24mm; line-height: 1; color: #160a2e }
+.who .c.web { margin-top: 1.5mm; font-size: 7mm; color: #7c6aa3 }
+.who .c { margin-top: 5mm; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 8.5mm; letter-spacing: .02em; color: #6b21d9 }
+</style></head>
+<body>
+<div class="frame"></div>
+
+<!-- the Bite wordmark: the logo "b" (tall stem, round belly, smile, bite on the right) + "ite", as in LogoWord.tsx -->
+<div class="logo">
+  <svg viewBox="-2 0 664 300" role="img" aria-label="Bite">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+      <linearGradient id="gb" x1="0" y1="0" x2="0" y2="549" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9c2ff"/></linearGradient>
+      <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549">
+        <rect x="0" y="0" width="549" height="549" fill="white"/>
+        <path d="M190 405q72 62 144 0" fill="none" stroke="black" stroke-width="26" stroke-linecap="round"/>
+        <g fill="black"><circle cx="405" cy="198" r="20"/><circle cx="434" cy="228" r="22"/><circle cx="456" cy="267" r="22"/><circle cx="469" cy="311" r="20"/></g>
+      </mask>
+    </defs>
+    <g transform="translate(-60 -12) scale(0.6)">
+      <g mask="url(#m)" fill="#efe4ff"><rect x="107" y="30" width="83" height="330" rx="41.5"/><circle cx="285" cy="340" r="178"/></g>
+    </g>
+    <text x="226" y="296" font-size="330" font-weight="900" fill="#efe4ff" font-family="Inter, sans-serif" letter-spacing="-14">ite</text>
+  </svg>
+</div>
+
+<div class="tag" data-de="zusammen schmeckt’s besser.">food is better shared.</div>
+<svg class="underline" viewBox="0 0 300 12" preserveAspectRatio="none" aria-hidden="true"><path d="M4 8c40-6 80-7 120-3s90 5 172-2"/></svg>
+<div class="what" data-de-html="Hausgemacht essen mit Nachbar:innen.<br><span>Kosten teilen.</span>">Home-cooked dinners with your neighbours.<br><span>Split the cost.</span></div>
+
+<div class="who">
+  <div class="k" data-de="Sprich mich an">Come and say hi</div>
+  <b>Sebastiano Operti</b>
+  <div class="c">sebaoperti@gmail.com</div>
+  <div class="c web">sebaoperti-png.github.io/Bite</div>
+</div>
+
+<script>
+  // ?lang=de swaps in the German lines
+  if (new URLSearchParams(location.search).get("lang") === "de") {
+    document.documentElement.lang = "de";
+    document.querySelectorAll("[data-de]").forEach((el) => { el.textContent = el.dataset.de; });
+    document.querySelectorAll("[data-de-html]").forEach((el) => { el.innerHTML = el.dataset.deHtml; });
+    document.querySelector(".tag").style.fontSize = "33mm"; // the German line is longer
+  }
+</script>
+</body></html>

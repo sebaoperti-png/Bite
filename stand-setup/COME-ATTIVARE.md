@@ -1,6 +1,8 @@
 # Bite at AIM: how to set up the stand
 
 ## What's in this folder
+- `bite-profile-A4-en.pdf` / `bite-profile-A4-de.pdf`: the **one-page profile** for the A4 holder on the table (who I am + what Bite is, set as a menu, with the survey QR). Sources: `profile-A4.html` / `profile-A4-de.html`.
+- `bite-sign-A2-en.pdf` / `bite-sign-A2-de.pdf`: **A2 sign** for the front of the table: logo, "food is better shared", name and contact. No QR on purpose (it's read from a distance). Source: `poster-A2.html` (`?lang=de`).
 - `bite-poster-A1.pdf`: **A1 (59×84 cm)** brand poster to hang behind the stand: “BlaBlaCar shares a ride. Bite shares a table.” Its small QR code opens the website (not the survey).
 - `bite-poster-A4.pdf`: A4 poster with QR code, for the table (print it in colour).
 - `bite-qr-cards-A4.pdf`: 4 QR cards per sheet, to cut out and leave on the table.

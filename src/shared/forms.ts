@@ -5,7 +5,7 @@
  * Paste the "Web app" URL of the Google Apps Script in stand-setup/google-apps-script.js
  * (it ends in /exec). While this is empty, answers are only kept in the browser they were given in.
  */
-export const FORMS_ENDPOINT = "";
+export const FORMS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxVRBOZK1IQSQL5nuw4ES6o95uYu8DGBz6wLeXK28XMTKVgguoinLsES7cKqRFiqdW6/exec"; // Google Sheet "Bite AIM" (sebaoperti@gmail.com)
 
 /**
  * Sends one form entry. Returns true when the server accepted it.

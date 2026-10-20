@@ -58,7 +58,7 @@ export function clearDevice() {
 }
 
 export function toCsv(rows: SurveyEntry[]) {
-  const cols = ["id", "at", "source", "device", "lang", "who", "home", "alone", "join", "price", "host", "cuisines", "worries", "email", "updates"];
+  const cols = ["id", "at", "source", "device", "lang", "who", "format", "alone", "join", "price", "host", "cuisines", "worries", "email", "updates"];
   const cell = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const lines = rows.map((r) => {
     const a = r.answers;

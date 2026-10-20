@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<title>Bite – Steckbrief A4</title>
+<link rel="stylesheet" href="../src/shared/fonts.css">
+<!-- The one-page profile for the A4 holder on the stand table: who I am and what Bite is, set like a restaurant menu.
+     Print: A4, no margins, colour. German version of profile-A4.html (keep the two in step). PDFs: bite-profile-A4-en.pdf / -de.pdf (Chrome headless, see COME-ATTIVARE.md). -->
+<style>
+@page { size: A4; margin: 0 }
+* { box-sizing: border-box; margin: 0 }
+body { width: 210mm; height: 297mm; position: relative; overflow: hidden; font-family: Inter, sans-serif; color: #160a2e; background: #f3eefb; -webkit-print-color-adjust: exact; print-color-adjust: exact }
+.serif { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400 }
+.mono { font-family: ui-monospace, 'SF Mono', Menlo, monospace }
+
+/* the menu card, with a double frame */
+.card { position: absolute; inset: 9mm; display: flex; flex-direction: column; background: #fbf6ec; border-radius: 3mm; box-shadow: inset 0 0 0 3mm #fbf6ec, inset 0 0 0 3.5mm rgba(107,33,217,.45), inset 0 0 0 4.6mm #fbf6ec, inset 0 0 0 5mm rgba(107,33,217,.25); padding: 10mm 15mm 10mm }
+
+.head { display: flex; align-items: center; justify-content: space-between }
+.brand { display: flex; align-items: center; gap: 3mm }
+.brand .word { display: block; width: 36mm; height: auto }
+.where { text-align: right; font-size: 2.9mm; letter-spacing: .18em; text-transform: uppercase; color: #7c6aa3; line-height: 1.6 }
+
+.rule { display: flex; align-items: center; gap: 3mm; margin: 4mm 0 2mm; color: #6b21d9 }
+.rule::before, .rule::after { content: ""; flex: 1; border-top: .3mm solid rgba(107,33,217,.35) }
+.rule i { width: 2mm; height: 2mm; background: #6b21d9; transform: rotate(45deg) }
+
+.eyebrow { text-align: center; font-size: 6mm; color: #6b21d9 }
+h1 { margin-top: 1mm; text-align: center; font-size: 12.5mm; font-weight: 900; letter-spacing: -.045em; line-height: .98 }
+h1 span { color: #6b21d9 }
+.lede { margin: 3mm auto 0; max-width: 150mm; text-align: center; font-size: 3.9mm; line-height: 1.5; color: #4a3a6e }
+.lede small { display: block; margin-top: 1.2mm; font-size: 3.4mm; color: #8b7bb5 }
+
+/* the courses */
+.courses { margin-top: 4mm }
+.course { display: grid; grid-template-columns: 13mm 1fr; column-gap: 3mm; padding: 1.9mm 0; border-top: .3mm dashed rgba(107,33,217,.25) }
+.course:last-child { border-bottom: .3mm dashed rgba(107,33,217,.25) }
+.course .n { grid-row: span 2; font-size: 2.9mm; letter-spacing: .14em; color: #9b4aff; padding-top: 2.2mm }
+.course .t { display: flex; align-items: baseline; gap: 2.5mm }
+.course .t b { font-size: 6.4mm; line-height: 1; white-space: nowrap }
+.course .t i { flex: 1; border-bottom: .5mm dotted rgba(42,21,83,.25); transform: translateY(-1.2mm) }
+.course .t em { font-style: normal; font-size: 2.8mm; letter-spacing: .12em; text-transform: uppercase; color: #6b21d9; white-space: nowrap }
+.course p { margin-top: .8mm; font-size: 3.35mm; line-height: 1.42; color: #4a3a6e }
+.course p small { color: #8b7bb5; font-size: 3mm }
+
+/* bottom: the cook behind it + the survey ticket */
+.bottom { position: relative; margin-top: auto; padding-top: 4mm; display: grid; grid-template-columns: 1fr 66mm; gap: 8mm; align-items: end }
+.chef { display: flex; flex-direction: column; justify-content: flex-end }
+.chef .k { font-size: 2.9mm; letter-spacing: .18em; text-transform: uppercase; color: #7c6aa3 }
+.chef .who { display: flex; align-items: center; gap: 4mm; margin-top: 3mm }
+.plate { flex-shrink: 0; width: 17mm; height: 17mm; border-radius: 50%; background: radial-gradient(circle, #fff 0 52%, #efe6d6 53% 58%, #fff 59% 70%, #e7dcc8 71% 72%, transparent 73%); display: flex; align-items: center; justify-content: center; font-size: 8mm; color: #6b21d9 }
+.chef b { display: block; font-size: 7.6mm; line-height: 1 }
+.chef .role { margin-top: 1.4mm; font-size: 3.4mm; color: #4a3a6e; line-height: 1.4 }
+.chef .row { display: flex; align-items: flex-end; justify-content: space-between; gap: 4mm; margin-top: 3mm }
+.chef .contact { font-size: 3.4mm; line-height: 1.65 }
+.chef .contact span { color: #7c6aa3; display: inline-block; width: 15mm; font-size: 2.8mm; letter-spacing: .12em; text-transform: uppercase }
+.chef .site { display: flex; flex-direction: column; align-items: center; gap: 1mm; font-size: 2.6mm; line-height: 1.25; text-align: center; color: #7c6aa3 }
+.chef .site img { width: 15mm; height: 15mm }
+
+.ticket { position: relative; padding: 5mm 5mm 7mm; background: #fff; text-align: center; box-shadow: 0 2mm 5mm rgba(46,16,96,.12);
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - 3mm) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 5mm 3mm repeat-x;
+          mask: linear-gradient(#000 0 0) top / 100% calc(100% - 3mm) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 5mm 3mm repeat-x }
+.ticket .k { font-size: 2.8mm; letter-spacing: .16em; text-transform: uppercase; color: #6b5a8e }
+.ticket .big { margin-top: 1mm; font-size: 6.6mm; line-height: 1 }
+.ticket img { display: block; width: 35mm; height: 35mm; margin: 2.5mm auto 1.5mm }
+.ticket .steps { font-size: 3.2mm; font-weight: 700; line-height: 1.5 }
+.ticket .steps small { display: block; font-weight: 500; color: #8b7bb5 }
+.stamp { position: absolute; right: 70mm; top: 7mm; padding: 1.6mm 3.2mm; border: .8mm solid #ff3d7f; border-radius: 2mm; color: #ff3d7f; font-size: 3.8mm; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; text-align: center; transform: rotate(-8deg) }
+.stamp small { display: block; font-size: 2.6mm; letter-spacing: .08em; text-transform: none; font-weight: 700 }
+</style></head>
+<body>
+<div class="card">
+  <div class="head">
+    <div class="brand"><svg class="word" viewBox="-2 0 664 300" role="img" aria-label="Bite">
+      <defs>
+        <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b3cf5"/><stop offset="1" stop-color="#5a17c0"/></linearGradient>
+        <linearGradient id="wgb" x1="0" y1="0" x2="0" y2="549" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#8b3cf5"/><stop offset="1" stop-color="#5a17c0"/></linearGradient>
+        <mask id="wm" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549">
+          <rect x="0" y="0" width="549" height="549" fill="white"/>
+          <path d="M190 405q72 62 144 0" fill="none" stroke="black" stroke-width="26" stroke-linecap="round"/>
+          <g fill="black"><circle cx="405" cy="198" r="20"/><circle cx="434" cy="228" r="22"/><circle cx="456" cy="267" r="22"/><circle cx="469" cy="311" r="20"/></g>
+        </mask>
+      </defs>
+      <g transform="translate(-60 -12) scale(0.6)"><g mask="url(#wm)" fill="#6b21d9"><rect x="107" y="30" width="83" height="330" rx="41.5"/><circle cx="285" cy="340" r="178"/></g></g>
+      <text x="226" y="296" font-size="330" font-weight="900" fill="#6b21d9" font-family="Inter, sans-serif" letter-spacing="-14">ite</text>
+    </svg></div>
+    <div class="where mono">AIM 2026 · Aalen<br>Frühe Phase · gestalte mit</div>
+  </div>
+
+  <div class="rule"><i></i></div>
+  <div class="eyebrow serif">heute auf der Karte</div>
+  <h1>Echtes Essen, echte Menschen,<br><span>deine Nachbarschaft.</span></h1>
+  <p class="lede">Bite verbindet dich mit Hobbyköch:innen in deiner Nähe. Teilt ein hausgemachtes Essen, teilt die Kosten für den Einkauf und zahlt weniger als beim Lieferdienst.</p>
+
+  <div class="courses">
+    <div class="course">
+      <span class="n mono">Nr. 1</span>
+      <div class="t"><b class="serif">Die Idee</b><i></i><em class="mono">BlaBlaCar fürs Abendessen</em></div>
+      <p>In deiner Nachbarschaft wird heute sowieso gekocht. Du setzt dich dazu und zahlst einen gleichen Anteil am Einkauf – keinen Restaurantpreis.</p>
+    </div>
+    <div class="course">
+      <span class="n mono">Nr. 2</span>
+      <div class="t"><b class="serif">Drei Arten zu essen</b><i></i><em class="mono">du entscheidest</em></div>
+      <p>Abholen · Zusammen essen bei Nachbar:innen · Zusammen kochen, dann essen.</p>
+    </div>
+    <div class="course">
+      <span class="n mono">Nr. 3</span>
+      <div class="t"><b class="serif">Ein fairer Preis</b><i></i><em class="mono">Kosten, kein Gewinn</em></div>
+      <p>Gäste zahlen ihren Anteil an den Zutaten plus 12 % Bite-Gebühr, alles in der App. Kein Bargeld, kein Aufschlag – und auch für die Gastgeber:innen wird das eigene Essen günstiger.</p>
+    </div>
+    <div class="course">
+      <span class="n mono">Nr. 4</span>
+      <div class="t"><b class="serif">Sicher von Anfang an</b><i></i><em class="mono">Hausregeln</em></div>
+      <p>Verifizierte Gastgeber:innen (Ausweis, Videocall, Probeessen), kleine Runden, Zahlung in der App, Datenschutz nach DSGVO.</p>
+    </div>
+    <div class="course">
+      <span class="n mono">Nr. 5</span>
+      <div class="t"><b class="serif">Wo wir stehen</b><i></i><em class="mono">frühe Phase</em></div>
+      <p>Getestet mit einer Umfrage unter 70+ Personen und Interviews; der Prototyp funktioniert. Jetzt wollen wir von dir hören.</p>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <span class="stamp">Süßes gratis</span>
+    <div class="chef">
+      <span class="k mono">Wer hinter Bite steht</span>
+      <div class="who">
+        <span class="plate serif">S</span>
+        <div><b class="serif">Sebastiano Operti</b><div class="role">Gründung von Bite · Masterstudium<br>Marketing &amp; KI, Hochschule Aalen</div></div>
+      </div>
+      <div class="row">
+        <div class="contact">
+          <div><span class="mono">E-Mail</span>sebaoperti@gmail.com</div>
+          <div><span class="mono">Web</span>sebaoperti-png.github.io/Bite</div>
+        </div>
+        <div class="site"><img src="img/qr-site.svg" alt=""><span>Demo-App<br>ausprobieren</span></div>
+      </div>
+    </div>
+
+    <div class="ticket">
+      <div class="k mono">60-Sekunden-Umfrage</div>
+      <div class="big serif">Wie isst deine Stadt?</div>
+      <img src="../public/stand/qr-stand.svg" alt="">
+      <div class="steps">Scannen · 8 Klicks · Süßes nehmen</div>
+    </div>
+  </div>
+</div>
+</body></html>

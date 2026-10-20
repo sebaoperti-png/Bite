@@ -5,7 +5,7 @@ type T = Record<Lang, string>;
 
 export interface Option { id: string; label: T; emoji?: string }
 export interface Question {
-  id: "who" | "home" | "alone" | "join" | "price" | "host" | "cuisines" | "worries";
+  id: "who" | "format" | "alone" | "join" | "price" | "host" | "cuisines" | "worries";
   title: T;
   hint?: T;
   multi?: number; // max selections for multi-choice
@@ -17,19 +17,22 @@ export const QUESTIONS: Question[] = [
     id: "who",
     title: { en: "First — who are you?", de: "Zuerst — wer bist du?" },
     options: [
+      { id: "intl-student", label: { en: "International student", de: "Internationale:r Student:in" } },
       { id: "student", label: { en: "Student", de: "Student:in" } },
+      { id: "intl-working", label: { en: "Working here, from abroad", de: "Berufstätig, aus dem Ausland" } },
       { id: "working", label: { en: "Working", de: "Berufstätig" } },
-      { id: "new-in-town", label: { en: "New in town / expat", de: "Neu in der Stadt / Expat" } },
       { id: "other", label: { en: "Something else", de: "Etwas anderes" } },
     ],
   },
   {
-    id: "home",
-    title: { en: "Where do you live?", de: "Wo wohnst du?" },
+    id: "format",
+    title: { en: "Which would you use most?", de: "Was würdest du am ehesten nutzen?" },
+    hint: { en: "Always home-cooked by a neighbour, you only split the cost.", de: "Immer von Nachbar:innen gekocht, ihr teilt nur die Kosten." },
     options: [
-      { id: "big-city", label: { en: "In a big city", de: "In einer Großstadt" } },
-      { id: "town", label: { en: "In a smaller town", de: "In einer kleineren Stadt" } },
-      { id: "countryside", label: { en: "In the countryside", de: "Auf dem Land" } },
+      { id: "pickup", label: { en: "Pick-up — take a home-cooked meal home", de: "Abholen — hausgemachtes Essen mitnehmen" } },
+      { id: "eat-together", label: { en: "Eat together at a neighbour's table", de: "Zusammen essen bei Nachbar:innen" } },
+      { id: "cook-together", label: { en: "Cook together, then eat", de: "Zusammen kochen, dann essen" } },
+      { id: "not-sure", label: { en: "Not sure yet", de: "Weiß ich noch nicht" } },
     ],
   },
   {
@@ -98,6 +101,7 @@ export const QUESTIONS: Question[] = [
       { id: "hygiene", label: { en: "Hygiene", de: "Hygiene" } },
       { id: "strangers", label: { en: "Eating with strangers", de: "Essen mit Fremden" } },
       { id: "price", label: { en: "Price", de: "Preis" } },
+      { id: "allergies", label: { en: "Allergies / diet", de: "Allergien / Ernährung" } },
       { id: "time", label: { en: "Time", de: "Zeit" } },
       { id: "nothing", label: { en: "Nothing — I'm in!", de: "Nichts — ich bin dabei!" } },
     ],

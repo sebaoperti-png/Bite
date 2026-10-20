@@ -18,8 +18,18 @@ const initialLang = (): Lang => (params.get("lang") === "de" || (!params.get("la
 
 const LETTERS = "ABCDEFGH";
 const ONLINE = SOURCE === "landing";
-// A made-up but stable order number for this visit, like the ticket from a waiter's pad
-const ORDER_NO = String(41 + (localResponses().length % 900)).padStart(4, "0");
+// The order number on the pad: the visitor's place in line, counted across all devices when the Google Sheet
+// is reachable (the first answer ever is № 001), otherwise on this device
+const pad3 = (n: number) => String(n).padStart(3, "0");
+async function nextOrderNo(): Promise<string> {
+  const local = localResponses().length + 1;
+  if (!FORMS_ENDPOINT) return pad3(local);
+  try {
+    const data = await fetch(`${FORMS_ENDPOINT}?action=stats`).then((r) => r.json());
+    if (data.ok && Array.isArray(data.rows)) return pad3(Math.max(data.rows.length + 1 + outboxSize(), 1));
+  } catch { /* offline: count on this device */ }
+  return pad3(local);
+}
 
 export function Survey() {
   const [lang, setLang] = useState<Lang>(initialLang);
@@ -31,11 +41,14 @@ export function Survey() {
   const [error, setError] = useState("");
   const [countdown, setCountdown] = useState(RESET_AFTER);
   const [admin, setAdmin] = useState(false);
+  const [orderNo, setOrderNo] = useState(() => pad3(localResponses().length + 1));
   const taps = useRef<number[]>([]);
   const timer = useRef(0);
   const t = UI[lang];
 
   useEffect(() => startAutoSync(), []);
+  // A fresh order number for every visitor (on the kiosk the page is reused, so recompute on each new start)
+  useEffect(() => { if (step === "start") void nextOrderNo().then(setOrderNo); }, [step]);
 
   // Kiosk: when nobody has touched the tablet for a while on the start page, show the "waiting" screen
   const [waiting, setWaiting] = useState(KIOSK);
@@ -158,7 +171,7 @@ export function Survey() {
           {step !== "thanks" && (
             <div className="st-pad-head">
               <span>BITE · {t.pad}</span>
-              <span>{t.order} № {ORDER_NO}</span>
+              <span>{t.order} № {orderNo}</span>
             </div>
           )}
 
@@ -239,7 +252,7 @@ export function Survey() {
               {!ONLINE && <Candy />}
               <div className="st-r-head">
                 <b>BITE</b>
-                <span>{t.yourOrder} · № {ORDER_NO}</span>
+                <span>{t.yourOrder} · № {orderNo}</span>
               </div>
               <div className="st-r-rule" />
               {QUESTIONS.map((x, i) => {
