@@ -19,10 +19,10 @@ export const QUESTIONS: Question[] = [
     id: "who",
     title: { en: "First — who are you?", de: "Zuerst — wer bist du?" },
     options: [
-      { id: "int-student", label: { en: "International student", de: "Internationale:r Student:in" }, emoji: "🌍" },
-      { id: "int-work", label: { en: "International, working here", de: "International, arbeite hier" }, emoji: "💼" },
-      { id: "student", label: { en: "Local student", de: "Student:in von hier" }, emoji: "🎓" },
-      { id: "local", label: { en: "Local, working or retired", de: "Von hier, berufstätig oder in Rente" }, emoji: "🏡" },
+      { id: "int-student", label: { en: "International student", de: "Internationale:r Student:in" } },
+      { id: "int-work", label: { en: "International, working here", de: "International, arbeite hier" } },
+      { id: "student", label: { en: "Local student", de: "Student:in von hier" } },
+      { id: "local", label: { en: "Local, working or retired", de: "Von hier, berufstätig oder in Rente" } },
     ],
   },
   {
