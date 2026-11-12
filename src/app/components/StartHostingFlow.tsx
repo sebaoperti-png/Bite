@@ -349,7 +349,7 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
 }
 
 function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
-  const { profile } = useStore();
+  const { profile, live } = useStore();
   const picker = usePhotoPicker();
   return (
     <div className="flex flex-col gap-4">
@@ -371,7 +371,7 @@ function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
               <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{profile.name}</p>
               <BadgeCheck size={14} color="#0a7c4e" strokeWidth={2} />
             </div>
-            <p style={{ fontSize: 12, color: "#7c6fa0" }}>{t("{place} · Verified host", { place: localPlace(profile.neighbourhood) })}</p>
+            <p style={{ fontSize: 12, color: "#7c6fa0" }}>{live ? localPlace(profile.neighbourhood) : t("{place} · Verified host", { place: localPlace(profile.neighbourhood) })}</p>
           </div>
           <div className="ml-auto flex items-center gap-1">
             <Star size={12} fill="#f59e0b" color="#f59e0b" />
@@ -1304,6 +1304,10 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
       costProof: form.freeEvent || !form.costSource ? undefined : { kind: form.costSource, total: form.groceryCost, people: form.maxGuests + 1 },
       tags: [form.cuisineType, ...[...form.dietary].map(d => DIET_TO_TAG[d]).filter(Boolean)],
       location: `${form.address.trim()}, ${form.city.trim()}`,
+      // live mode saves these separately (the street stays private until a guest is confirmed)
+      street: form.address.trim(),
+      city: form.city.trim(),
+      dateISO: form.date,
       time: form.startTime,
       date: labelForISO(form.date),
       description: form.description.trim() || t("{title}. On the menu: {menu}.", { title: form.eventTitle.trim(), menu: [form.appetizers, form.mainDishes, form.desserts].filter(x => x.trim()).join(" · ") }),

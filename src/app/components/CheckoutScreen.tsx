@@ -36,12 +36,16 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
     setError("");
     setPaying(true);
     setTimeout(() => {
-      const b = store.book(meal, guests, note);
-      // the "table booked" moment: drawn check + confetti, then on to the chat with the host
-      setBooked(b);
-      window.setTimeout(() => confetti({ particleCount: 110, spread: 80, origin: { y: 0.42 }, colors: ["#6b21d9", "#b87fff", "#ffffff", "#9b4aff", "#0a9c62"] }), 250);
-      window.setTimeout(() => onBooked(b), 2000);
-    }, 1100);
+      store.book(meal, guests, note).then((b) => {
+        // the "table booked" moment: drawn check + confetti, then on to the chat with the host
+        setBooked(b);
+        window.setTimeout(() => confetti({ particleCount: 110, spread: 80, origin: { y: 0.42 }, colors: ["#6b21d9", "#b87fff", "#ffffff", "#9b4aff", "#0a9c62"] }), 250);
+        window.setTimeout(() => onBooked(b), 2000);
+      }).catch((e: Error) => {
+        setPaying(false);
+        setError(e.message);
+      });
+    }, store.live ? 0 : 1100);
   };
 
   const summary = (
@@ -122,6 +126,12 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
 
       {/* Payment */}
       <Card title={t("Payment")} Icon={CreditCard}>
+        {store.live ? (
+          <div className="p-3 rounded-2xl" style={{ background: "#f7f4fd", border: "1.5px dashed rgba(107,33,217,0.35)" }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{t("Nothing is charged now")}</p>
+            <p style={{ fontSize: 12, color: "#7c6fa0", lineHeight: 1.5, marginTop: 2 }}>{t("{name} first accepts your request. Paying in the app is coming soon; until then you settle the grocery share with the host.", { name: meal.host.split(" ")[0] })}</p>
+          </div>
+        ) : (
         <div className="flex items-center gap-3 p-3 rounded-2xl" style={{ background: "#f7f4fd", border: "1.5px solid #6b21d9" }}>
           <div className="w-11 h-8 rounded-md flex items-center justify-center" style={{ background: "#160a2e" }}>
             <span style={{ fontSize: 10, fontWeight: 900, fontStyle: "italic", color: "#fff" }}>{t("VISA")}</span>
@@ -132,6 +142,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
           </div>
           <CheckCircle size={18} color="#6b21d9" />
         </div>
+        )}
         <label key={shake} className={`flex items-start gap-2.5 mt-3 cursor-pointer terms ${shake ? "shake" : ""} ${error ? "is-error" : ""}`}>
           <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setError(""); }} className="tick-input" />
           <span className="tick-box" aria-hidden><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" /></svg></span>
@@ -162,7 +173,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
       ) : (
         <>
           <Lock size={15} color="#fff" strokeWidth={2.5} />
-          <span style={{ color: "#fff", fontWeight: 800, fontSize: 15 }}>{left === 0 ? t("Sold out") : t("Confirm & pay {price}", { price: euro(total) })}</span>
+          <span style={{ color: "#fff", fontWeight: 800, fontSize: 15 }}>{left === 0 ? t("Sold out") : store.live ? t("Ask for {n} at the table", { n: guests === 1 ? t("1 seat") : t("{n} seats", { n: guests }) }) : t("Confirm & pay {price}", { price: euro(total) })}</span>
         </>
       )}
     </motion.button>
@@ -170,7 +181,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
 
   const trust = (
     <div className="flex items-center justify-center gap-1.5" style={{ fontSize: 11.5, color: "#7c6fa0" }}>
-      <Shield size={12} color="#0a7c4e" />{" "}{t("Secure payments · verified host · insured meal")}</div>
+      <Shield size={12} color="#0a7c4e" />{" "}{store.live ? t("The host chooses who joins · report a problem any time") : t("Secure payments · verified host · insured meal")}</div>
   );
 
   return (
@@ -178,7 +189,8 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
       {booked && (
         <div className="bk-done" role="status">
           <SuccessCheck size={84} />
-          <h2>{t("Your table is booked!")}</h2>
+          <h2>{store.live ? t("Request sent!") : t("Your table is booked!")}</h2>
+          {store.live && <p>{t("{name} will accept or decline. You will get a message.", { name: meal.host.split(" ")[0] })}</p>}
           <p>{t("{meal} with {name}, {date} · {time}", { meal: tMaybe(meal.title), name: meal.host, date: dateLabel(meal.date), time: meal.time })}</p>
         </div>
       )}
@@ -190,7 +202,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
           </motion.button>
           <div>
             <p style={{ fontSize: isDesktop ? 28 : 16, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.01em" }}>{t("Confirm your booking")}</p>
-            {isDesktop && <p style={{ fontSize: 14, color: "#7c6fa0" }}>{t("You won't be charged in this demo")}</p>}
+            {isDesktop && <p style={{ fontSize: 14, color: "#7c6fa0" }}>{store.live ? t("Nothing is charged now: you pay the host's share once your seat is confirmed") : t("You won't be charged in this demo")}</p>}
           </div>
         </div>
       </div>

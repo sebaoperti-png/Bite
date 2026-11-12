@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "motion/react";
 import logoImg from "../logo.png";
 import { dayLabel, AREAS, TIMES, CUISINE_TAGS, ANY_DAY, ANY_AREA, ANY_TIME, matchesCriteria, type Meal, type ServiceType, type SearchCriteria, euro } from "../data";
 import { useIsDesktop } from "../useIsDesktop";
-import { useStore, timeLabel, copyText, type Booking } from "../store";
+import { useStore, timeLabel, copyText, bookingStatusText, type Booking } from "../store";
 import type { NavTab } from "./DesktopTopBar";
 import { MealCard } from "./ListingsScreen";
 import { Sheet } from "./Sheet";
@@ -768,7 +768,7 @@ function BookingRow({ b, confirmCancel, setConfirmCancel, onOpen, onChat }: { b:
         <span className="flex-1 min-w-0">
           <span className="block truncate" style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{tMaybe(m.title)}</span>
           <span className="block" style={{ fontSize: 12, color: "#7c6fa0" }}>{dateLabel(m.date)} · {m.time} · {b.guests === 1 ? t("1 guest") : t("{n} guests", { n: b.guests })}</span>
-          <span className="block" style={{ fontSize: 12, fontWeight: 700, color: cancelled ? "#e9345a" : "#0a7c4e" }}>{cancelled ? t("Cancelled · refunded") : t("Confirmed · {price} paid", { price: euro(b.total) })}</span>
+          {(() => { const st = bookingStatusText(b, euro(b.total)); return <span className="block" style={{ fontSize: 12, fontWeight: 700, color: st.tone === "off" ? "#e9345a" : st.tone === "wait" ? "#b45309" : "#0a7c4e" }}>{st.text}</span>; })()}
         </span>
       </button>
       {!cancelled && (

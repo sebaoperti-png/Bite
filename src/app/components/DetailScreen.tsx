@@ -137,7 +137,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         </div>
         <div className="flex-1 min-w-0">
           <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{meal.host}{meal.ownedByMe && <span style={{ fontWeight: 600, color: "#0a7c4e" }}>{" "}{t("· you")}</span>}</p>
-          <p style={{ fontSize: 12.5, color: "#7c6fa0" }}>{t("Verified host · {n} meals shared", { n: meal.reviews })}</p>
+          <p style={{ fontSize: 12.5, color: "#7c6fa0" }}>{meal.hostVerified === false ? t("New host on Bite") : t("Verified host · {n} meals shared", { n: meal.reviews })}</p>
         </div>
         {!meal.ownedByMe && (
           <motion.button onClick={onMessage} className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl hover:bg-[#e6dcfa]" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.92 }}>
@@ -221,7 +221,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
                   <p style={{ fontSize: 14.5, fontWeight: 800, color: "#160a2e" }}>{b.guest!.name}</p>
                   <p style={{ fontSize: 12, color: "#7c6fa0" }}>{b.guests === 1 ? t("wants to join with 1 seat") : t("wants to join with {n} seats", { n: b.guests })}</p>
                 </div>
-                <span className="rq-chip"><ShieldCheck size={12} /> {t("Verified · ID checked")}</span>
+                {!store.live && <span className="rq-chip"><ShieldCheck size={12} /> {t("Verified · ID checked")}</span>}
               </div>
               {(() => { const hello = store.conversations.find((c) => c.id === b.conversationId)?.messages[0]?.text; return hello ? <p className="rq-msg">“{tMaybe(hello)}”</p> : null; })()}
               <div className="rq-actions">
@@ -234,7 +234,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
               <img src={b.guest!.avatar} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{b.guest!.name}</p>
-                <p style={{ fontSize: 12, color: "#7c6fa0" }}>{b.guests === 1 ? t("1 seat") : t("{n} seats", { n: b.guests })} · {t("{price} paid in-app", { price: euro(b.total) })}</p>
+                <p style={{ fontSize: 12, color: "#7c6fa0" }}>{b.guests === 1 ? t("1 seat") : t("{n} seats", { n: b.guests })} · {b.live ? euro(b.total) : t("{price} paid in-app", { price: euro(b.total) })}</p>
               </div>
               <motion.button onClick={() => onOpenChat(b.conversationId)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-[#e6dcfa]" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.92 }}>
                 <MessageCircle size={14} color="#6b21d9" />
@@ -329,10 +329,10 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
     </AnimatePresence>
   );
 
-  const ctaLabel = meal.ownedByMe ? t("Unpublish listing") : myBooking ? t("You're booked · Open chat") : left === 0 ? t("Sold out") : `${t(svc.cta)} · ${euro(withFee(meal.price))}`;
+  const ctaLabel = meal.ownedByMe ? (store.live ? t("Cancel this meal") : t("Unpublish listing")) : myBooking?.live === "requested" ? t("Request sent · Open chat") : myBooking ? t("You're booked · Open chat") : left === 0 ? t("Sold out") : `${t(svc.cta)} · ${euro(withFee(meal.price))}`;
   const ctaAction = () => {
     if (meal.ownedByMe) { store.unpublish(meal.id); onUnpublished(); return; }
-    if (myBooking) { onMessage(); return; }
+    if (myBooking) { if (myBooking.conversationId) onOpenChat(myBooking.conversationId); else onMessage(); return; }
     if (left > 0) onBook();
   };
   const ctaButton = (

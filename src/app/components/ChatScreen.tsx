@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Send, CheckCircle, Star, Leaf, Wine, Clock, MapPin, Calendar, Users, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { euro, type Meal } from "../data";
-import { useStore, timeLabel, type ChatMessage } from "../store";
+import { useStore, timeLabel, bookingStatusText, type ChatMessage } from "../store";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
 import { t, tMaybe, dateLabel } from "../../shared/i18n";
@@ -26,7 +26,9 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   const isDesktop = useIsDesktop();
   const store = useStore();
   const conv = store.conversations.find((c) => c.id === conversationId);
-  const booking = bookingId ? store.bookings.find((b) => b.id === bookingId) : store.bookings.find((b) => b.conversationId === conversationId && b.status === "confirmed" && !b.guest);
+  const booking = bookingId ? store.bookings.find((b) => b.id === bookingId) : store.bookings.find((b) => b.conversationId === conversationId && (b.status === "confirmed" || !!b.live) && !b.guest);
+  const waiting = booking?.live === "requested";
+  const off = booking?.status === "cancelled";
   const meal = (booking && store.mealById(booking.mealId)) || (conv?.mealId ? store.mealById(conv.mealId) : undefined);
   const [text, setText] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -60,11 +62,11 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
       </motion.button>
       <div className="relative">
         <img src={conv.avatar} alt="" className="w-10 h-10 rounded-full object-cover" style={{ border: "2px solid #6b21d9" }} />
-        <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full" style={{ background: "#10b981", border: "1.5px solid #fff" }} />
+        {!store.live && <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full" style={{ background: "#10b981", border: "1.5px solid #fff" }} />}
       </div>
       <div className="flex-1 min-w-0">
         <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{conv.name}</p>
-        <p style={{ fontSize: 11.5, color: typing ? "#6b21d9" : "#10b981", fontWeight: 600 }}>{typing ? t("Typing…") : isDesktop ? t("Online · usually replies in minutes") : t("Online")}</p>
+        <p style={{ fontSize: 11.5, color: typing ? "#6b21d9" : "#10b981", fontWeight: 600 }}>{typing ? t("Typing…") : store.live ? (meal ? tMaybe(meal.title) : "") : isDesktop ? t("Online · usually replies in minutes") : t("Online")}</p>
       </div>
       {meal && !isDesktop && (
         <button onClick={() => onOpenMeal(meal)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl" style={{ background: "#f0ecfa", fontSize: 11.5, fontWeight: 700, color: "#6b21d9" }}>{t("Meal")}{" "}<ChevronRight size={12} />
@@ -75,10 +77,10 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
 
   const confirmation = booking && meal && (
     <motion.div className="rounded-2xl overflow-hidden" initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 280, damping: 24, delay: 0.1 }}>
-      <div className="p-4" style={{ background: booking.status === "cancelled" ? "linear-gradient(135deg, #7c6fa0, #a99cc8)" : "linear-gradient(135deg, #6b21d9, #9b4aff)" }}>
+      <div className="p-4" style={{ background: off ? "linear-gradient(135deg, #7c6fa0, #a99cc8)" : waiting ? "linear-gradient(135deg, #b45309, #e08a1e)" : "linear-gradient(135deg, #6b21d9, #9b4aff)" }}>
         <div className="flex items-center gap-2 mb-3">
           <CheckCircle size={16} color="#fff" />
-          <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{booking.status === "cancelled" ? t("Booking cancelled · refunded") : t("Booking confirmed")}</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{booking.live === "declined" ? t("Request declined") : booking.live === "cancelled" ? t("Booking cancelled") : off ? t("Booking cancelled · refunded") : waiting ? t("Request sent · waiting for {name}", { name: conv.name.split(" ")[0] }) : t("Booking confirmed")}</span>
         </div>
         <button onClick={() => onOpenMeal(meal)} className="flex gap-3 text-left w-full">
           <img src={meal.image} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
@@ -86,11 +88,11 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
             <p style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{tMaybe(meal.title)}</p>
             <p className="flex items-center gap-1" style={{ fontSize: 11.5, color: "rgba(255,255,255,0.85)", marginTop: 2 }}><Calendar size={11} />{dateLabel(meal.date)} · {meal.time}</p>
             <p className="flex items-center gap-1 truncate" style={{ fontSize: 11.5, color: "rgba(255,255,255,0.75)" }}><MapPin size={11} />{localPlace(meal.location)}</p>
-            <p className="flex items-center gap-1" style={{ fontSize: 11.5, color: "rgba(255,255,255,0.75)" }}><Users size={11} />{booking.guests > 1 ? t("{n} guests", { n: booking.guests }) : t("1 guest")} · {t("{price} paid", { price: euro(booking.total) })}</p>
+            <p className="flex items-center gap-1" style={{ fontSize: 11.5, color: "rgba(255,255,255,0.75)" }}><Users size={11} />{booking.guests > 1 ? t("{n} guests", { n: booking.guests }) : t("1 guest")} · {booking.live ? bookingStatusText(booking, euro(booking.total)).text.split(" · ").pop() : t("{price} paid", { price: euro(booking.total) })}</p>
           </div>
         </button>
       </div>
-      {booking.status === "confirmed" && (
+      {booking.status === "confirmed" && !waiting && (!booking.live || (meal.startsAt && Date.parse(meal.startsAt) < Date.now())) && (
         <div className="px-4 py-2.5 flex items-center justify-between" style={{ background: "#ede8fb" }}>
           <span style={{ fontSize: 12, color: "#6b21d9", fontWeight: 700 }}>{booking.rating ? t("Thanks for rating!") : t("Rate {name} after the meal", { name: conv.name.split(" ")[0] })}</span>
           <div className="flex gap-1">
