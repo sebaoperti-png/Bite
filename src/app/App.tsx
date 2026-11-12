@@ -46,7 +46,7 @@ const BARE_SCREENS: Screen[] = ["splash", "onboarding", "auth"];
 
 
 /** Everything needed to rebuild a screen when the browser's back/forward buttons are used */
-type Route = { screen: Screen; mealId?: string; conversationId?: string; bookingId?: string; authMode?: AuthMode; role?: "cook" | "eat" };
+type Route = { screen: Screen; mealId?: string; conversationId?: string; bookingId?: string; authMode?: AuthMode; role?: "cook" | "eat"; reason?: string };
 type HistoryState = Route & { idx: number };
 
 export default function App() {
@@ -65,9 +65,13 @@ function AppInner() {
   // No splash or welcome screen: the app opens straight on Home (or on log-in after a log-out)
   // bite.html?host opens the hosting flow straight away (used by the landing page's "I want to host" button)
   const [route, setRoute] = useState<Route>(() => {
-    if (!store.account) return { screen: "auth", authMode: "login" };
+    // live mode: visitors look around first (meals, map, a meal's page); an account is asked for only to book,
+    // message, save or host. The demo opens already signed in; after a demo log-out it shows the log-in.
+    if (!store.account && !store.live) return { screen: "auth", authMode: "login" };
     const params = new URLSearchParams(window.location.search);
-    if (params.has("host")) return { screen: "start-hosting" };
+    // bite.html?login opens the log-in straight away (links from the website)
+    if (!store.account && params.has("login")) return { screen: "auth", authMode: "login" };
+    if (params.has("host")) return store.account ? { screen: "start-hosting" } : { screen: "auth", authMode: "signup", reason: t("Create a free account to host your first table.") };
     // bite.html?meal=<id> opens that meal (links from the landing page assistant)
     const mealId = params.get("meal");
     if (mealId && store.mealById(mealId)) return { screen: "detail", mealId };
@@ -92,7 +96,7 @@ function AppInner() {
   useEffect(() => {
     // Drop one-off parameters (?reset, ?host) from the address bar, keep ?embed for the landing preview
     const params = new URLSearchParams(window.location.search);
-    params.delete("reset"); params.delete("host"); params.delete("meal");
+    params.delete("reset"); params.delete("host"); params.delete("meal"); params.delete("login");
     const qs = params.toString();
     window.history.replaceState({ ...route, idx: 0 } satisfies HistoryState, "", window.location.pathname + (qs ? `?${qs}` : ""));
     const onPop = (e: PopStateEvent) => {
@@ -128,6 +132,24 @@ function AppInner() {
   };
 
   const openDetail = (meal: Meal) => navigate({ screen: "detail", mealId: meal.id });
+
+  // A visitor without an account (live mode) is asked to sign up only when they act; afterwards they land
+  // where they were going.
+  const afterAuth = useRef<(() => void) | null>(null);
+  // the action runs after sign-in, so it must read the store of that moment, not of the click
+  const storeRef = useRef(store);
+  storeRef.current = store;
+  useEffect(() => {
+    if (!store.account || !afterAuth.current || screen === "auth") return;
+    const then = afterAuth.current;
+    afterAuth.current = null;
+    window.setTimeout(then, 0);
+  }, [store.account, screen]); // eslint-disable-line react-hooks/exhaustive-deps
+  const withAccount = (reason: string, then: () => void) => {
+    if (store.account) { then(); return; }
+    afterAuth.current = then;
+    navigate({ screen: "auth", authMode: "signup", reason });
+  };
   const openChat = (conversationId: string, bookingId?: string, replace = false) => navigate({ screen: "chat", conversationId, bookingId }, replace);
   // When a search was just started (the listings screen shows its "kitchen check" if it opens right after)
   const [searchedAt, setSearchedAt] = useState(0);
@@ -139,6 +161,10 @@ function AppInner() {
 
   const onNav = (tab: NavTab) => {
     if (tab === "browse") { if (screen !== "listings") navigate("listings"); return; }
+    if (tab !== "home" && !store.account) {
+      withAccount(tab === "messages" ? t("Log in to see your messages.") : t("Log in to see your profile and bookings."), () => { setHomeTab(tab); navigate("home", true); });
+      return;
+    }
     setHomeTab(tab);
     if (screen !== "home") navigate("home");
   };
@@ -180,7 +206,9 @@ function AppInner() {
           unread={store.unreadTotal}
           name={store.profile.name}
           onNavigate={onNav}
-          onStartHosting={() => navigate("start-hosting")}
+          onStartHosting={() => withAccount(t("Create a free account to host your first table."), () => navigate("start-hosting"))}
+          guest={!store.account}
+          onLogIn={() => navigate({ screen: "auth", authMode: "login" })}
         />
       )}
       <div className="relative flex-1 min-h-0 overflow-hidden" style={{ background: dark ? "#0d0620" : "#f5f4f9" }}>
@@ -206,7 +234,8 @@ function AppInner() {
               {screen === "auth" && (
                 <AuthScreen
                   initialMode={route.authMode ?? "signup"}
-                  onBack={store.account ? () => goBack("home") : undefined}
+                  reason={route.reason}
+                  onBack={store.account || store.live ? () => { afterAuth.current = null; if (idx.current > 0) window.history.back(); else navigate("home", true); } : undefined}
                   onDone={() => {
                     // The sign-up screen is not a place to come back to: start a fresh history
                     const next: Screen = route.role === "cook" ? "cook-profile" : "home";
@@ -214,6 +243,8 @@ function AppInner() {
                     setHomeTab("home");
                     window.history.replaceState({ screen: next, idx: 0 } satisfies HistoryState, "");
                     show({ screen: next });
+                    // a visitor who signed up to book, message or host carries on from there (effect above,
+                    // once the account has arrived)
                   }}
                 />
               )}
@@ -239,10 +270,12 @@ function AppInner() {
                   onSearch={search}
                   onSelectMeal={openDetail}
                   onOpenChat={(id) => openChat(id)}
-                  onStartHosting={() => navigate("start-hosting")}
+                  onStartHosting={() => withAccount(t("Create a free account to host your first table."), () => navigate("start-hosting"))}
                   onSignOut={() => {
                     store.signOut();
                     setHomeTab("home");
+                    // live: back to looking around as a visitor; demo: the log-in screen
+                    if (store.live) { stack.current = ["home"]; idx.current = 0; window.history.replaceState({ screen: "home", idx: 0 } satisfies HistoryState, ""); show({ screen: "home" }); return; }
                     stack.current = ["auth"]; idx.current = 0;
                     window.history.replaceState({ screen: "auth", authMode: "login", idx: 0 } satisfies HistoryState, "");
                     show({ screen: "auth", authMode: "login" });
@@ -256,8 +289,8 @@ function AppInner() {
                 <DetailScreen
                   meal={meal}
                   onBack={() => goBack(prevScreen === "home" ? "home" : "listings")}
-                  onBook={() => navigate({ screen: "checkout", mealId: meal.id })}
-                  onMessage={() => { store.openConversation(meal).then((id) => openChat(id)).catch((e: Error) => store.showToast(e.message)); }}
+                  onBook={() => withAccount(t("Create a free account to ask for a seat. It takes a minute."), () => navigate({ screen: "checkout", mealId: meal.id }))}
+                  onMessage={() => withAccount(t("Create a free account to message the host."), () => { const st = storeRef.current; st.openConversation(meal).then((id) => openChat(id)).catch((e: Error) => st.showToast(e.message)); })}
                   onOpenChat={(id) => openChat(id)}
                   onUnpublished={() => navigate("home", true)}
                 />

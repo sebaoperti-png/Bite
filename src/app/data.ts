@@ -9,6 +9,9 @@ export interface Meal {
   title: string;
   host: string;
   hostAvatar: string;
+  /** Approximate position (about 1 km, never the street): live meals, for the map and the radius search */
+  lat?: number;
+  lng?: number;
   /** Live mode: the host's account id (used to report or block them). The demo identifies hosts by name. */
   hostId?: string;
   rating: number;
@@ -485,10 +488,15 @@ export function searchCenter(c: SearchCriteria): [number, number] | null {
   if (c.origin) return [c.origin.lat, c.origin.lng];
   return c.area !== ANY_AREA ? CITIES[c.area] ?? null : null;
 }
+/** Where a meal is on the map: its own (approximate) coordinates, else its neighbourhood or town */
+export function mealCoords(meal: Meal): [number, number] | null {
+  if (meal.lat != null && meal.lng != null) return [meal.lat, meal.lng];
+  return coordsOf(meal.location);
+}
 /** How far a meal is from the search point, in km (null when there is no point or we don't know where the meal is) */
 export function mealDistance(meal: Meal, c: SearchCriteria): number | null {
   const centre = searchCenter(c);
-  const at = coordsOf(meal.location);
+  const at = mealCoords(meal);
   return centre && at ? distanceKm(centre, at) : null;
 }
 /** The radius actually used: a postcode or "my location" always has one (10 km unless chosen) */

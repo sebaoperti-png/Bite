@@ -1,4 +1,5 @@
 import { supabase } from "../shared/supabase";
+import { approximateSpot } from "./geocode";
 import { labelForISO, SERVICE_FEE, type Meal, type ServiceType } from "./data";
 import type { Booking, Conversation, Person, ReportInput } from "./store";
 
@@ -55,6 +56,8 @@ export function mealFromRow(r: MealRow, me: string | null, address?: string): Me
     costProof: r.cost_proof ?? undefined,
     ownedByMe: !!me && r.host_id === me,
     hostId: r.host_id,
+    lat: r.lat ?? undefined,
+    lng: r.lng ?? undefined,
     hostVerified: r.host_verified,
     startsAt: r.starts_at,
     cancelled: r.status === "cancelled",
@@ -145,13 +148,15 @@ export interface NewMeal {
 }
 
 export async function publishMeal(me: string, m: NewMeal) {
+  // where the meal shows on the map: the town's centre, rounded to ~1 km (never the street)
+  const spot = await approximateSpot(m.city).catch(() => null);
   const photos = [m.image, ...m.gallery].filter(Boolean) as string[];
   const urls = await Promise.all(photos.map((p, i) => uploadPhoto(me, m.id, i, p)));
   const startsAt = new Date(`${m.dateISO}T${m.time || "19:00"}`).toISOString();
   const { error } = await supabase.from("meals").insert({
     id: m.id, host_id: me, title: m.title.slice(0, 80), description: m.description, service_type: m.serviceType,
     price_cents: Math.round(m.price * 100), seats: m.seats, starts_at: startsAt, city: m.city, area: m.area,
-    tags: m.tags, image_url: urls[0] ?? null, gallery: urls.slice(1), cost_proof: m.costProof ?? null, status: "published",
+    tags: m.tags, lat: spot?.lat ?? null, lng: spot?.lng ?? null, image_url: urls[0] ?? null, gallery: urls.slice(1), cost_proof: m.costProof ?? null, status: "published",
   });
   if (error) throw error;
   const addr = await supabase.from("meal_addresses").insert({ meal_id: m.id, address: m.address });

@@ -2,7 +2,7 @@
 // approximate coordinates for the demo neighbourhoods, city centres, and German postcodes by their first two
 // digits (a postcode area, so a "60311" search starts from the middle of the 60xxx area, not the exact street).
 
-export interface Place { label: string; lat: number; lng: number; kind: "city" | "postal" | "me" }
+export interface Place { label: string; lat: number; lng: number; kind: "city" | "postal" | "me" | "map" }
 
 /** Demo meals' neighbourhoods ("Neighbourhood, City") */
 const NEIGHBOURHOODS: Record<string, [number, number]> = {
@@ -21,6 +21,10 @@ export const CITIES: Record<string, [number, number]> = {
   Hanover: [52.3759, 9.732], Nuremberg: [49.4521, 11.0767], Bonn: [50.7374, 7.0982], Mainz: [49.9929, 8.2473], Wiesbaden: [50.0782, 8.2398], Darmstadt: [49.8728, 8.6512],
   Offenbach: [50.0956, 8.7761], Heidelberg: [49.3988, 8.6724], Mannheim: [49.4875, 8.466], Karlsruhe: [49.0069, 8.4037], Freiburg: [47.999, 7.8421], Münster: [51.9607, 7.6261],
   Aachen: [50.7753, 6.0839], Kiel: [54.3233, 10.1228], Rostock: [54.0924, 12.0991], Erfurt: [50.9848, 11.0299], Fulda: [50.5558, 9.6808], Kassel: [51.3127, 9.4797],
+  Aalen: [48.8376, 10.093], Ulm: [48.4011, 9.9876], Augsburg: [48.3705, 10.8978], Regensburg: [49.0134, 12.1016], Würzburg: [49.7913, 9.9534], Ingolstadt: [48.7665, 11.4258],
+  Göttingen: [51.5413, 9.9158], Gießen: [50.5841, 8.6784], Jena: [50.9271, 11.5892], Potsdam: [52.3906, 13.0645], Halle: [51.4825, 11.9697], Magdeburg: [52.1205, 11.6276],
+  Chemnitz: [50.8278, 12.9214], Lübeck: [53.8655, 10.6866], Oldenburg: [53.1435, 8.2146], Osnabrück: [52.2799, 8.0472], Bielefeld: [52.0302, 8.5325], Saarbrücken: [49.2402, 6.9969],
+  Trier: [49.7499, 6.6371], Konstanz: [47.6779, 9.1732], Tübingen: [48.5216, 9.0576], Heilbronn: [49.1427, 9.2109], "Schwäbisch Gmünd": [48.7999, 9.7977], Ellwangen: [48.9616, 10.1309],
 };
 /** German spellings people may type */
 const CITY_ALIASES: Record<string, string> = { münchen: "Munich", muenchen: "Munich", köln: "Cologne", koeln: "Cologne", hannover: "Hanover", nürnberg: "Nuremberg", nuernberg: "Nuremberg", "frankfurt am main": "Frankfurt" };
@@ -41,7 +45,7 @@ const PLZ2: Record<string, [string, number, number]> = {
   "90": ["Nuremberg", 49.45, 11.08], "93": ["Regensburg", 49.01, 12.1], "97": ["Würzburg", 49.79, 9.95], "99": ["Erfurt", 50.98, 11.03],
 };
 
-export const RADII = [0, 2, 5, 10, 20, 50];
+export const RADII = [0, 2, 5, 10, 20, 50, 100];
 
 export function distanceKm(a: [number, number], b: [number, number]) {
   const R = 6371, toRad = (d: number) => (d * Math.PI) / 180;
