@@ -904,6 +904,6 @@ const SAME = ["Berlin", "Hamburg", "Frankfurt", "Leipzig", "Stuttgart", "Düssel
   "Basel", "Bern", "Lausanne", "Turin", "Bologna", "Paris", "Lyon", "Marseille", "Toulouse", "Bordeaux", "Madrid", "Barcelona", "Valencia",
   "Bilbao", "Amsterdam", "Rotterdam", "Utrecht", "Eindhoven", "Liège", "Aarhus", "Odense", "Brno", "Ostrava", "London", "Manchester",
   "Edinburgh", "Bristol", "Birmingham", "Dublin", "Cork", "Galway", "Porto", "Braga", "Stockholm", "Malmö", "New York", "San Francisco",
-  "Los Angeles", "Chicago", "Boston", "Bite", "Sebastiano Operti", "sebaoperti@gmail.com"];
+  "Los Angeles", "Chicago", "Boston", "Bite", "Sebastiano Operti", "hello@bitetable.de"];
 
 export const DE_APP: Record<string, string> = { ...Object.fromEntries(SAME.map((w) => [w, w])), ...DE_UI, ...DE_MEALS };
