@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Bite</title></head>
+<body style="margin:0;padding:0;background:#f3eefb">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3eefb"><tr><td align="center" style="padding:32px 14px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px">
+<tr><td align="center" style="padding:0 0 18px"><a href="https://bitetable.de/"><img src="https://bitetable.de/bite-icon-192.png" width="64" height="64" alt="Bite" style="display:block;border:0;border-radius:16px"></a></td></tr>
+<tr><td bgcolor="#fbf7ef" style="border-radius:22px;padding:7px;box-shadow:0 10px 30px rgba(46,16,96,0.08)">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border:1px dashed #d6c6f0;border-radius:16px;padding:30px 28px">
+{{ if and .Data.lang (eq .Data.lang "de") }}<p style="margin:0 0 10px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9a8bb8">Tisch für eine Person · neuer Gast</p>
+<h1 style="margin:0 0 14px;font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-style:italic;font-weight:400;font-size:32px;line-height:1.15;color:#160a2e">{{ if .Data.name }}Hallo {{ .Data.name }},{{ else }}Hallo,{{ end }} dein Platz ist fast bereit.</h1>
+<p style="margin:0 0 26px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#4b3a6b">Tippe auf den Button, um deine E-Mail zu bestätigen. Danach kannst du hausgemachte Gerichte aus deiner Nachbarschaft buchen oder selbst einen Tisch decken.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#6b21d9" style="border-radius:999px">
+<a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 28px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;border-radius:999px">E-Mail bestätigen &rarr;</a>
+</td></tr></table>
+<p style="margin:26px 0 0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#7c6fa0">Der Link ist eine Stunde gültig. Wenn du kein Bite-Konto erstellt hast, ignoriere diese E-Mail einfach.</p>
+<p style="margin:18px 0 0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#9a8bb8">Button funktioniert nicht? Kopiere diesen Link in deinen Browser:<br><a href="{{ .ConfirmationURL }}" style="color:#6b21d9;word-break:break-all">{{ .ConfirmationURL }}</a></p>{{ else }}<p style="margin:0 0 10px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9a8bb8">Table for one · new guest</p>
+<h1 style="margin:0 0 14px;font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-style:italic;font-weight:400;font-size:32px;line-height:1.15;color:#160a2e">{{ if .Data.name }}Hi {{ .Data.name }},{{ else }}Hi,{{ end }} your seat is almost ready.</h1>
+<p style="margin:0 0 26px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#4b3a6b">Tap the button to confirm your email. Then you can book home-cooked meals from your neighbours, or host a table of your own.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#6b21d9" style="border-radius:999px">
+<a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 28px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;border-radius:999px">Confirm my email &rarr;</a>
+</td></tr></table>
+<p style="margin:26px 0 0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#7c6fa0">The link works for one hour. If you didn't create a Bite account, just ignore this email.</p>
+<p style="margin:18px 0 0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#9a8bb8">Button not working? Copy this link into your browser:<br><a href="{{ .ConfirmationURL }}" style="color:#6b21d9;word-break:break-all">{{ .ConfirmationURL }}</a></p>{{ end }}
+</td></tr></table>
+</td></tr>
+<tr><td align="center" style="padding:22px 10px 0">
+<p style="margin:0 0 14px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:12px;letter-spacing:3px;color:#c9b8e8">&middot; &middot; &middot; &middot; &middot; &middot; &middot; &middot; &middot; &middot; &middot; &middot;</p>
+{{ if and .Data.lang (eq .Data.lang "de") }}<p style="margin:0 0 4px;font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-style:italic;font-size:16px;color:#6b21d9">Hausgemachtes Essen, geteilt mit deiner Nachbarschaft.</p>
+<p style="margin:0;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:.5px;color:#9a8bb8">Fragen? Schreib an <a href="mailto:hello@bitetable.de" style="color:#6b21d9">hello@bitetable.de</a> &middot; <a href="https://bitetable.de/" style="color:#6b21d9">bitetable.de</a></p>{{ else }}<p style="margin:0 0 4px;font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-style:italic;font-size:16px;color:#6b21d9">Home-cooked meals, shared with your neighbours.</p>
+<p style="margin:0;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:.5px;color:#9a8bb8">Questions? Write to <a href="mailto:hello@bitetable.de" style="color:#6b21d9">hello@bitetable.de</a> &middot; <a href="https://bitetable.de/" style="color:#6b21d9">bitetable.de</a></p>{{ end }}
+</td></tr>
+</table>
+</td></tr></table>
+</body></html>
