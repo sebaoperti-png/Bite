@@ -17,7 +17,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  * Live mode (bite.html?live): real accounts through Supabase (see liveAuth.ts). After sign-up the person confirms
  * their email; after "Forgot password?" they get a link and choose a new password here (store.recovering).
  */
-export function AuthScreen({ initialMode, onBack, onDone }: { initialMode: AuthMode; onBack?: () => void; onDone: (mode: AuthMode) => void }) {
+export function AuthScreen({ initialMode, onBack, onDone, reason }: { initialMode: AuthMode; onBack?: () => void; onDone: (mode: AuthMode) => void; /** why we ask (a guest tried to book, message or host) */ reason?: string }) {
   const store = useStore();
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [name, setName] = useState("");
@@ -119,7 +119,7 @@ export function AuthScreen({ initialMode, onBack, onDone }: { initialMode: AuthM
 
         <div className="mt-8 text-center">
           <h1 style={{ fontSize: 30, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em" }}>{mode === "signup" ? t("Create your account") : t("Welcome back")}</h1>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", marginTop: 6 }}>{mode === "signup" ? t("Join your neighbours around the table.") : t("Log in to see your bookings and messages.")}</p>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", marginTop: 6 }}>{reason ?? (mode === "signup" ? t("Join your neighbours around the table.") : t("Log in to see your bookings and messages."))}</p>
         </div>
 
         {/* Mode switch */}

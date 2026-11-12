@@ -1,12 +1,18 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { placeSummary, fmtKm } from "./LocationPicker";
 import { BiteLoader, EmptyPlate } from "../../shared/Restaurant";
 import { LikeHeart } from "../../shared/Motion";
 import {
   ChevronLeft, Star, SlidersHorizontal, Heart, MapPin, Search,
   ShoppingBag, Utensils, ChefHat, X, Check, Wheat, Fish,
-  Milk, Egg, Nut, Leaf, FlameKindling, Sprout, ArrowUpDown,
+  Milk, Egg, Nut, Leaf, FlameKindling, Sprout, ArrowUpDown, Map as MapIcon, List,
 } from "lucide-react";
+import type { Place } from "../geo";
+
+// the map (MapLibre) is loaded only when someone opens it
+const MealMap = lazy(() => import("./MealMap"));
+type View = "list" | "map";
+const VIEW_KEY = "bite_view";
 import { motion, AnimatePresence } from "motion/react";
 import { ANY_AREA, ANY_DAY, ANY_TIME, DEFAULT_CRITERIA, matchesCriteria, mealDistance, searchCenter, euro, type Meal, type ServiceType, type SearchCriteria } from "../data";
 import { BottomNav, SheetHeader } from "./HomeScreen";
@@ -79,6 +85,19 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   }, [checking]);
 
   const set = (patch: Partial<SearchCriteria>) => setCriteria((c) => ({ ...c, ...patch }));
+  const [view, setViewState] = useState<View>(() => { try { return sessionStorage.getItem(VIEW_KEY) === "map" ? "map" : "list"; } catch { return "list"; } });
+  const setView = (v: View) => { setViewState(v); try { sessionStorage.setItem(VIEW_KEY, v); } catch { /* ignore */ } };
+  const searchArea = (place: Place, km: number) => set({ origin: place, area: ANY_AREA, radius: km });
+  const viewSwitch = (floating: boolean) => (
+    <div className={`vw-switch ${floating ? "vw-float" : ""}`} role="tablist" aria-label={t("Show as")}>
+      {([["list", List, t("List")], ["map", MapIcon, t("Map")]] as const).map(([id, Icon, label]) => (
+        <button key={id} role="tab" aria-selected={view === id} className={view === id ? "on" : ""} onClick={() => setView(id)}>
+          {view === id && <motion.span layoutId={floating ? "vw-pill-f" : "vw-pill"} className="vw-pill" transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}
+          <Icon size={14} strokeWidth={2.4} /> {label}
+        </button>
+      ))}
+    </div>
+  );
   const toggleSet = (s: Set<string>, id: string): Set<string> => {
     const n = new Set(s);
     if (n.has(id)) n.delete(id); else n.add(id);
@@ -92,6 +111,12 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
     .filter((m) => [...dietary, ...allergens].every((f) => m.tags.includes(f)))
     .slice()
     .sort((a, b) => sort === "price" ? a.price - b.price : sort === "rating" ? b.rating - a.rating : sort === "distance" ? (mealDistance(a, criteria) ?? 1e9) - (mealDistance(b, criteria) ?? 1e9) : 0);
+
+  const mapView = (
+    <Suspense fallback={<div className="mm"><div className="mm-loading">{t("Unfolding the map…")}</div></div>}>
+      <MealMap meals={filtered} criteria={criteria} onSelect={onSelect} onSearchArea={searchArea} />
+    </Suspense>
+  );
 
   // Search criteria coming from Home, shown as removable chips
   const criteriaChips: { label: string; clear: () => void }[] = [
@@ -203,14 +228,19 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
                 <h1 style={{ fontSize: 30, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.02em" }}>
                   {filtered.length === 1 ? t("1 meal available") : t("{n} meals available", { n: filtered.length })}</h1>
               </div>
+              <div className="flex items-center gap-3 flex-shrink-0">
+              {viewSwitch(false)}
               <button onClick={cycleSort} className="flex items-center gap-2 px-4 py-2.5 rounded-xl flex-shrink-0" style={{ background: sort !== "default" ? "#ede8fb" : "#fff", border: "1.5px solid rgba(107,33,217,0.12)" }}>
                 <ArrowUpDown size={15} color="#6b21d9" strokeWidth={2} />
                 <span style={{ fontSize: 13.5, fontWeight: 700, color: "#6b21d9" }}>{sort === "default" ? t("Sort: recommended") : t("Sort: {by}", { by: getLang() === "de" ? sortLabel : sortLabel.toLowerCase() })}</span>
               </button>
+              </div>
             </div>
             {searchBox}
             {chips}
-            {checking ? kitchenCheck : filtered.length === 0 ? empty : (
+            {view === "map" ? (
+              <div className="rounded-3xl overflow-hidden" style={{ height: "calc(100vh - 290px)", minHeight: 520, boxShadow: "0 4px 24px rgba(46,16,96,0.08)" }}>{mapView}</div>
+            ) : checking ? kitchenCheck : filtered.length === 0 ? empty : (
               <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((meal, i) => (
                   <motion.div key={meal.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03 }}>
@@ -226,7 +256,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   }
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="relative flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
       <div style={{ height: "max(env(safe-area-inset-top), 14px)", flexShrink: 0, background: "#fff" }} />
 
       {/* Header */}
@@ -267,8 +297,9 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
 
       {chips && <div className="px-4 pt-3">{chips}</div>}
 
+      {view === "map" && <div className="flex-1 relative min-h-0">{mapView}</div>}
       {/* Meal list */}
-      <div className="flex-1 overflow-y-auto px-4 py-4" style={{ scrollbarWidth: "none" }}>
+      {view === "list" && <div className="flex-1 overflow-y-auto px-4 py-4" style={{ scrollbarWidth: "none" }}>
         {checking && kitchenCheck}
         <AnimatePresence>
           {!checking && filtered.map((meal, i) => (
@@ -278,8 +309,9 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
           ))}
         </AnimatePresence>
         {!checking && filtered.length === 0 && empty}
-        <div style={{ height: 12 }} />
-      </div>
+        <div style={{ height: 64 }} />
+      </div>}
+      {viewSwitch(true)}
 
       <BottomNav active="browse" unread={store.unreadTotal} onNavigate={onNavigate} />
 

@@ -15,10 +15,13 @@ const ITEMS: { id: NavTab; label: string; Icon: React.ElementType }[] = [
 ];
 
 /** Desktop-only navigation bar: replaces the phone's bottom tab bar on wide screens. */
-export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting }: {
+export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting, guest = false, onLogIn }: {
   active: NavTab | null;
   unread: number;
   name: string;
+  /** live mode visitor without an account */
+  guest?: boolean;
+  onLogIn?: () => void;
   onNavigate: (tab: NavTab) => void;
   onStartHosting: () => void;
 }) {
@@ -62,10 +65,14 @@ export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting
             <ChefHat size={15} color="#b87fff" strokeWidth={2.3} />
             <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff", whiteSpace: "nowrap" }}>{t("Start hosting")}</span>
           </button>
-          <button onClick={() => onNavigate("profile")} className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full" style={{ background: "#ede8fb" }} aria-label={t("Your profile")}>
-            <Avatar size={28} fontSize={11} />
-            <span style={{ fontSize: 13.5, color: "#6b21d9", fontWeight: 700 }}>{name.split(" ")[0]}</span>
-          </button>
+          {guest ? (
+            <button onClick={onLogIn} className="px-4 py-2.5 rounded-xl" style={{ background: "#ede8fb", fontSize: 13.5, color: "#6b21d9", fontWeight: 800 }}>{t("Log in")}</button>
+          ) : (
+            <button onClick={() => onNavigate("profile")} className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full" style={{ background: "#ede8fb" }} aria-label={t("Your profile")}>
+              <Avatar size={28} fontSize={11} />
+              <span style={{ fontSize: 13.5, color: "#6b21d9", fontWeight: 700 }}>{name.split(" ")[0]}</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

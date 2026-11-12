@@ -1,10 +1,12 @@
-// "Where?" — a place and a radius, like Kleinanzeigen: type a city or a German postcode (or use your location),
-// then choose how far around it to look ("Whole city", +2 … +50 km). The button shows how many meals match.
-import { useState } from "react";
+// "Where?" — a place and a radius, like Kleinanzeigen: type any town, village, district or postcode in Germany
+// (suggestions as you type, from OpenStreetMap via geocode.ts) or use your location, then choose how far
+// around it to look ("Whole city", +2 … +100 km). The button shows how many meals match.
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { MapPin, LocateFixed, Search } from "lucide-react";
 import { AREAS, ANY_AREA, effectiveRadius, type SearchCriteria } from "../data";
-import { RADII, CITIES, cityName, placeFromPostcode, type Place } from "../geo";
+import { RADII, type Place } from "../geo";
+import { searchPlaces, geocodePlace, type Suggestion } from "../geocode";
 import { t, dec } from "../../shared/i18n";
 
 export function LocationPicker({ criteria, set, countFor, onDone }: {
@@ -16,22 +18,38 @@ export function LocationPicker({ criteria, set, countFor, onDone }: {
   const [text, setText] = useState(criteria.origin?.kind === "postal" ? criteria.origin.label.split(" · ")[0] : "");
   const [error, setError] = useState("");
   const [locating, setLocating] = useState(false);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [looking, setLooking] = useState(false);
+  const typed = useRef(false);
+
+  // suggestions while typing (a short pause first, the previous request is cancelled)
+  useEffect(() => {
+    const q = text.trim();
+    if (!typed.current || q.length < 2) { setSuggestions([]); return; }
+    const ctrl = new AbortController();
+    const id = window.setTimeout(() => {
+      setLooking(true);
+      searchPlaces(q, ctrl.signal).then((s) => { setSuggestions(s); setLooking(false); }).catch(() => setLooking(false));
+    }, 220);
+    return () => { window.clearTimeout(id); ctrl.abort(); };
+  }, [text]);
 
   const usePlace = (origin: Place) => { set({ origin, area: ANY_AREA, radius: criteria.radius || 10 }); setError(""); };
-  const useCity = (area: string) => { set({ area, origin: null }); setError(""); setText(""); };
+  const useCity = (area: string) => { set({ area, origin: null }); setError(""); setText(""); typed.current = false; setSuggestions([]); };
+  const pick = (s: Suggestion) => {
+    usePlace({ label: s.label, lat: s.lat, lng: s.lng, kind: s.kind });
+    typed.current = false; setText(s.label); setSuggestions([]);
+  };
 
-  const submit = () => {
+  const submit = async () => {
     const q = text.trim();
     if (!q) return;
-    if (/^\d{5}$/.test(q)) {
-      const p = placeFromPostcode(q);
-      if (p) usePlace(p); else setError(t("We don't know this postcode yet — try a city"));
-      return;
-    }
-    const city = cityName(q);
-    if (city && AREAS.includes(city)) useCity(city);
-    else if (city) { const [lat, lng] = CITIES[city]; usePlace({ label: t(city), lat, lng, kind: "city" }); } // a city without demo meals: search around it
-    else setError(t("Type a city (e.g. Frankfurt) or a 5-digit postcode"));
+    if (suggestions[0]) { pick(suggestions[0]); return; }
+    setLooking(true);
+    const s = await geocodePlace(q);
+    setLooking(false);
+    if (s) pick(s);
+    else setError(t("We could not find this place in Germany. Try a town or a postcode."));
   };
 
   const locate = () => {
@@ -53,9 +71,22 @@ export function LocationPicker({ criteria, set, countFor, onDone }: {
     <div className="lp-pick">
       <form className="lp-search" onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <Search size={16} color="#7c6fa0" />
-        <input value={text} onChange={(e) => { setText(e.target.value); setError(""); }} placeholder={t("City or postcode")} aria-label={t("City or postcode")} inputMode="search" maxLength={40} />
-        <button type="submit" disabled={!text.trim()}>{t("Go")}</button>
+        <input value={text} onChange={(e) => { typed.current = true; setText(e.target.value); setError(""); }} placeholder={t("Any town, village or postcode in Germany")} aria-label={t("City or postcode")} inputMode="search" maxLength={60}
+          role="combobox" aria-expanded={suggestions.length > 0} aria-controls="lp-suggest" aria-autocomplete="list" />
+        <button type="submit" disabled={!text.trim() || looking}>{looking ? "…" : t("Go")}</button>
       </form>
+      {suggestions.length > 0 && (
+        <ul className="lp-suggest" id="lp-suggest" role="listbox">
+          {suggestions.map((s) => (
+            <li key={`${s.label}-${s.detail}`} role="option" aria-selected={false}>
+              <button type="button" onClick={() => pick(s)}>
+                <MapPin size={14} />
+                <span><b>{s.label}</b>{s.detail && <em>{s.detail}</em>}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       <button type="button" className="lp-me" onClick={locate} disabled={locating}>
         <LocateFixed size={16} /> {locating ? t("Finding you…") : t("Use my location")}
       </button>
@@ -65,7 +96,7 @@ export function LocationPicker({ criteria, set, countFor, onDone }: {
         <p className="lp-current"><MapPin size={14} /> {t("Around {place}", { place: criteria.origin.label })}</p>
       )}
 
-      <p className="lp-label">{t("Cities")}</p>
+      <p className="lp-label">{t("Popular cities")}</p>
       <div className="lp-chips">
         {AREAS.map((a) => {
           const on = !criteria.origin && criteria.area === a;

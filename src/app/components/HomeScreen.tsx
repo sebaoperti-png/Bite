@@ -110,8 +110,8 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                   <div className="flex items-center gap-2">
                   <LangSwitch size="sm" />
                   <motion.button onClick={() => onNavigate("profile")} aria-label={t("Your profile")} className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: "#ede8fb" }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, type: "spring" }} whileTap={{ scale: 0.94 }}>
-                    <Avatar size={24} fontSize={10} />
-                    <span style={{ fontSize: 13, color: "#6b21d9", fontWeight: 600 }}>{store.profile.name.split(" ")[0]}</span>
+                    {store.account ? <Avatar size={24} fontSize={10} /> : null}
+                    <span style={{ fontSize: 13, color: "#6b21d9", fontWeight: store.account ? 600 : 800 }}>{store.account ? store.profile.name.split(" ")[0] : t("Log in")}</span>
                   </motion.button>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                   </motion.div>
 
                   <motion.div className="px-5 pt-5 pb-2" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-                    <p style={{ fontSize: 12.5, fontWeight: 700, color: "#9b4aff", marginBottom: 2 }}>{greeting()}, {store.profile.name.split(" ")[0]}</p>
+                    <p style={{ fontSize: 12.5, fontWeight: 700, color: "#9b4aff", marginBottom: 2 }}>{store.profile.name ? `${greeting()}, ${store.profile.name.split(" ")[0]}` : greeting()}</p>
                     <h1 style={{ fontSize: 22, fontWeight: 800, color: "#160a2e", lineHeight: 1.25 }}>{t("What do you feel like")}<br />
                       <span style={{ color: "#6b21d9" }}>{t("eating today?")}</span>
                     </h1>
@@ -341,7 +341,7 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
         <div className="grid gap-6 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_320px] items-stretch">
           {/* Search panel */}
           <motion.section className="rounded-[28px] p-8 lg:p-10" style={{ background: "#ffffff", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: "#9b4aff" }}>{greeting()}, {name.split(" ")[0]}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#9b4aff" }}>{name ? `${greeting()}, ${name.split(" ")[0]}` : greeting()}</p>
             <h1 style={{ fontSize: 44, fontWeight: 900, color: "#160a2e", lineHeight: 1.05, letterSpacing: "-0.03em", marginTop: 6 }}>{t("What do you feel like")}{" "}<span className="dh-serif">{t("eating today?")}</span>
             </h1>
 
