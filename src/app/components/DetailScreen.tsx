@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { SafetyActions, ReportSheet, BlockSheet, type ReportTarget } from "./SafetySheets";
+import { personOfMeal, type Person } from "../store";
 import { LikeHeart } from "../../shared/Motion";
 import { Cloche, TableSeats } from "../../shared/Restaurant";
 import { PrepChecklist } from "./PrepChecklist";
-import { ChevronLeft, Star, MapPin, Clock, Users, Heart, Share2, CheckCircle, ChevronDown, ShoppingBag, Utensils, ChefHat, Leaf, MessageCircle, Link2, Mail, Send, ExternalLink, Trash2, ShieldCheck, ConciergeBell } from "lucide-react";
+import { ChevronLeft, Flag, Star, MapPin, Clock, Users, Heart, Share2, CheckCircle, ChevronDown, ShoppingBag, Utensils, ChefHat, Leaf, MessageCircle, Link2, Mail, Send, ExternalLink, Trash2, ShieldCheck, ConciergeBell } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { withFee, euro, type Meal } from "../data";
 import { useStore, copyText } from "../store";
@@ -45,6 +47,9 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
   const [activeImage, setActiveImage] = useState(0);
   const [showReviews, setShowReviews] = useState(isDesktop);
   const [showShare, setShowShare] = useState(false);
+  const [safetyOpen, setSafetyOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
+  const [blockTarget, setBlockTarget] = useState<Person | null>(null);
   const svc = SVC_CONFIG[meal.serviceType];
   const { Icon } = svc;
 
@@ -131,9 +136,11 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
       <div className="p-4 flex items-center gap-3">
         <div className="relative flex-shrink-0">
           <img src={meal.hostAvatar} alt="" className="w-12 h-12 rounded-full object-cover" style={{ border: "2px solid #6b21d9" }} />
-          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#6b21d9", border: "1.5px solid #fff" }}>
-            <CheckCircle size={8} color="#fff" />
-          </div>
+          {meal.hostVerified !== false && (
+            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#6b21d9", border: "1.5px solid #fff" }}>
+              <CheckCircle size={8} color="#fff" />
+            </div>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{meal.host}{meal.ownedByMe && <span style={{ fontWeight: 600, color: "#0a7c4e" }}>{" "}{t("· you")}</span>}</p>
@@ -147,9 +154,21 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         )}
       </div>
       <div className="px-4 pb-4" style={{ borderTop: "1px solid rgba(107,33,217,0.07)" }}>
-        <p style={{ fontSize: 14, color: "#4a3a6e", lineHeight: 1.6, paddingTop: 10 }}>"{tMaybe(meal.hostBio)}"</p>
+        {meal.hostBio && <p style={{ fontSize: 14, color: "#4a3a6e", lineHeight: 1.6, paddingTop: 10 }}>"{tMaybe(meal.hostBio)}"</p>}
+        {!meal.ownedByMe && (
+          <button onClick={() => setSafetyOpen(true)} className="mt-3 flex items-center gap-1.5" style={{ fontSize: 12, fontWeight: 600, color: "#9a8bb8" }}>
+            <Flag size={12} strokeWidth={2.4} /> {t("Something not right? Report or block")}
+          </button>
+        )}
       </div>
     </div>
+  );
+  const safety = !meal.ownedByMe && (
+    <>
+      <SafetyActions open={safetyOpen} onClose={() => setSafetyOpen(false)} person={personOfMeal(meal)} mealId={meal.id} onReport={setReportTarget} onBlock={setBlockTarget} />
+      <ReportSheet target={reportTarget} onClose={() => setReportTarget(null)} />
+      <BlockSheet person={blockTarget} onClose={() => setBlockTarget(null)} onBlocked={onBack} />
+    </>
   );
 
   const infoPills = (
@@ -400,13 +419,14 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
                 {tableSeats && <div className="mb-4">{tableSeats}</div>}
                 {ctaButton}
                 <p className="flex items-center justify-center gap-1.5 mt-3" style={{ fontSize: 12.5, color: "#7c6fa0" }}>
-                  <ShieldCheck size={14} color="#0a7c4e" />{" "}{t("Free cancellation up to 24h before")}</p>
+                  <ShieldCheck size={14} color="#0a7c4e" />{" "}{store.live ? t("Nothing is charged now. You pay at the table.") : t("Free cancellation up to 24h before")}</p>
               </div>
               {location}
             </aside>
           </div>
         </div>
         {shareSheet}
+        {safety}
       </div>
     );
   }
@@ -443,11 +463,12 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         {ctaButton}
         {!meal.ownedByMe && (
           <p className="flex items-center justify-center gap-1.5 mt-2" style={{ fontSize: 11.5, color: "#7c6fa0" }}>
-            <ShieldCheck size={13} color="#0a7c4e" />{" "}{t("Free cancellation up to 24h before")}</p>
+            <ShieldCheck size={13} color="#0a7c4e" />{" "}{store.live ? t("Nothing is charged now. You pay at the table.") : t("Free cancellation up to 24h before")}</p>
         )}
       </div>
 
       {shareSheet}
+      {safety}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { HouseRulesSheet, ProfileGateSheet } from "./SafetySheets";
 import { ThinkingOrb } from "thinking-orbs";
 import { generate } from "../../lib/ui-generation.js";
 import { useStore } from "../store";
@@ -1083,7 +1084,8 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
 }
 
 function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () => void; publishing: boolean }) {
-  const { profile } = useStore();
+  const store = useStore();
+  const { profile } = store;
   const covered = form.pricePerGuest * form.maxGuests;
   // The preview card draws itself like the assistant is assembling the listing, once, when the step opens
   const cardRef = useRef<HTMLDivElement>(null);
@@ -1191,10 +1193,10 @@ function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () 
       <div className="px-1 pb-1">
         <div className="flex items-center gap-2 mb-3">
           <ShieldCheck size={14} color="#0a7c4e" strokeWidth={2} />
-          <p style={{ fontSize: 12, fontWeight: 700, color: "#0a7c4e" }}>{t("Your listing is protected by Bite's Host Guarantee")}</p>
+          <p style={{ fontSize: 12, fontWeight: 700, color: "#0a7c4e" }}>{store.live ? t("Bite's safety basics for your table") : t("Your listing is protected by Bite's Host Guarantee")}</p>
         </div>
         <div className="flex flex-col gap-1.5">
-          {[t("Identity verified"), t("Secure payments"), t("24/7 support")].map(item => (
+          {(store.live ? [t("Every guest has a name and a photo"), t("You choose who sits at your table"), t("Report or block anyone, at any time")] : [t("Identity verified"), t("Secure payments"), t("24/7 support")]).map(item => (
             <div key={item} className="flex items-center gap-2">
               <CheckCircle size={12} color="#0a7c4e" strokeWidth={2.5} />
               <span style={{ fontSize: 12, color: "#4a3a6e" }}>{t(item)}</span>
@@ -1261,6 +1263,9 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
 
   const set = (k: keyof FormData, v: any) => { setError(""); setForm(f => ({ ...f, [k]: v })); };
 
+  const [gate, setGate] = useState<"profile" | "rules" | null>(null);
+  const gatePassed = useRef({ profile: false, rules: false });
+
   const goNext = () => {
     const err = stepError(step, form);
     if (err) { setError(err); return; }
@@ -1288,6 +1293,9 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
       const err = stepError(i, form);
       if (err) { setDirection(-1); setStep(i); setError(err); return; }
     }
+    // before the first table: who is cooking (live: a name and a photo) and the house rules (the database checks both)
+    if (store.live && !gatePassed.current.profile && !store.profileComplete) { setGate("profile"); return; }
+    if (!gatePassed.current.rules && !store.hostRulesAccepted) { setGate("rules"); return; }
     setPublishing(true);
     const name = store.profile.name;
     const meal: Omit<Meal, "id"> = {
@@ -1453,6 +1461,10 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
           </motion.button>
         </div>
       )}
+      <ProfileGateSheet open={gate === "profile"} reason="host" onClose={() => setGate(null)}
+        onDone={() => { gatePassed.current.profile = true; setGate(null); window.setTimeout(publish, 450); }} />
+      <HouseRulesSheet open={gate === "rules"} onClose={() => setGate(null)}
+        onAccepted={() => { gatePassed.current.rules = true; setGate(null); window.setTimeout(publish, 350); }} />
     </div>
   );
 }

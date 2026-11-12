@@ -89,7 +89,7 @@ function Medal({ Icon, tone, on, delay }: { Icon: React.ElementType; tone: strin
 
 /** The trust sticker, like the certificate stuck on a restaurant window: ticks light up to the score
     while "verified neighbour" turns around the edge */
-function TrustSticker({ score }: { score: number }) {
+function TrustSticker({ score, checks, ring, label }: { score: number; checks: { label: string; on: boolean }[]; ring: string; label: string }) {
   const ticks = 48;
   const [lit, setLit] = useState(0);
   const target = Math.round((score / 100) * ticks);
@@ -99,7 +99,7 @@ function TrustSticker({ score }: { score: number }) {
     return () => window.clearInterval(id);
   }, [target]);
   const shown = target ? Math.round((lit / target) * score) : score;
-  const ringText = `${t("BITE")} · ${t("VERIFIED NEIGHBOUR")} · ${t("BITE")} · ${t("VERIFIED NEIGHBOUR")} · `;
+  const ringText = `${t("BITE")} · ${ring} · ${t("BITE")} · ${ring} · `;
   return (
     <div className="pd-sticker">
       <div className="pd-seal">
@@ -121,12 +121,12 @@ function TrustSticker({ score }: { score: number }) {
           })}
           <circle cx="80" cy="80" r="40" fill="url(#pd-seal-core)" />
         </svg>
-        <div className="pd-seal-num"><b>{Math.min(score, shown)}<small>%</small></b><span>{t("Trust score")}</span></div>
+        <div className="pd-seal-num"><b>{Math.min(score, shown)}<small>%</small></b><span>{label}</span></div>
       </div>
       <ul className="pd-sticker-checks">
-        {[t("ID verified"), t("Email & phone"), t("{n}★ from 38 reviews", { n: dec(4.9) })].map((label, i) => (
-          <motion.li key={i} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 + i * 0.2 }}>
-            <Check size={11} strokeWidth={3.5} /> {label}
+        {checks.map((c, i) => (
+          <motion.li key={i} initial={{ opacity: 0, y: 4 }} animate={{ opacity: c.on ? 1 : 0.45, y: 0 }} transition={{ delay: 0.9 + i * 0.2 }}>
+            {c.on ? <Check size={11} strokeWidth={3.5} /> : <span style={{ display: "inline-block", width: 11 }}>·</span>} {c.label}
           </motion.li>
         ))}
       </ul>
@@ -181,18 +181,20 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
   const myBookings = store.bookings.filter((b) => !b.guest && b.status === "confirmed");
   const guestsAtMyTables = store.bookings.filter((b) => b.guest && b.status === "confirmed");
   const bookedMeals = myBookings.map((b) => store.mealById(b.mealId)).filter(Boolean) as Meal[];
-  const mealsShared = 12 + myBookings.length + store.published.length;
-  const neighbours = 31 + myBookings.reduce((n, b) => n + 3 + b.guests, 0) + guestsAtMyTables.reduce((n, b) => n + b.guests, 0);
-  const saved = 148 + myBookings.reduce((n, b) => n + Math.max(0, 25 * b.guests - b.total), 0);
-  const kgSaved = 9.7 + myBookings.reduce((n, b) => n + 0.4 * b.guests, 0) + guestsAtMyTables.reduce((n, b) => n + 0.5 * b.guests, 0) + store.published.length * 0.6;
+  // live mode starts from zero: only what really happened on this account
+  const base = store.live ? { meals: 0, neighbours: 0, saved: 0, kg: 0 } : { meals: 12, neighbours: 31, saved: 148, kg: 9.7 };
+  const mealsShared = base.meals + myBookings.length + store.published.length;
+  const neighbours = base.neighbours + myBookings.reduce((n, b) => n + 3 + b.guests, 0) + guestsAtMyTables.reduce((n, b) => n + b.guests, 0);
+  const saved = base.saved + myBookings.reduce((n, b) => n + Math.max(0, 25 * b.guests - b.total), 0);
+  const kgSaved = base.kg + myBookings.reduce((n, b) => n + 0.4 * b.guests, 0) + guestsAtMyTables.reduce((n, b) => n + 0.5 * b.guests, 0) + store.published.length * 0.6;
 
-  const tried = new Set(TRIED_BEFORE);
+  const tried = new Set(store.live ? [] : TRIED_BEFORE);
   bookedMeals.forEach((m) => m.tags.forEach((tag) => STAMPS.some((s) => s.c === tag) && tried.add(tag)));
   const stampsLeft = Math.max(0, GLOBETROTTER - tried.size);
 
   const badges = [
-    { id: "first", Icon: Utensils, tone: "gold", name: "First table", how: "Book your first meal", on: true },
-    { id: "guest", Icon: Star, tone: "rose", name: "Great guest", how: "Get a 5★ review from a host", on: true },
+    { id: "first", Icon: Utensils, tone: "gold", name: "First table", how: "Book your first meal", on: !store.live || myBookings.length > 0 },
+    { id: "guest", Icon: Star, tone: "rose", name: "Great guest", how: "Get a 5★ review from a host", on: !store.live },
     { id: "waste", Icon: Leaf, tone: "mint", name: "Zero waste", how: "Save 10 kg of food", on: kgSaved >= 10 },
     { id: "host", Icon: ChefHat, tone: "violet", name: "Super host", how: "Host your first table", on: store.published.length > 0 },
     { id: "globe", Icon: Globe2, tone: "sky", name: "Globetrotter", how: "Collect 8 passport stamps", on: tried.size >= GLOBETROTTER },
@@ -204,7 +206,15 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
     .sort((a, b) => (a.d ?? 99) - (b.d ?? 99))[0];
 
   const [passOpen, setPassOpen] = useState(false);
-  const trust = 96;
+  // demo: the founder's believable history. Live: how complete the profile really is (nothing invented)
+  const liveChecks = [
+    { label: t("Email confirmed"), on: !!store.account },
+    { label: t("Photo and name"), on: store.profileComplete },
+    { label: t("A few words about you"), on: profile.bio.trim().length >= 20 },
+    { label: t("House rules accepted"), on: store.hostRulesAccepted },
+  ];
+  const trust = store.live ? Math.round(liveChecks.reduce((n, c, i) => n + (c.on ? [25, 35, 20, 20][i] : 0), 0)) : 96;
+  const trustChecks = store.live ? liveChecks : [{ label: t("ID verified"), on: true }, { label: t("Email & phone"), on: true }, { label: t("{n}★ from 38 reviews", { n: dec(4.9) }), on: true }];
 
   return (
     <div className={`pd ${isDesktop ? "pd-desk" : ""}`}>
@@ -223,7 +233,7 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
             <motion.button whileTap={{ scale: 0.95 }} onClick={onShare} className="pd-btn"><Share2 size={14} /> {t("Share profile")}</motion.button>
           </div>
         </div>
-        <TrustSticker score={trust} />
+        <TrustSticker score={trust} checks={trustChecks} ring={store.live ? t("YOUR PROFILE") : t("VERIFIED NEIGHBOUR")} label={store.live ? t("Profile complete") : t("Trust score")} />
       </section>
 
       <div className="pd-grid">

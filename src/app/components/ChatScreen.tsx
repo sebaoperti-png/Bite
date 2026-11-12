@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, Send, CheckCircle, Star, Leaf, Wine, Clock, MapPin, Calendar, Users, ChevronRight } from "lucide-react";
+import { ChevronLeft, Send, CheckCircle, Star, Leaf, Wine, Clock, MapPin, Calendar, Users, ChevronRight, MoreHorizontal, Ban } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { euro, type Meal } from "../data";
-import { useStore, timeLabel, bookingStatusText, type ChatMessage } from "../store";
+import { useStore, timeLabel, bookingStatusText, personOfConversation, type ChatMessage, type Person } from "../store";
+import { SafetyActions, ReportSheet, BlockSheet, type ReportTarget } from "./SafetySheets";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
 import { t, tMaybe, dateLabel } from "../../shared/i18n";
@@ -34,6 +35,9 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const typing = !!store.typing[conversationId];
+  const [safetyOpen, setSafetyOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
+  const [blockTarget, setBlockTarget] = useState<Person | null>(null);
 
   useEffect(() => { store.markRead(conversationId); }, [conv?.messages.length]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [conv?.messages.length, typing]);
@@ -47,6 +51,19 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
       </div>
     );
   }
+
+  const person = personOfConversation(conv);
+  const blocked = store.isBlocked(person.id);
+  // what Bite's team sees with a report from this chat: the other person's last messages
+  const chatContext = conv.messages.filter((m) => m.sender === "them").slice(-6).map((m) => `${conv.name}: ${m.text}`).join("\n");
+  const safety = (
+    <>
+      <SafetyActions open={safetyOpen} onClose={() => setSafetyOpen(false)} person={person} mealId={conv.mealId}
+        onReport={(r) => setReportTarget({ ...r, context: r.about === "person" ? chatContext : undefined })} onBlock={setBlockTarget} />
+      <ReportSheet target={reportTarget} onClose={() => setReportTarget(null)} />
+      <BlockSheet person={blockTarget} onClose={() => setBlockTarget(null)} />
+    </>
+  );
 
   const send = (t?: string) => {
     const msg = (t ?? text).trim();
@@ -68,6 +85,9 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
         <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{conv.name}</p>
         <p style={{ fontSize: 11.5, color: typing ? "#6b21d9" : "#10b981", fontWeight: 600 }}>{typing ? t("Typing…") : store.live ? (meal ? tMaybe(meal.title) : "") : isDesktop ? t("Online · usually replies in minutes") : t("Online")}</p>
       </div>
+      <motion.button onClick={() => setSafetyOpen(true)} aria-label={t("Safety: report or block")} className="w-9 h-9 flex items-center justify-center rounded-xl" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.88 }}>
+        <MoreHorizontal size={17} color="#6b21d9" strokeWidth={2.5} />
+      </motion.button>
       {meal && !isDesktop && (
         <button onClick={() => onOpenMeal(meal)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl" style={{ background: "#f0ecfa", fontSize: 11.5, fontWeight: 700, color: "#6b21d9" }}>{t("Meal")}{" "}<ChevronRight size={12} />
         </button>
@@ -135,7 +155,13 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
     </div>
   );
 
-  const input = (
+  const input = blocked ? (
+    <div className="px-4 pt-3 flex-shrink-0 flex items-center gap-3" style={{ background: "#ffffff", borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: isDesktop ? 14 : "max(env(safe-area-inset-bottom), 16px)" }}>
+      <Ban size={16} color="#7c6fa0" />
+      <p className="flex-1" style={{ fontSize: 13, color: "#4b3a6b" }}>{t("You blocked {name}. You can no longer write to each other.", { name: conv.name.split(" ")[0] })}</p>
+      <button onClick={() => void store.unblock(person.id)} className="px-3 py-1.5 rounded-xl" style={{ background: "#f0ecfa", fontSize: 12.5, fontWeight: 700, color: "#6b21d9" }}>{t("Unblock")}</button>
+    </div>
+  ) : (
     <div className="px-4 pt-2 flex-shrink-0" style={{ background: "#ffffff", borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: isDesktop ? 14 : "max(env(safe-area-inset-bottom), 16px)" }}>
       <div className="flex gap-2 mb-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
         {QUICK_REPLIES.map(({ icon: Icon, label }) => (
@@ -173,6 +199,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
         {header}
         {messages}
         {input}
+        {safety}
       </div>
     );
   }
@@ -195,9 +222,9 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
             <div className="rounded-3xl p-4" style={{ background: "#fff", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
               <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e" }}>{t("Good to know")}</p>
               <ul className="mt-2 flex flex-col gap-1.5" style={{ fontSize: 12.5, color: "#4a3a6e" }}>
-                <li>{t("• Keep payments and chat inside Bite — you're covered.")}</li>
-                <li>{t("• Free cancellation up to 24h before the meal.")}</li>
-                <li>{t("• Something wrong? Our safety line is 24/7.")}</li>
+                <li>{t("• Keep the chat inside Bite, so we can help if something goes wrong.")}</li>
+                <li>{t("• Never pay or send money outside Bite.")}</li>
+                <li>{t("• Something wrong? Tap ··· above to report or block. We read every report.")}</li>
               </ul>
             </div>
           </aside>
@@ -207,6 +234,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
           {messages}
           {input}
         </section>
+        {safety}
       </div>
     </div>
   );

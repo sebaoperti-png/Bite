@@ -8,7 +8,7 @@ import { SpinningText } from "../../shared/Motion";
 import { COUNTRIES, countryByName, postalError, placeLabel, localPlace } from "../location";
 import {
   MapPin, Calendar, Clock, Users, Search, ChevronRight, ShoppingBag, Utensils, ChefHat, Home, MessageCircle, User, X, Check,
-  Star, Bell, BadgeCheck, Globe, Shield, CheckCircle, Camera, Settings, CreditCard, UserPlus, BookOpen, Heart, LogOut,
+  Star, Bell, BadgeCheck, Globe, Shield, Ban, CheckCircle, Camera, Settings, CreditCard, UserPlus, BookOpen, Heart, LogOut,
   RotateCcw, FileText, LifeBuoy, Leaf, Plus, Minus, Trash2, Eye, Sparkles, ChevronDown,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -522,10 +522,10 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
     { Icon: Heart,      label: t("Saved meals"),         sub: saved.length ? t("{n} saved", { n: saved.length }) : t("Tap ♥ on a meal to save it"), onClick: () => setSheet("saved") },
     { Icon: ChefHat,    label: t("My listings"),         sub: myListings.length ? t("{n} live", { n: myListings.length }) : t("Host your first meal"), onClick: () => setSheet("listings") },
     { Icon: Leaf,       label: t("Dietary preferences"), sub: profile.dietary.length ? profile.dietary.map((d) => t(d)).join(" · ") : t("None set"), onClick: () => setSheet("dietary") },
-    { Icon: CreditCard, label: t("Payment methods"),     sub: t("Visa ···· 4242 (demo)"), onClick: () => setSheet("payment") },
+    { Icon: CreditCard, label: t("Payment methods"),     sub: store.live ? t("For now you pay at the table") : t("Visa ···· 4242 (demo)"), onClick: () => setSheet("payment") },
     { Icon: UserPlus,   label: t("Invite friends"),      sub: t("Bring your neighbours to the table"), onClick: invite },
     { Icon: Globe,      label: t("About Bite"),          sub: t("How it works, safety and hosting on bitetable.de"), onClick: () => { window.top!.location.href = "./?from=app"; } },
-    { Icon: Settings,   label: t("Settings"),            sub: t("Notifications, language, Bite news, demo data"), onClick: () => setSheet("settings") },
+    { Icon: Settings,   label: t("Settings"),            sub: store.live ? t("Notifications, language, blocked people") : t("Notifications, language, Bite news, demo data"), onClick: () => setSheet("settings") },
   ];
 
   const shareProfile = async () => {
@@ -648,7 +648,20 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
           </>
         )}
 
-        {sheet === "payment" && (
+        {sheet === "payment" && store.live && (
+          <div className="flex flex-col gap-3">
+            <div className="rounded-2xl p-5" style={{ background: "#fbf7ef", border: "1px dashed rgba(107,33,217,0.3)" }}>
+              <p style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9a8bb8" }}>{t("How paying works for now")}</p>
+              <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 24, color: "#160a2e", margin: "4px 0 8px" }}>{t("You pay at the table.")}</p>
+              <p style={{ fontSize: 13.5, color: "#4b3a6b", lineHeight: 1.55 }}>{t("Bite charges nothing in this early phase. Once the host confirms your seat, you hand them their share of the groceries, as shown on the meal.")}</p>
+            </div>
+            <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "#f7f4fd" }}>
+              <Shield size={15} color="#6b21d9" className="flex-shrink-0 mt-0.5" />
+              <p style={{ fontSize: 12.5, color: "#4a3a6e", lineHeight: 1.5 }}>{t("Never send money in advance or outside Bite. If someone asks you to, report them.")}</p>
+            </div>
+          </div>
+        )}
+        {sheet === "payment" && !store.live && (
           <>
             <div className="rounded-2xl p-5" style={{ background: "linear-gradient(135deg, #160a2e, #3b1278)", color: "#fff" }}>
               <div className="flex items-center justify-between">
@@ -681,9 +694,25 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
               <span className="flex items-center gap-3"><Globe size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{t("Language")}</span></span>
               <LangSwitch size="sm" />
             </div>
+            <div className="px-4 py-3 rounded-2xl" style={{ background: "#f7f4fd" }}>
+              <span className="flex items-center gap-3"><Ban size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{t("Blocked people")}</span></span>
+              {store.blocked.length === 0 ? (
+                <p style={{ fontSize: 12.5, color: "#7c6fa0", marginTop: 6, marginLeft: 28 }}>{t("Nobody. You can block someone from their meal or your chat with them.")}</p>
+              ) : (
+                <div className="flex flex-col gap-2 mt-3">
+                  {store.blocked.map((p) => (
+                    <div key={p.id} className="flex items-center gap-3">
+                      <img src={p.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
+                      <span className="flex-1 truncate" style={{ fontSize: 13.5, fontWeight: 600, color: "#160a2e" }}>{p.name}</span>
+                      <button onClick={() => void store.unblock(p.id)} className="px-3 py-1.5 rounded-xl" style={{ background: "#fff", fontSize: 12.5, fontWeight: 700, color: "#6b21d9" }}>{t("Unblock")}</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <SettingsLink Icon={FileText} label={t("Terms & privacy")} onClick={() => window.open("legal.html", "_blank", "noopener")} />
             <SettingsLink Icon={LifeBuoy} label={t("Help & support")} onClick={() => window.open("./#help", "_blank", "noopener")} />
-            <div className="mt-2 p-4 rounded-2xl" style={{ background: "#fff4f6", border: "1px solid rgba(233,52,90,0.15)" }}>
+            {!store.live && <div className="mt-2 p-4 rounded-2xl" style={{ background: "#fff4f6", border: "1px solid rgba(233,52,90,0.15)" }}>
               <p style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{t("Demo data")}</p>
               <p style={{ fontSize: 12.5, color: "#7c6fa0", marginTop: 2 }}>{t("Clear bookings, chats, saved meals and published listings made in this browser.")}</p>
               {confirmReset ? (
@@ -695,7 +724,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
                 <button onClick={() => setConfirmReset(true)} className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#fff", color: "#e9345a", fontSize: 13, fontWeight: 700 }}>
                   <RotateCcw size={14} />{" "}{t("Reset demo data")}</button>
               )}
-            </div>
+            </div>}
             <button
               onClick={() => go(onSignOut)}
               className="flex items-center gap-3 px-4 py-3 rounded-2xl mt-1" style={{ background: "#f7f4fd" }}

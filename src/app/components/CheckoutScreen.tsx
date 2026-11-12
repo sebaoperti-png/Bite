@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ProfileGateSheet } from "./SafetySheets";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, Minus, Plus, Shield, Lock, CreditCard, CheckCircle, Calendar, MapPin, Users, Leaf } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -24,13 +25,16 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
   const [booked, setBooked] = useState<Booking | null>(null);
   const [shake, setShake] = useState(0); // bumps to replay the "you forgot the terms" shake
   const [tip, setTip] = useState(false);
+  // live: hosts see who is coming, so a name and a photo come first (the database checks it too)
+  const [gate, setGate] = useState(false);
 
   const subtotal = meal.price * guests;
   const fees = Math.round(feeFor(meal.price) * guests * 100) / 100;
   const total = Math.round((subtotal + fees) * 100) / 100;
   const unit = meal.serviceType === "pickup" ? "order" : meal.serviceType === "eat-together" ? "seat" : "spot";
 
-  const pay = () => {
+  const pay = (profileChecked = false) => {
+    if (store.live && !profileChecked && !store.profileComplete) { setGate(true); return; }
     if (!agree) { setError(t("Please accept the booking terms to continue.")); setShake((n) => n + 1); return; }
     if (guests > left) { setError(t("Not enough seats left.")); return; }
     setError("");
@@ -68,7 +72,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
             {t("Bite service fee (12%)")}
             <span className="tip-wrap" onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
               <button type="button" className="tip-btn" aria-label={t("What is the service fee for?")} aria-expanded={tip} onClick={() => setTip((v) => !v)} onBlur={() => setTip(false)}>?</button>
-              <span className={`tip ${tip ? "on" : ""}`} role="tooltip">{t("It keeps every dinner safe: in-app payments, host checks, insurance and support. Your host gets the full contribution for the groceries.")}</span>
+              <span className={`tip ${tip ? "on" : ""}`} role="tooltip">{store.live ? t("Bite's fee for running the platform. In this early phase it is not charged: you only pay the host's share at the table.") : t("It keeps every dinner safe: in-app payments, host checks, insurance and support. Your host gets the full contribution for the groceries.")}</span>
             </span>
           </span>
           <span style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{euro(fees)}</span>
@@ -159,7 +163,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
 
   const payButton = (
     <motion.button
-      onClick={pay}
+      onClick={() => pay()}
       disabled={paying || left === 0}
       className="w-full py-4 rounded-2xl flex items-center justify-center gap-2"
       style={{ background: left === 0 ? "#c4b8de" : "linear-gradient(135deg, #6b21d9, #9b4aff)", boxShadow: "0 12px 28px rgba(107,33,217,0.28)" }}
@@ -226,6 +230,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
           </div>
         </>
       )}
+      <ProfileGateSheet open={gate} reason="book" onClose={() => setGate(false)} onDone={() => { setGate(false); window.setTimeout(() => pay(true), 450); }} />
     </div>
   );
 }
