@@ -1,6 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../shared/supabase";
-import { t } from "../shared/i18n";
+import { t, getLang } from "../shared/i18n";
 import type { Account, Profile } from "./store";
 
 /**
@@ -30,7 +30,8 @@ export async function liveSignUp(name: string, email: string, password: string, 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name, news }, emailRedirectTo: backToApp() },
+    // `lang` picks the language of Bite's emails (supabase/email-templates)
+    options: { data: { name, news, lang: getLang() }, emailRedirectTo: backToApp() },
   });
   if (error) return { ok: false, error: authError(error.message) };
   // Supabase answers "ok" with an empty identities list when the email is already taken (so nobody can
@@ -42,8 +43,11 @@ export async function liveSignUp(name: string, email: string, password: string, 
 }
 
 export async function liveSignIn(email: string, password: string): Promise<AuthResult> {
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  return error ? { ok: false, error: authError(error.message) } : { ok: true };
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return { ok: false, error: authError(error.message) };
+  // keep the email language in step with the language the person uses the app in
+  if (data.user && data.user.user_metadata?.lang !== getLang()) void supabase.auth.updateUser({ data: { lang: getLang() } });
+  return { ok: true };
 }
 
 export async function liveResetPassword(email: string): Promise<AuthResult> {
