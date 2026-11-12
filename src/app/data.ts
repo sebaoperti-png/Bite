@@ -28,6 +28,17 @@ export interface Meal {
   costProof?: { kind: "receipt" | "estimate"; total: number; people: number };
   /** Listings published from this browser through "Start hosting" */
   ownedByMe?: boolean;
+  /* ── live mode only ── */
+  /** Bite has checked this host (ID + video call). Undefined in the demo. */
+  hostVerified?: boolean;
+  /** ISO start time, from the database */
+  startsAt?: string;
+  /** The host cancelled this meal */
+  cancelled?: boolean;
+  /** Set by the hosting flow so the live store can save the parts separately */
+  dateISO?: string;
+  city?: string;
+  street?: string;
 }
 
 /** "Today", "Tomorrow" or e.g. "Saturday, 17 Oct": the demo always shows meals in the coming days. */

@@ -163,6 +163,15 @@ function AppInner() {
     </div>
   );
 
+  // Live mode: the password-reset email brings the person back here to choose a new password
+  if (store.recovering) {
+    return (
+      <div className="bite-shell">
+        <AuthScreen initialMode="login" onDone={() => show({ screen: store.account ? "home" : "auth", authMode: "login" })} />
+      </div>
+    );
+  }
+
   return (
     <div className="bite-shell">
       {showTopBar && (
@@ -248,7 +257,7 @@ function AppInner() {
                   meal={meal}
                   onBack={() => goBack(prevScreen === "home" ? "home" : "listings")}
                   onBook={() => navigate({ screen: "checkout", mealId: meal.id })}
-                  onMessage={() => openChat(store.openConversation(meal))}
+                  onMessage={() => { store.openConversation(meal).then((id) => openChat(id)).catch((e: Error) => store.showToast(e.message)); }}
                   onOpenChat={(id) => openChat(id)}
                   onUnpublished={() => navigate("home", true)}
                 />
