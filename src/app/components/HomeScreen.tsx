@@ -24,6 +24,7 @@ import { LangSwitch } from "../../shared/LangSwitch";
 import { ProfileDashboard } from "./ProfileDashboard";
 import { WeekMenu } from "./WeekMenu";
 import { ChefScene } from "./ChefScene";
+import { AboutBiteCard } from "./AboutBiteCard";
 
 export type HomeTab = Exclude<NavTab, "browse">;
 
@@ -216,6 +217,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                       </button>
                     </div>
                     <MobileWeekMenu meals={store.meals.filter((m) => store.seatsLeft(m) > 0)} active={activeService} onSelectMeal={onSelectMeal} onSeeService={(s) => onSearch({ service: s })} />
+                    <div style={{ marginTop: 22 }}><AboutBiteCard compact /></div>
                   </div>
                 </div>
 
@@ -424,6 +426,8 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
           </div>
           <WeekMenu meals={meals} active={activeTab} onSelectMeal={onSelectMeal} onSeeService={onSeeService} />
         </section>
+
+        <div className="mt-12 mb-4"><AboutBiteCard /></div>
       </div>
     </div>
   );
@@ -520,6 +524,7 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
     { Icon: Leaf,       label: t("Dietary preferences"), sub: profile.dietary.length ? profile.dietary.map((d) => t(d)).join(" · ") : t("None set"), onClick: () => setSheet("dietary") },
     { Icon: CreditCard, label: t("Payment methods"),     sub: t("Visa ···· 4242 (demo)"), onClick: () => setSheet("payment") },
     { Icon: UserPlus,   label: t("Invite friends"),      sub: t("Bring your neighbours to the table"), onClick: invite },
+    { Icon: Globe,      label: t("About Bite"),          sub: t("How it works, safety and hosting on bitetable.de"), onClick: () => { window.top!.location.href = "./?from=app"; } },
     { Icon: Settings,   label: t("Settings"),            sub: t("Notifications, language, Bite news, demo data"), onClick: () => setSheet("settings") },
   ];
 
