@@ -33,6 +33,22 @@ select t_ok((select news from profiles where id = '00000000-0000-0000-0000-00000
 
 set role authenticated;
 
+-- ===== safety first: a name, a photo and (for hosts) the house rules
+select t_as('00000000-0000-0000-0000-00000000000a');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city)
+  values (auth.uid(),'No photo yet','pickup',500,1,now()+interval '1 day','Aalen') $$, 'hosting needs a profile photo first');
+update profiles set photo_url = 'data:image/jpeg;base64,AAAA' where id = auth.uid();
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city)
+  values (auth.uid(),'No rules yet','pickup',500,1,now()+interval '1 day','Aalen') $$, 'hosting needs the house rules accepted');
+update profiles set host_rules_at = now() where id = auth.uid();
+select t_ok((select host_rules_at from profiles where id = auth.uid()) is null, 'the house-rules date cannot be faked by editing the profile');
+select t_ok(accept_house_rules() is not null, 'Anna accepts the house rules');
+select t_ok((select host_rules_at from profiles where id = auth.uid()) is not null, 'the acceptance is saved');
+select t_as('00000000-0000-0000-0000-00000000000c');
+update profiles set photo_url = 'data:image/jpeg;base64,CCCC' where id = auth.uid();
+select t_as('00000000-0000-0000-0000-00000000000d');
+update profiles set photo_url = 'data:image/jpeg;base64,DDDD' where id = auth.uid();
+
 -- ===== Anna (host) publishes a dinner with 3 seats
 select t_as('00000000-0000-0000-0000-00000000000a');
 insert into meals (id, host_id, title, service_type, price_cents, seats, starts_at, city, area)
@@ -53,6 +69,8 @@ select t_fails($$ insert into meals (host_id, title, service_type, price_cents, 
 
 -- ===== Ben (guest)
 select t_as('00000000-0000-0000-0000-00000000000b');
+select t_fails($$ select request_booking('11111111-1111-1111-1111-111111111111', 1) $$, 'booking needs a profile photo first');
+update profiles set photo_url = 'data:image/jpeg;base64,BBBB' where id = auth.uid();
 select t_ok((select count(*) from meal_cards) = 1, 'Ben sees the published meal');
 select t_ok((select seats_left from meal_cards) = 3, 'seats left = 3');
 select t_ok((select count(*) from meal_addresses) = 0, 'Ben cannot see the address before he is confirmed');
@@ -162,5 +180,36 @@ select t_ok((select status from bookings) = 'cancelled', 'cancelling the meal ca
 select t_ok((select count(*) from meals) = 1, 'Cara still sees the meal she had booked (to know it was cancelled)');
 select t_as('00000000-0000-0000-0000-00000000000d');
 select t_ok((select count(*) from meals) = 0, 'strangers no longer see a cancelled meal');
+
+-- ===== reports and blocking
+reset role;
+update meals set status = 'published', starts_at = now() + interval '3 days';
+update bookings set status = 'cancelled';
+set role authenticated;
+select t_as('00000000-0000-0000-0000-00000000000d');
+insert into reports (reporter_id, meal_id, category, reason) values (auth.uid(), '11111111-1111-1111-1111-111111111111', 'hygiene', 'The kitchen photos look dirty');
+select t_ok((select count(*) from reports) = 0, 'reports cannot be read back by the reporter (only Bite reads them)');
+select t_fails($$ insert into reports (reporter_id, category, reason) values (auth.uid(), 'other', 'about nothing') $$, 'a report needs a meal, a person or a message');
+select t_fails($$ insert into reports (reporter_id, user_id, category, reason) values (auth.uid(), auth.uid(), 'other', 'myself') $$, 'nobody can report themselves');
+select t_fails($$ insert into reports (reporter_id, user_id, category, reason) values ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000a', 'scam', 'in Ben''s name') $$, 'nobody can file a report in someone else''s name');
+select t_fails($$ insert into reports (reporter_id, user_id, category, reason) select auth.uid(), '00000000-0000-0000-0000-00000000000a', 'other', 'spam ' || g from generate_series(1, 12) g $$, 'at most 10 reports a day');
+reset role;
+select t_ok((select status from reports limit 1) = 'open', 'Bite sees the report as open');
+set role authenticated;
+select t_as('00000000-0000-0000-0000-00000000000c');
+select request_booking('11111111-1111-1111-1111-111111111111', 1);
+select t_as('00000000-0000-0000-0000-00000000000a');
+insert into blocks (blocker_id, blocked_id) values (auth.uid(), '00000000-0000-0000-0000-00000000000c');
+select t_fails($$ insert into blocks (blocker_id, blocked_id) values ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c') $$, 'nobody can block in someone else''s name');
+select t_as('00000000-0000-0000-0000-00000000000c');
+select t_ok((select status from bookings) = 'cancelled', 'blocking cancels the open booking between the two');
+select t_ok((select count(*) from blocks) = 0, 'Cara cannot see that Anna blocked her');
+select t_ok((select count(*) from meal_cards where status = 'published' and host_id = '00000000-0000-0000-0000-00000000000a') = 0, 'Cara no longer sees Anna''s meals in the list');
+select t_fails($$ select request_booking('11111111-1111-1111-1111-111111111111', 1) $$, 'Cara cannot book Anna again');
+select t_fails($$ insert into messages (conversation_id, sender_id, body) select id, auth.uid(), 'why?' from conversations $$, 'Cara cannot write to Anna any more');
+select t_as('00000000-0000-0000-0000-00000000000a');
+delete from blocks where blocked_id = '00000000-0000-0000-0000-00000000000c';
+select t_as('00000000-0000-0000-0000-00000000000c');
+select t_ok((select count(*) from meal_cards where host_id = '00000000-0000-0000-0000-00000000000a' and status = 'published') = 1, 'after unblocking, Cara sees Anna''s meals again');
 
 \echo ALL TESTS PASSED
