@@ -179,6 +179,17 @@ const DE_UI: Record<string, string> = {
   "Payment methods": "Zahlungsmethoden",
   "Visa ···· 4242 (demo)": "Visa ···· 4242 (Demo)",
   "Invite friends": "Freunde einladen",
+  "About Bite": "Über Bite",
+  "How it works, safety and hosting on bitetable.de": "So funktioniert's, Sicherheit und Gastgeben auf bitetable.de",
+  "Bite · the full menu": "Bite · die ganze Karte",
+  "Wanna know more?": "Neugierig geworden?",
+  "The story behind Bite, told course by course on our website.": "Die Geschichte hinter Bite, Gang für Gang auf unserer Website erzählt.",
+  "Have a look": "Schau mal rein",
+  "On the website": "Auf der Website",
+  "How a shared table works": "So funktioniert ein geteilter Tisch",
+  "Hosting and fair prices": "Gastgeben und faire Preise",
+  "House rules: how we keep you safe": "Hausregeln: so schützen wir dich",
+  "No. {n}": "Nr. {n}",
   "Bring your neighbours to the table": "Hol deine Nachbarn an den Tisch",
   "Settings": "Einstellungen",
   "Notifications, language, Bite news, demo data": "Benachrichtigungen, Sprache, Bite-News, Demodaten",
@@ -904,6 +915,6 @@ const SAME = ["Berlin", "Hamburg", "Frankfurt", "Leipzig", "Stuttgart", "Düssel
   "Basel", "Bern", "Lausanne", "Turin", "Bologna", "Paris", "Lyon", "Marseille", "Toulouse", "Bordeaux", "Madrid", "Barcelona", "Valencia",
   "Bilbao", "Amsterdam", "Rotterdam", "Utrecht", "Eindhoven", "Liège", "Aarhus", "Odense", "Brno", "Ostrava", "London", "Manchester",
   "Edinburgh", "Bristol", "Birmingham", "Dublin", "Cork", "Galway", "Porto", "Braga", "Stockholm", "Malmö", "New York", "San Francisco",
-  "Los Angeles", "Chicago", "Boston", "Bite", "Sebastiano Operti", "hello@bitetable.de"];
+  "Los Angeles", "Chicago", "Boston", "Bite", "Sebastiano Operti", "hello@bitetable.de", "bitetable.de"];
 
 export const DE_APP: Record<string, string> = { ...Object.fromEntries(SAME.map((w) => [w, w])), ...DE_UI, ...DE_MEALS };
