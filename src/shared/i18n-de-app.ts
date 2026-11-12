@@ -324,7 +324,7 @@ const DE_UI: Record<string, string> = {
   "{title} with {host} on Bite — {date}, {time}. {price}.": "{title} bei {host} auf Bite – {date}, {time}. {price}.",
   "Join me at {title}": "Komm mit zu {title}",
   "Link copied": "Link kopiert",
-  "Link: sebaoperti-png.github.io/Bite": "Link: sebaoperti-png.github.io/Bite",
+  "Link: bitetable.de": "Link: bitetable.de",
   "Photo {n}": "Foto {n}",
   "+ 12% service fee": "+ 12 % Servicegebühr",
   "1 review": "1 Bewertung",
