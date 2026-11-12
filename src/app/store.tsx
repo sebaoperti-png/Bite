@@ -2,7 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { MEALS, withFee, type Meal } from "./data";
 import { t, tMaybe, locale } from "../shared/i18n";
 import { IS_LIVE, supabase } from "../shared/supabase";
-import { BiteLoader } from "../shared/Restaurant";
+import { AnimatePresence } from "motion/react";
+import { BootScreen } from "./components/BootScreen";
 import { accountFromUser, liveSignOut, loadProfile, profileFromRow, saveProfile } from "./liveAuth";
 import * as L from "./liveData";
 
@@ -544,15 +545,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     } satisfies Partial<Store>);
   }
 
-  if (!ready) {
-    return (
-      <div className="h-full flex items-center justify-center" style={{ background: "#160a2e" }}>
-        <BiteLoader size={64} dark label={t("Loading…")} />
-      </div>
-    );
-  }
-
-  return <Ctx.Provider value={store}>{children}</Ctx.Provider>;
+  // Live mode opens with the boot screen, which fades away over the app once the data is there
+  return (
+    <>
+      <AnimatePresence>{!ready && <BootScreen key="boot" />}</AnimatePresence>
+      {ready && <Ctx.Provider value={store}>{children}</Ctx.Provider>}
+    </>
+  );
 }
 
 export function useStore() {
