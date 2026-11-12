@@ -264,8 +264,8 @@ export function LegalPage() {
             {" "}
             <p>
               {"Controller: Bite — Sebastiano Operti (Bite is not yet a registered company), address as in the Impressum. Email: "}
-              <a href="mailto:sebaoperti@gmail.com">
-                sebaoperti@gmail.com
+              <a href="mailto:hello@bitetable.de">
+                hello@bitetable.de
               </a>
               . A Data Protection Officer is not required at this stage (§ 38 BDSG); for any privacy question, write to the email above.
             </p>
@@ -407,8 +407,8 @@ export function LegalPage() {
             <p>
               You have the right to access (Art. 15), rectification (16), erasure (17), restriction (18), data portability (20) and objection (21), and to withdraw consent at any time (7(3)) without affecting prior processing. To exercise them, contact
               {" "}
-              <a href="mailto:sebaoperti@gmail.com">
-                sebaoperti@gmail.com
+              <a href="mailto:hello@bitetable.de">
+                hello@bitetable.de
               </a>
               . You may also lodge a complaint with a data protection supervisory authority, in particular in the EU country where you live or work (Art. 77 GDPR).
             </p>
@@ -448,7 +448,7 @@ export function LegalPage() {
               {"2. Who is responsible"}
             </h3>
             <p>
-              {"Sebastiano Operti, founder of Bite (no company registered yet), address as in the Impressum. Email: sebaoperti@gmail.com."}
+              {"Sebastiano Operti, founder of Bite (no company registered yet), address as in the Impressum. Email: hello@bitetable.de."}
             </p>
             <h3>
               {"3. The survey (anonymous)"}
@@ -484,7 +484,7 @@ export function LegalPage() {
               {"8. Your rights"}
             </h3>
             <p>
-              {"You can withdraw any consent at any time without giving a reason, by email to sebaoperti@gmail.com or with the unsubscribe link; this does not affect processing before the withdrawal (Art. 7(3) GDPR). You also have the rights of access, rectification, erasure, restriction, data portability and objection (Art. 15 to 21 GDPR), and the right to complain to a data protection supervisory authority (Art. 77 GDPR). Giving your email is voluntary; you can take the survey without it."}
+              {"You can withdraw any consent at any time without giving a reason, by email to hello@bitetable.de or with the unsubscribe link; this does not affect processing before the withdrawal (Art. 7(3) GDPR). You also have the rights of access, rectification, erasure, restriction, data portability and objection (Art. 15 to 21 GDPR), and the right to complain to a data protection supervisory authority (Art. 77 GDPR). Giving your email is voluntary; you can take the survey without it."}
             </p>
             <h2 style={{ marginTop: "36px" }} lang="de">
               {"Umfrage, Interviews & Newsletter"}
@@ -500,7 +500,7 @@ export function LegalPage() {
               {"2. Verantwortlicher"}
             </h3>
             <p>
-              {"Sebastiano Operti, Gründer von Bite (noch keine Gesellschaft eingetragen), Anschrift wie im Impressum. E-Mail: sebaoperti@gmail.com."}
+              {"Sebastiano Operti, Gründer von Bite (noch keine Gesellschaft eingetragen), Anschrift wie im Impressum. E-Mail: hello@bitetable.de."}
             </p>
             <h3>
               {"3. Die Umfrage (anonym)"}
@@ -536,7 +536,7 @@ export function LegalPage() {
               {"8. Deine Rechte"}
             </h3>
             <p>
-              {"Du kannst jede Einwilligung jederzeit ohne Angabe von Gründen widerrufen, per E-Mail an sebaoperti@gmail.com oder über den Abmeldelink; die Rechtmäßigkeit der Verarbeitung bis zum Widerruf bleibt unberührt (Art. 7 Abs. 3 DSGVO). Außerdem hast du das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch (Art. 15 bis 21 DSGVO) sowie das Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde (Art. 77 DSGVO). Die Angabe deiner E-Mail ist freiwillig; die Umfrage funktioniert auch ohne."}
+              {"Du kannst jede Einwilligung jederzeit ohne Angabe von Gründen widerrufen, per E-Mail an hello@bitetable.de oder über den Abmeldelink; die Rechtmäßigkeit der Verarbeitung bis zum Widerruf bleibt unberührt (Art. 7 Abs. 3 DSGVO). Außerdem hast du das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch (Art. 15 bis 21 DSGVO) sowie das Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde (Art. 77 DSGVO). Die Angabe deiner E-Mail ist freiwillig; die Umfrage funktioniert auch ohne."}
             </p>
             </div>
           </section>
@@ -676,8 +676,8 @@ export function LegalPage() {
                 {" "}
                 Use in-app reporting or
                 {" "}
-                <a href="mailto:safety@bite.food">
-                  safety@bite.food
+                <a href="mailto:hello@bitetable.de">
+                  hello@bitetable.de
                 </a>
                 . We review every report.
               </li>
@@ -706,8 +706,8 @@ export function LegalPage() {
             <p>
               Email
               {" "}
-              <a href="mailto:privacy@bite.food">
-                privacy@bite.food
+              <a href="mailto:hello@bitetable.de">
+                hello@bitetable.de
               </a>
               {" "}
               from your registered address, or use "Download my data" / "Delete my account" in the app settings. We may ask you to verify your identity to protect your account.
@@ -797,8 +797,8 @@ export function LegalPage() {
             <p>
               Email:
               {" "}
-              <a href="mailto:sebaoperti@gmail.com">
-                sebaoperti@gmail.com
+              <a href="mailto:hello@bitetable.de">
+                hello@bitetable.de
               </a>
             </p>
             {" "}
@@ -858,8 +858,8 @@ export function LegalPage() {
             <p>
               If you encounter a barrier, please tell us at
               {" "}
-              <a href="mailto:accessibility@bite.food">
-                accessibility@bite.food
+              <a href="mailto:hello@bitetable.de">
+                hello@bitetable.de
               </a>
               {" "}
               and we will respond promptly and work to resolve it.
@@ -892,8 +892,8 @@ export function LegalPage() {
             <p>
               Report any concern confidentially to
               {" "}
-              <a href="mailto:ethics@bite.food">
-                ethics@bite.food
+              <a href="mailto:hello@bitetable.de">
+                hello@bitetable.de
               </a>
               .
             </p>
