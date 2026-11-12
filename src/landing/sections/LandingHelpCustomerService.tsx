@@ -13,7 +13,7 @@ const TICKETS: { kind: string; title: string; text: React.ReactNode; foot: strin
   },
   {
     kind: "Email", title: "Email us", foot: "Reply within 24h",
-    text: <><a href="mailto:sebaoperti@gmail.com">sebaoperti<wbr />@gmail.com</a> {t("— we answer within 24h.")}</>,
+    text: <><a href="mailto:hello@bitetable.de">hello<wbr />@bitetable.de</a> {t("— we answer within 24h.")}</>,
     icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>,
   },
   {

@@ -48,7 +48,7 @@ export function LandingFooter() {
             <div className="ft-ctas">
               <a href="bite.html" className="ft-btn primary">{t("Open the demo app →")}</a>
               <a href="stand.html?ref=footer" className="ft-btn">{t("Take the 60-second survey")}</a>
-              <a href="mailto:sebaoperti@gmail.com" className="ft-btn">{t("Write to Sebastiano")}</a>
+              <a href="mailto:hello@bitetable.de" className="ft-btn">{t("Write to Sebastiano")}</a>
             </div>
           </div>
           <div className="r-grid-footer" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr 1fr", gap: "40px", paddingBottom: "44px", borderBottom: "1px solid rgba(255,255,255,0.09)" }}>
@@ -65,7 +65,7 @@ export function LandingFooter() {
               {" "}
               <div style={{ fontSize: "16px", color: "#fff", fontWeight: 700 }}>{t("Sebastiano Operti")}</div>
               <div style={{ fontSize: "13px", color: "#a897c8", margin: "2px 0 8px" }}>{t("Founder")}</div>
-              <a href="mailto:sebaoperti@gmail.com" style={{ fontSize: "16px", color: "#b87fff", fontWeight: 700 }}>{t("sebaoperti@gmail.com")}</a>
+              <a href="mailto:hello@bitetable.de" style={{ fontSize: "16px", color: "#b87fff", fontWeight: 700 }}>{t("hello@bitetable.de")}</a>
             </div>
             {" "}
             <div>
@@ -88,7 +88,7 @@ export function LandingFooter() {
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#help" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Help Center")}</a>
                 {" "}
-                <a href="mailto:sebaoperti@gmail.com" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Contact us")}</a>
+                <a href="mailto:hello@bitetable.de" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Contact us")}</a>
                 {" "}
                 <a href="#safety" style={{ fontSize: "16px", color: "#a897c8" }}>
                   {t("Trust & Safety")}
