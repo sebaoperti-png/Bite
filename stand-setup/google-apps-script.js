@@ -123,7 +123,7 @@ const COPY = {
     unsubTitle: "You're unsubscribed",
     unsubText: "You won't receive any more Bite news. Thanks for your interest!",
     badTitle: "Link not valid",
-    badText: "This link has expired or was already used. Write to sebaoperti@gmail.com if you need help.",
+    badText: "This link has expired or was already used. Write to hello@bitetable.de if you need help.",
   },
   de: {
     subject: "Bitte bestätigen: Bite-Neuigkeiten",
@@ -137,7 +137,7 @@ const COPY = {
     unsubTitle: "Du bist abgemeldet",
     unsubText: "Du erhältst keine Bite-Neuigkeiten mehr. Danke für dein Interesse!",
     badTitle: "Link ungültig",
-    badText: "Dieser Link ist abgelaufen oder wurde schon benutzt. Schreib an sebaoperti@gmail.com, wenn du Hilfe brauchst.",
+    badText: "Dieser Link ist abgelaufen oder wurde schon benutzt. Schreib an hello@bitetable.de, wenn du Hilfe brauchst.",
   },
 };
 
@@ -154,7 +154,7 @@ function sendConfirmation_(email, token, lang) {
     "<p>" + c.sign + "</p>" +
     '<p style="font-size:12px;color:#7c6fa0"><a href="' + unsub + '" style="color:#7c6fa0">' + c.unsub + "</a> · " +
     '<a href="https://sebaoperti-png.github.io/Bite/legal.html#survey" style="color:#7c6fa0">Privacy</a></p></div>';
-  MailApp.sendEmail({ to: email, subject: c.subject, htmlBody: html, name: "Bite" });
+  MailApp.sendEmail({ to: email, subject: c.subject, htmlBody: html, name: "Bite", replyTo: "hello@bitetable.de" });
 }
 
 // Finds a token in either sheet and sets the newsletter status. Returns the row's language, or "" if not found.
