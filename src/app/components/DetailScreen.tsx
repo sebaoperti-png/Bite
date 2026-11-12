@@ -24,7 +24,7 @@ const SVC_CONFIG = {
   "cook-together": { label: "Cook Together",color: "#0a7c4e", bg: "#e5f7f0", Icon: ChefHat,     cta: "Join the cooking" },
 };
 
-const APP_URL = "https://sebaoperti-png.github.io/Bite/bite.html";
+const APP_URL = "https://bitetable.de/bite.html";
 
 interface DetailScreenProps {
   meal: Meal;
@@ -55,10 +55,10 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
     setShowShare(false);
     if (where === "whatsapp") window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${APP_URL}`)}`, "_blank", "noopener");
     if (where === "email") window.location.href = `mailto:?subject=${encodeURIComponent(t("Join me at {title}", { title: tMaybe(meal.title) }))}&body=${encodeURIComponent(`${shareText}\n\n${APP_URL}`)}`;
-    if (where === "copy") store.showToast((await copyText(`${shareText} ${APP_URL}`)) ? t("Link copied") : t("Link: sebaoperti-png.github.io/Bite"));
+    if (where === "copy") store.showToast((await copyText(`${shareText} ${APP_URL}`)) ? t("Link copied") : t("Link: bitetable.de"));
     if (where === "more") {
       if (navigator.share) { try { await navigator.share({ title: tMaybe(meal.title), text: shareText, url: APP_URL }); } catch { /* cancelled */ } }
-      else store.showToast((await copyText(`${shareText} ${APP_URL}`)) ? t("Link copied") : t("Link: sebaoperti-png.github.io/Bite"));
+      else store.showToast((await copyText(`${shareText} ${APP_URL}`)) ? t("Link copied") : t("Link: bitetable.de"));
     }
   };
 

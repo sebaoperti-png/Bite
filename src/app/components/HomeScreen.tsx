@@ -35,7 +35,7 @@ const SERVICE_TABS = [
 
 const DATES = [ANY_DAY, ...Array.from({ length: 7 }, (_, i) => dayLabel(i))];
 const DIETARY_PREFS = ["Vegetarian", "Vegan", "Halal", "Pescatarian", "Gluten-free", "Dairy-free", "Nut-free"];
-const APP_URL = "https://sebaoperti-png.github.io/Bite/";
+const APP_URL = "https://bitetable.de/";
 
 type Picker = "area" | "date" | "time" | "guests";
 type ProfileSheet = "bookings" | "saved" | "listings" | "dietary" | "payment" | "settings" | "edit" | null;
@@ -525,7 +525,7 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
 
   const shareProfile = async () => {
     const ok = await copyText(`${t("{name} hosts home-cooked meals on Bite:", { name: profile.name })} ${APP_URL}`);
-    store.showToast(ok ? t("Profile link copied") : t("Link: sebaoperti-png.github.io/Bite"));
+    store.showToast(ok ? t("Profile link copied") : t("Link: bitetable.de"));
   };
 
   return (

@@ -51,8 +51,8 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
   const name = store.profile.name;
   const first = name.split(" ")[0];
   const share = async () => {
-    const ok = await copyText(t("{name} hosts home-cooked meals on Bite:", { name }) + " https://sebaoperti-png.github.io/Bite/");
-    store.showToast(ok ? t("Profile link copied") : t("Link: sebaoperti-png.github.io/Bite"));
+    const ok = await copyText(t("{name} hosts home-cooked meals on Bite:", { name }) + " https://bitetable.de/");
+    store.showToast(ok ? t("Profile link copied") : t("Link: bitetable.de"));
   };
 
   return (
