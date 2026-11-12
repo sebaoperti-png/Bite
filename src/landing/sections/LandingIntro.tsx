@@ -21,7 +21,10 @@ const CRUMBS = Array.from({ length: 22 }, (_, i) => {
 
 function shouldPlay() {
   try {
-    if (new URLSearchParams(window.location.search).has("intro")) return true;
+    const q = new URLSearchParams(window.location.search);
+    if (q.has("intro")) return true;
+    // coming from the app's "Wanna know more?" card: people already know the logo, go straight to the page
+    if (q.get("from") === "app") return false;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
     return !sessionStorage.getItem(KEY);
   } catch {
