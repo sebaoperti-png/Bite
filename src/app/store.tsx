@@ -18,7 +18,7 @@ import * as L from "./liveData";
 const STORAGE_KEY = IS_LIVE ? "bite_live_v1" : "bite_demo_v4";
 
 export interface ChatMessage { id: string; sender: "me" | "them"; text: string; at: number }
-export interface Conversation { id: string; name: string; avatar: string; mealId?: string; messages: ChatMessage[]; unread: number }
+export interface Conversation { id: string; name: string; avatar: string; mealId?: string; messages: ChatMessage[]; unread: number; /** live: the other person's account id */ otherId?: string }
 export interface Booking {
   id: string; mealId: string; guests: number; total: number; note: string; at: number;
   status: "confirmed" | "cancelled"; conversationId: string; rating?: number;
@@ -27,8 +27,21 @@ export interface Booking {
   /** Live mode: the real state in the database ("requested" = waiting for the host) */
   live?: "requested" | "confirmed" | "declined" | "cancelled";
 }
-export interface Profile { name: string; bio: string; /** square photo as a data URL, chosen in the browser */ photo?: string; dietary: string[]; neighbourhood: string; country?: string; city?: string; postalCode?: string; notifications: boolean; news?: boolean }
+export interface Profile { name: string; bio: string; /** square photo as a data URL, chosen in the browser */ photo?: string; dietary: string[]; neighbourhood: string; country?: string; city?: string; postalCode?: string; notifications: boolean; news?: boolean; /** when the person accepted the house rules for hosts */ hostRulesAt?: string }
 export interface Account { name: string; email: string }
+/** Someone you can report or block. Live: the account id. Demo: the name stands in for the id. */
+export interface Person { id: string; name: string; avatar: string }
+export type ReportCategory = "unsafe" | "hygiene" | "harassment" | "scam" | "no_show" | "inappropriate" | "other";
+export interface ReportInput {
+  category: ReportCategory; details: string;
+  mealId?: string; personId?: string; messageId?: string;
+  /** what the person was looking at, added to the report for Bite (e.g. the reported message) */
+  context?: string;
+}
+export const personOfMeal = (m: Meal): Person => ({ id: m.hostId ?? m.host, name: m.host, avatar: m.hostAvatar });
+export const personOfConversation = (c: Conversation): Person => ({ id: c.otherId ?? c.name, name: c.name, avatar: c.avatar });
+/** a name and a photo: what hosts and guests need before they meet */
+export const isProfileComplete = (p: Profile) => p.name.trim().length >= 2 && !!p.photo;
 
 interface Data {
   published: Meal[];
@@ -40,6 +53,8 @@ interface Data {
   account: Account | null;
   /** Guest bookings on your listings that wait for you to accept them ("you choose who sits at your table") */
   pending?: string[];
+  /** demo: people you blocked (live mode keeps them in the database) */
+  blocked?: Person[];
 }
 
 const ago = (min: number) => Date.now() - min * 60_000;
@@ -186,6 +201,15 @@ interface Store extends Data {
   doneRecovering: () => void;
   toast: string | null;
   showToast: (msg: string) => void;
+  // safety
+  blocked: Person[];
+  isBlocked: (id: string) => boolean;
+  block: (p: Person) => Promise<void>;
+  unblock: (id: string) => Promise<void>;
+  report: (r: ReportInput) => Promise<void>;
+  hostRulesAccepted: boolean;
+  acceptHostRules: () => Promise<void>;
+  profileComplete: boolean;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -199,7 +223,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const refreshRef = useRef<() => Promise<void>>(async () => {});
   const [me, setMe] = useState<string | null>(null);
   type LiveState = Awaited<ReturnType<typeof L.fetchAll>>;
-  const EMPTY_LIVE: LiveState = { meals: [], seatsLeft: {}, conversations: [], bookings: [], pending: [], liked: [] };
+  const EMPTY_LIVE: LiveState = { meals: [], seatsLeft: {}, conversations: [], bookings: [], pending: [], liked: [], blocked: [] };
   const [live, setLive] = useState<LiveState>(EMPTY_LIVE);
   const [liveLoading, setLiveLoading] = useState(IS_LIVE);
   // meals published from this device that are still uploading (shown at once, replaced by the real row)
@@ -292,7 +316,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     toastTimer.current = window.setTimeout(() => setToast(null), 2600);
   }, []);
 
-  const meals = useMemo(() => [...data.published, ...MEALS], [data.published]);
+  const blockedIds = useMemo(() => new Set((data.blocked ?? []).map((p) => p.id)), [data.blocked]);
+  // meals of people you blocked disappear from what you browse
+  const meals = useMemo(() => [...data.published, ...MEALS].filter((m) => !blockedIds.has(m.hostId ?? m.host)), [data.published, blockedIds]);
   const mealById = useCallback((id: string) => meals.find((m) => m.id === id), [meals]);
 
   const seatsLeft = useCallback((meal: Meal) => {
@@ -441,12 +467,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     doneRecovering: () => setRecovering(false),
     toast,
     showToast,
+    blocked: data.blocked ?? [],
+    isBlocked: (id) => blockedIds.has(id),
+    block: async (p) => {
+      setData((d) => ({ ...d, blocked: [...(d.blocked ?? []).filter((x) => x.id !== p.id), p] }));
+      showToast(t("{name} is blocked. You will not see each other's meals or messages.", { name: p.name.split(" ")[0] }));
+    },
+    unblock: async (id) => {
+      setData((d) => ({ ...d, blocked: (d.blocked ?? []).filter((x) => x.id !== id) }));
+      showToast(t("Unblocked"));
+    },
+    report: async () => { await new Promise((r) => setTimeout(r, 600)); },
+    hostRulesAccepted: !!data.profile.hostRulesAt,
+    acceptHostRules: async () => { setData((d) => ({ ...d, profile: { ...d.profile, hostRulesAt: new Date().toISOString() } })); },
+    profileComplete: isProfileComplete(data.profile),
   };
 
   if (IS_LIVE) {
     const uid = me;
     const fail = (e: { message?: string } | null | undefined) => { showToast(L.dataError(e?.message, t)); };
-    const allMeals = [...optimistic.filter((o) => !live.meals.some((m) => m.id === o.id)), ...live.meals];
+    const liveBlocked = new Set(live.blocked.map((p) => p.id));
+    const allMeals = [...optimistic.filter((o) => !live.meals.some((m) => m.id === o.id)), ...live.meals].filter((m) => !m.hostId || !liveBlocked.has(m.hostId));
     // what visitors browse: upcoming and not cancelled (own meals stay visible to the host)
     const browsable = allMeals.filter((m) => !m.cancelled && (m.ownedByMe || !m.startsAt || Date.parse(m.startsAt) > Date.now() - 60 * 60 * 1000));
     Object.assign(store, {
@@ -541,6 +582,32 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         live.conversations.filter((c) => c.unread).forEach((c) => void L.markRead(c.id));
         setLive((l) => ({ ...l, conversations: l.conversations.map((c) => ({ ...c, unread: 0 })) }));
         showToast(t("All caught up"));
+      },
+      blocked: live.blocked,
+      isBlocked: (id: string) => liveBlocked.has(id),
+      block: async (p: Person) => {
+        if (!uid) return;
+        const { error } = await L.blockPerson(uid, p.id);
+        if (error && !/duplicate/i.test(error.message)) throw new Error(L.dataError(error.message, t));
+        showToast(t("{name} is blocked. You will not see each other's meals or messages.", { name: p.name.split(" ")[0] }));
+        await refresh();
+      },
+      unblock: async (id: string) => {
+        if (!uid) return;
+        const { error } = await L.unblockPerson(uid, id);
+        if (error) throw new Error(L.dataError(error.message, t));
+        showToast(t("Unblocked"));
+        await refresh();
+      },
+      report: async (r: ReportInput) => {
+        if (!uid) throw new Error(t("Log in to report"));
+        const { error } = await L.fileReport(uid, r);
+        if (error) throw new Error(L.dataError(error.message, t));
+      },
+      acceptHostRules: async () => {
+        const { data: at, error } = await L.acceptHouseRules();
+        if (error) throw new Error(L.dataError(error.message, t));
+        setData((d) => ({ ...d, profile: { ...d.profile, hostRulesAt: (at as string) ?? new Date().toISOString() } }));
       },
     } satisfies Partial<Store>);
   }

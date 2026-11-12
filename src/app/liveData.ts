@@ -1,6 +1,6 @@
 import { supabase } from "../shared/supabase";
 import { labelForISO, SERVICE_FEE, type Meal, type ServiceType } from "./data";
-import type { Booking, Conversation } from "./store";
+import type { Booking, Conversation, Person, ReportInput } from "./store";
 
 /**
  * Live mode data: meals, bookings, chats and likes from Supabase, translated into the same shapes the
@@ -54,6 +54,7 @@ export function mealFromRow(r: MealRow, me: string | null, address?: string): Me
     hostBio: r.host_bio ?? "",
     costProof: r.cost_proof ?? undefined,
     ownedByMe: !!me && r.host_id === me,
+    hostId: r.host_id,
     hostVerified: r.host_verified,
     startsAt: r.starts_at,
     cancelled: r.status === "cancelled",
@@ -64,14 +65,15 @@ export function mealFromRow(r: MealRow, me: string | null, address?: string): Me
 /** Everything the signed-in person needs, in one go */
 export async function fetchAll(me: string) {
   const since = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString();
-  const [mealsRes, addrRes, bookingsRes, convRes, likesRes] = await Promise.all([
+  const [mealsRes, addrRes, bookingsRes, convRes, likesRes, blocksRes] = await Promise.all([
     supabase.from("meal_cards").select("*").gte("starts_at", since).order("starts_at"),
     supabase.from("meal_addresses").select("meal_id,address"),
     supabase.from("bookings").select("*, guest:profiles!bookings_guest_id_fkey(name,photo_url), review:reviews(rating)").order("created_at", { ascending: false }),
     supabase.from("conversations").select("*, host:profiles!conversations_host_id_fkey(name,photo_url), guest:profiles!conversations_guest_id_fkey(name,photo_url), messages(id,sender_id,body,created_at,read_at)").order("created_at", { ascending: false }),
     supabase.from("likes").select("meal_id"),
+    supabase.from("blocks").select("blocked_id, person:profiles!blocks_blocked_id_fkey(name,photo_url)"),
   ]);
-  const err = mealsRes.error || addrRes.error || bookingsRes.error || convRes.error || likesRes.error;
+  const err = mealsRes.error || addrRes.error || bookingsRes.error || convRes.error || likesRes.error || blocksRes.error;
   if (err) throw err;
 
   const addresses = new Map((addrRes.data ?? []).map((a) => [a.meal_id as string, a.address as string]));
@@ -90,6 +92,7 @@ export async function fetchAll(me: string) {
       avatar: other?.photo_url || initialAvatar(other?.name || "B"),
       mealId: c.meal_id,
       guestId: c.guest_id,
+      otherId: c.host_id === me ? c.guest_id : c.host_id,
       messages: msgs.map((m: any) => ({ id: m.id, sender: m.sender_id === me ? "me" : "them", text: m.body, at: Date.parse(m.created_at) })),
       unread: msgs.filter((m: any) => m.sender_id !== me && !m.read_at).length,
     };
@@ -119,7 +122,8 @@ export async function fetchAll(me: string) {
   });
 
   const liked = (likesRes.data ?? []).map((l) => l.meal_id as string);
-  return { meals, seatsLeft, conversations, bookings, pending, liked };
+  const blocked: Person[] = (blocksRes.data ?? []).map((b: any) => ({ id: b.blocked_id, name: b.person?.name || "Bite", avatar: b.person?.photo_url || initialAvatar(b.person?.name || "B") }));
+  return { meals, seatsLeft, conversations, bookings, pending, liked, blocked };
 }
 
 // ---------------------------------------------------------------- writes
@@ -165,9 +169,25 @@ export const markRead = (conversationId: string) => supabase.rpc("mark_read", { 
 export const like = (me: string, mealId: string, on: boolean) =>
   on ? supabase.from("likes").insert({ user_id: me, meal_id: mealId }) : supabase.from("likes").delete().eq("user_id", me).eq("meal_id", mealId);
 
+// ---------------------------------------------------------------- safety
+
+export async function fileReport(me: string, r: ReportInput) {
+  const reason = [r.details.trim(), r.context].filter(Boolean).join("\n\n") || r.category;
+  return supabase.from("reports").insert({
+    reporter_id: me, category: r.category, reason: reason.padEnd(3, ".").slice(0, 2000),
+    meal_id: r.mealId ?? null, user_id: r.personId ?? null, message_id: r.messageId && !r.messageId.startsWith("tmp-") ? r.messageId : null,
+  });
+}
+export const blockPerson = (me: string, id: string) => supabase.from("blocks").insert({ blocker_id: me, blocked_id: id });
+export const unblockPerson = (me: string, id: string) => supabase.from("blocks").delete().eq("blocker_id", me).eq("blocked_id", id);
+export const acceptHouseRules = () => supabase.rpc("accept_house_rules");
+
 /** Friendly text for errors coming back from the database functions */
 export function dataError(message: string | undefined, t: (s: string) => string): string {
   const m = (message ?? "").toLowerCase();
+  if (m.includes("photo before")) return t("Add your name and a photo first, so your host or guests know who you are.");
+  if (m.includes("house rules")) return t("Please accept the house rules before you host.");
+  if (m.includes("too many reports")) return t("You sent many reports today. Write to hello@bitetable.de if something is urgent.");
   if (m.includes("not enough seats")) return t("Sorry, those seats were just taken.");
   if (m.includes("already have a booking")) return t("You already asked for a seat at this table.");
   if (m.includes("already started")) return t("This meal has already started.");

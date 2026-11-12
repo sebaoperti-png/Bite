@@ -9,6 +9,8 @@ export interface Meal {
   title: string;
   host: string;
   hostAvatar: string;
+  /** Live mode: the host's account id (used to report or block them). The demo identifies hosts by name. */
+  hostId?: string;
   rating: number;
   reviews: number;
   price: number;

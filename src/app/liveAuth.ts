@@ -68,7 +68,7 @@ export async function liveSignOut() {
 
 interface ProfileRow {
   id: string; name: string; bio: string; photo_url: string | null; dietary: string[];
-  city: string; postal_code: string; country: string; notifications: boolean; news: boolean;
+  city: string; postal_code: string; country: string; notifications: boolean; news: boolean; host_rules_at: string | null;
 }
 
 export function accountFromUser(user: User, row?: Partial<ProfileRow> | null): Account {
@@ -89,6 +89,7 @@ export function profileFromRow(row: Partial<ProfileRow> | null, fallbackName: st
     postalCode: row?.postal_code ?? "",
     notifications: row?.notifications ?? true,
     news: row?.news ?? false,
+    hostRulesAt: row?.host_rules_at ?? undefined,
   };
 }
 
