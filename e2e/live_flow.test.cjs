@@ -1,6 +1,7 @@
 // Needs: local PostgreSQL 16 with the migrations applied in database bite_e2e (see e2e/README.md), npx vite preview --port 4173, Playwright.
 // Full live flow with two people in two browsers: Anna (host) publishes a dinner, Ben (guest) asks for a seat,
-// Anna accepts, Ben sees the address, they chat, Anna cancels the meal.
+// Anna accepts, Ben sees the address, they chat, Anna cancels the meal, Ben reports and blocks Anna.
+// Safety on the way: both must add a name and a photo first, and Anna accepts the house rules before her first table.
 // Supabase is replaced by fakebase.cjs: real SQL, real security rules, local PostgreSQL. Nothing leaves this machine.
 const { chromium } = require("playwright");
 const { handle, pool } = require("./fakebase.cjs");
@@ -33,6 +34,15 @@ async function personContext(browser, label) {
   return { ctx, page };
 }
 
+const PHOTO_FILE = { name: "me.png", mimeType: "image/png", buffer: Buffer.from(PHOTO.split(",")[1], "base64") };
+/** the "Who is cooking? / Who is coming?" sheet: add a photo and continue */
+async function passProfileGate(page, heading) {
+  await page.getByText(heading).waitFor({ timeout: 8000 });
+  await page.getByRole("dialog").locator("input[type=file]").setInputFiles(PHOTO_FILE);
+  await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Save and continue" }).click();
+}
+
 async function logIn(page, email) {
   await page.goto(`${BASE}/bite.html?live&lang=en`);
   await page.getByRole("heading", { name: "Welcome back" }).waitFor({ timeout: 10000 });
@@ -45,6 +55,7 @@ async function logIn(page, email) {
 
 (async () => {
   await pool.query("delete from meals");
+  await pool.query("delete from blocks; delete from reports; update profiles set photo_url = null, host_rules_at = null");
   const browser = await chromium.launch();
   const anna = await personContext(browser, "Anna");
   const ben = await personContext(browser, "Ben");
@@ -64,7 +75,16 @@ async function logIn(page, email) {
   await anna.page.evaluate((f) => localStorage.setItem("bite_hosting_draft", JSON.stringify({ step: 7, form: f })), form);
   await anna.page.goto(`${BASE}/bite.html?host&lang=en`);
   await anna.page.getByRole("button", { name: /Publish event/ }).click();
-  await anna.page.waitForTimeout(4000);
+  await passProfileGate(anna.page, "Who is cooking?");
+  check(true, "before her first table Anna is asked for a photo");
+  await anna.page.getByText("Six promises every host makes").waitFor({ timeout: 8000 });
+  check(true, "then she sees the house rules");
+  check(await anna.page.getByRole("button", { name: "Accept and continue" }).isDisabled(), "she cannot accept without ticking the box");
+  await anna.page.getByText("I have read the house rules and I will follow them").click();
+  await anna.page.getByRole("button", { name: "Accept and continue" }).click();
+  await anna.page.waitForTimeout(4500);
+  const annaProfile = (await q("select photo_url, host_rules_at from profiles where id::text like 'aaaaaaaa%'"))[0];
+  check(annaProfile.photo_url && annaProfile.host_rules_at, "Anna's photo and house-rules acceptance are saved");
   const meals = await q("select m.*, a.address from meals m left join meal_addresses a on a.meal_id = m.id");
   check(meals.length === 1, "the meal is saved in the database");
   const meal = meals[0];
@@ -96,6 +116,8 @@ async function logIn(page, email) {
   check(!co.includes("insured"), "checkout makes no insurance promise in live mode");
   await ben.page.locator("input.tick-input").check({ force: true });
   await ben.page.getByRole("button", { name: /Ask for 1 seat/ }).click();
+  await passProfileGate(ben.page, "Who is coming?");
+  check(true, "Ben is asked for a photo before his first request");
   await ben.page.getByRole("heading", { name: "Request sent!" }).waitFor({ timeout: 8000 });
   check(true, "Ben sees 'Request sent!'");
   await ben.page.screenshot({ path: "/tmp/flow_3_request.png" });
@@ -148,6 +170,32 @@ async function logIn(page, email) {
   await ben.page.waitForTimeout(2000);
   const benHome = await ben.page.locator("body").innerText();
   check(!benHome.includes("Search 1"), "the cancelled meal disappears from browsing");
+
+  // ---------------------------------------------------------------- Ben reports and blocks Anna
+  await ben.page.getByRole("button", { name: "Messages" }).last().click();
+  await ben.page.waitForTimeout(800);
+  await ben.page.getByText("Anna").first().click();
+  await ben.page.waitForTimeout(1200);
+  await ben.page.getByRole("button", { name: "Safety: report or block" }).click();
+  await ben.page.getByRole("button", { name: /Report Anna/ }).click();
+  await ben.page.waitForTimeout(500);
+  await ben.page.getByRole("radio", { name: /Scam or fake profile/ }).click();
+  await ben.page.locator("#sf-details").fill("Asked me to pay by bank transfer before the dinner.");
+  await ben.page.getByRole("button", { name: "Send report" }).click();
+  await ben.page.getByText("Report received").waitFor({ timeout: 8000 });
+  await ben.page.screenshot({ path: "/tmp/flow_7_report.png" });
+  const rep = await q("select * from reports");
+  check(rep.length === 1 && rep[0].category === "scam" && rep[0].user_id.startsWith("aaaaaaaa") && rep[0].reporter_id.startsWith("bbbbbbbb") && rep[0].reason.includes("bank transfer"), "the report reaches Bite with reason, reporter and the reported person");
+  await ben.page.getByRole("button", { name: "Back to Bite" }).click();
+  await ben.page.waitForTimeout(400);
+  await ben.page.getByRole("button", { name: "Safety: report or block" }).click();
+  await ben.page.getByRole("button", { name: /Block Anna/ }).first().click();
+  await ben.page.waitForTimeout(500);
+  await ben.page.getByRole("button", { name: /^Block Anna$/ }).click();
+  await ben.page.waitForTimeout(1500);
+  check((await q("select * from blocks")).length === 1, "the block is saved");
+  check((await ben.page.locator("body").innerText()).includes("You blocked Anna"), "the chat says Anna is blocked and the message box is gone");
+  await ben.page.screenshot({ path: "/tmp/flow_8_blocked.png" });
 
   console.log(`\n${pass} passed, ${fail} failed`);
   await browser.close(); await pool.end();
