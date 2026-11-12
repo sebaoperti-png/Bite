@@ -44,7 +44,7 @@ async function passProfileGate(page, heading) {
 }
 
 async function logIn(page, email) {
-  await page.goto(`${BASE}/bite.html?live&lang=en`);
+  await page.goto(`${BASE}/bite.html?live&login&lang=en`);
   await page.getByRole("heading", { name: "Welcome back" }).waitFor({ timeout: 10000 });
   await page.getByLabel("Email").fill(email);
   await page.getByRole("textbox", { name: /^Password/ }).fill("local-test-only");
@@ -96,13 +96,15 @@ async function logIn(page, email) {
   check(meal && (meal.image_url || "").includes("/storage/v1/object/public/meal-photos/"), "the meal points to the uploaded photo, not a huge inline image");
   await anna.page.screenshot({ path: "/tmp/flow_1_published.png" });
 
-  // ---------------------------------------------------------------- Ben books
-  await logIn(ben.page, "ben@test.local");
+  // ---------------------------------------------------------------- Ben looks around as a visitor, then books
+  await ben.page.goto(`${BASE}/bite.html?live&lang=en`);
+  await ben.page.waitForTimeout(2500);
+  check(!(await ben.page.getByRole("heading", { name: "Welcome back" }).count()), "a visitor opens the live app without a log-in wall");
   await ben.page.getByRole("button", { name: "Browse" }).last().click();
   await ben.page.waitForTimeout(3500);
   const browse = await ben.page.locator("body").innerText();
   await ben.page.screenshot({ path: "/tmp/flow_ben_browse.png" });
-  check(browse.includes("Lamb tajine with apricots") && !browse.includes("Thai Green Curry"), "Browse shows Anna's real meal and no demo meals");
+  check(browse.includes("Lamb tajine with apricots") && !browse.includes("Thai Green Curry"), "as a visitor Ben sees Anna's real meal and no demo meals");
   await ben.page.goto(`${BASE}/bite.html?live&lang=en&meal=${meal.id}`);
   await ben.page.waitForTimeout(2000);
   const detail = await ben.page.locator("body").innerText();
@@ -111,6 +113,14 @@ async function logIn(page, email) {
   check(detail.includes("New host on Bite") && !detail.includes("Verified host"), "no false 'verified' claim for a host Bite has not checked");
   await ben.page.screenshot({ path: "/tmp/flow_2_detail.png" });
   await ben.page.getByRole("button", { name: /Eat together|Book|Join|€/ }).last().click();
+  await ben.page.getByText("Create a free account to ask for a seat").waitFor({ timeout: 8000 });
+  check(true, "booking as a visitor asks for an account, saying why");
+  await ben.page.getByRole("tab", { name: "Log in" }).click();
+  await ben.page.getByLabel("Email").fill("ben@test.local");
+  await ben.page.getByRole("textbox", { name: /^Password/ }).fill("local-test-only");
+  await ben.page.getByRole("button", { name: "Log in", exact: true }).last().click();
+  await ben.page.getByText("Confirm your booking").waitFor({ timeout: 10000 });
+  check(true, "after logging in Ben lands straight on the booking he wanted");
   await ben.page.waitForTimeout(800);
   const co = await ben.page.locator("body").innerText();
   check(!co.includes("insured"), "checkout makes no insurance promise in live mode");

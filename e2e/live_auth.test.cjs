@@ -44,10 +44,16 @@ await ctx.route(`${SB}/**`, async (route) => {
 
 const text = () => page.locator("body").innerText();
 
-// 1. live mode, nobody signed in -> log-in screen, no demo button
+// 1. live mode, nobody signed in -> a visitor can look around; the account is asked for only to act
 await page.goto(`${BASE}/bite.html?live&lang=en`);
+await page.waitForTimeout(2500);
+check(!(await page.getByRole("heading", { name: "Welcome back" }).count()) && (await text()).includes("eating today?"), "live mode opens on Home for visitors, without a log-in wall");
+await page.getByRole("button", { name: "Your profile" }).first().click();
+await page.getByRole("heading", { name: "Create your account" }).waitFor({ timeout: 8000 });
+check((await text()).includes("Log in to see your profile and bookings."), "opening the profile as a visitor asks for an account, saying why");
+await page.goto(`${BASE}/bite.html?live&login&lang=en`);
 await page.getByRole("heading", { name: "Welcome back" }).waitFor({ timeout: 10000 });
-check(true, "live mode opens on the log-in screen");
+check(true, "bite.html?live&login opens the log-in screen");
 check(!(await text()).includes("Continue with the demo account"), "no demo-account shortcut in live mode");
 check((await text()).includes("Frankfurt"), "privacy note mentions servers in Frankfurt");
 
@@ -122,8 +128,8 @@ await page.waitForTimeout(400);
 await page.getByRole("button", { name: /Log out/ }).first().click().catch(async () => {
   await settings.click(); await page.waitForTimeout(500); await page.getByRole("button", { name: /Log out/ }).first().click();
 });
-await page.getByRole("heading", { name: "Welcome back" }).waitFor({ timeout: 8000 });
-check(true, "log out returns to the log-in screen");
+await page.waitForTimeout(1500);
+check((await text()).includes("eating today?") && (await text()).includes("Log in"), "log out returns to Home as a visitor");
 const left = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("sb-")).length);
 check(left === 0, "the session is removed from the browser on log out");
 
