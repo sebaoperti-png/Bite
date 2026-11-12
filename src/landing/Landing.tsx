@@ -58,6 +58,18 @@ export function Landing() {
       setLeaving(true);
       setTimeout(() => { window.location.href = href; }, APP_TRANSITION_MS);
     };
+    // Arriving with a section in the URL (e.g. from the app's "Wanna know more?" card): the page is
+    // built after load, so the browser's own jump misses; scroll there once the sections exist.
+    const hash = window.location.hash;
+    if (hash.length > 1) {
+      let tries = 0;
+      const jump = () => {
+        const el = document.getElementById(decodeURIComponent(hash.slice(1)));
+        if (el) { el.scrollIntoView({ behavior: "auto", block: "start" }); return; }
+        if (++tries < 20) setTimeout(jump, 100);
+      };
+      setTimeout(jump, 150);
+    }
     // Coming back with the back button: remove the fade
     const onPageShow = () => setLeaving(false);
     document.addEventListener("click", onSettings);
