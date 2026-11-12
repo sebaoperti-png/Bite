@@ -2,7 +2,7 @@
 
 This repo contains the whole bite website: the landing page, the web app and the legal page.
 It is built with Vite + React + TypeScript and published on GitHub Pages
-(https://sebaoperti-png.github.io/Bite/) automatically on every push to `main`.
+(https://bitetable.de/) automatically on every push to `main`.
 
 ## Pages
 | URL | Entry HTML | Code |
