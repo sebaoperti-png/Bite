@@ -185,3 +185,10 @@ button:hover .dh-doodle { transform: rotate(-6deg); }
 @media (prefers-reduced-motion: reduce) { .mwm-dish { animation: none; } }
 .mwm-tabs button { flex: 1 1 0; min-width: 0; white-space: normal; line-height: 1.15; }
 @media (max-width: 420px) { .mwm-tabs button svg { display: none; } }
+/* place suggestions under the "Where?" search (any town in Germany) */
+.lp-suggest { list-style: none; margin: 6px 0 0; padding: 4px; border-radius: 14px; background: #fff; box-shadow: 0 10px 30px rgba(46,16,96,0.12), inset 0 0 0 1px rgba(107,33,217,0.08); }
+.lp-suggest button { width: 100%; display: flex; align-items: flex-start; gap: 9px; padding: 9px 10px; border-radius: 10px; text-align: left; color: #6b21d9; }
+.lp-suggest button:hover, .lp-suggest button:focus-visible { background: #f6f1fe; outline: none; }
+.lp-suggest svg { margin-top: 2px; flex-shrink: 0; }
+.lp-suggest b { display: block; font-size: 14px; color: #160a2e; font-weight: 700; }
+.lp-suggest em { display: block; font-style: normal; font-size: 12px; color: #7c6fa0; }
