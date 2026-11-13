@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:writer": "esbuild tests/descriptionWriter.test.ts --bundle --platform=node --format=cjs --define:import.meta.env.DEV=false --log-level=error --outfile=/tmp/writer.test.cjs && node /tmp/writer.test.cjs",
     "test:costing": "esbuild tests/costing.test.ts --bundle --platform=node --format=cjs --define:import.meta.env.DEV=false --define:import.meta.env.BASE_URL=\"\\\"/\\\"\" --loader:.jpg=empty --loader:.png=empty --outfile=/tmp/costing.test.cjs --log-level=error && node /tmp/costing.test.cjs"
   },
   "dependencies": {
