@@ -17,14 +17,14 @@ const FAQ: { test: (q: string) => boolean; reply: () => AssistantReply }[] = [
   {
     test: (q) => has(q, "safe", "sicher", "trust", "vertrau", "verif", "stranger", "fremd", "danger", "gefahr"),
     reply: () => ({
-      text: t("Safety comes first. Every host is verified in 4 steps — ID check, a quick video call, a sample meal and references. Payments stay in the app (no cash), you can read reviews before booking, and one trust violation means immediate suspension."),
+      text: t("Safety comes first. Everyone needs a real name and a photo before booking or hosting, hosts accept Bite's house rules, and the host chooses who joins: the street is shared only after that. You can report or block anyone in one tap. ID checks and reviews are coming next."),
       chips: [t("How does cost sharing work?"), t("How do I become a host?")],
     }),
   },
   {
     test: (q) => has(q, "cost shar", "split", "how much", "price", "pay", "fee", "expensive", "cost", "preis", "kost", "teil", "zahl", "gebühr", "gebuhr", "wie viel", "teuer"),
     reply: () => ({
-      text: t("Bite works like BlaBlaCar, but for dinner: the host shares what the groceries really cost. Everyone at the table — host included — pays an equal share, plus a 12% Bite service fee. Hosts can scan their supermarket receipt to show the real cost, and there's a price cap so nobody can make a profit. A typical plate is around €6."),
+      text: t("Bite works like BlaBlaCar, but for dinner: the host shares what the groceries really cost. Everyone at the table — host included — pays an equal share. For now you pay it at the table and Bite charges no fee. Hosts can scan their supermarket receipt to show the real cost, and there's a price cap so nobody can make a profit. A typical plate is around €6."),
       chips: [t("Find me something cheap"), t("Is it safe?")],
     }),
   },
@@ -37,7 +37,7 @@ const FAQ: { test: (q: string) => boolean; reply: () => AssistantReply }[] = [
   },
   {
     test: (q) => has(q, "cancel", "refund", "storn", "absag", "erstatt", "zurück", "zuruck"),
-    reply: () => ({ text: t("If a host cancels, you get a full refund automatically. If you cancel more than 24 hours before the meal, you're refunded in full too.") }),
+    reply: () => ({ text: t("Right now nothing is paid in advance: you pay your share at the table, so a cancellation costs you nothing. Please cancel as early as you can.") }),
   },
   {
     test: (q) => has(q, "allerg", "intoler", "unverträg", "unvertrag"),
