@@ -98,7 +98,7 @@ export function LegalPage() {
             </h2>
             {" "}
             <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
-              Effective 13 July 2026
+              Effective 13 November 2026
             </p>
             {" "}
             <h3>
@@ -158,47 +158,19 @@ export function LegalPage() {
             </h3>
             {" "}
             <p>
-              Prices are set by Hosts and shown inclusive of applicable taxes where required. All payments are processed in-app through our payment service provider;
-              {" "}
-              <strong>
-                off-platform or cash payments are prohibited.
-              </strong>
-              {" "}
-              A guest service fee may apply and is shown before you pay. Bite retains a platform commission from each booking; Hosts receive the remainder via automatic weekly payout.
+              {"Each Host sets a contribution per guest within Bite's price cap: an equal share of the real grocery cost, never a profit. In this early phase Bite processes no payments and charges no fee: guests pay their share directly to the Host at the meal. Before in-app payments or any fee start, these terms will be updated, and any fee will always be shown before you pay."}
             </p>
             {" "}
             <h3>
-              {"6. Cancellations & refunds"}
+              {"6. Cancellations"}
             </h3>
             {" "}
             <ul>
-              <li>
-                <strong>
-                  Host cancels:
-                </strong>
-                {" "}
-                the Guest receives a full refund automatically.
-              </li>
+              <li>{"Cancel in the app as early as you can, so the Host and the other guests can plan. Since nothing is paid in advance, cancelling costs nothing."}</li>
               {" "}
-              <li>
-                <strong>
-                  {"Guest cancels > 24h before:"}
-                </strong>
-                {" "}
-                full refund.
-              </li>
+              <li>{"If a Host cancels, guests are told in the app."}</li>
               {" "}
-              <li>
-                <strong>
-                  {"Guest cancels < 24h before:"}
-                </strong>
-                {" "}
-                the service fee may be non-refundable.
-              </li>
-              {" "}
-              <li>
-                Because meals are perishable/personalised, the statutory right of withdrawal for distance contracts may not apply once preparation has begun (§ 312g (2) BGB).
-              </li>
+              <li>{"Repeated no-shows or last-minute cancellations can lead to losing access to Bite."}</li>
             </ul>
             {" "}
             <h3>
@@ -255,7 +227,7 @@ export function LegalPage() {
             </h2>
             {" "}
             <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
-              {"In accordance with Art. 13 & 14 GDPR · Effective 13 July 2026"}
+              {"In accordance with Art. 13 & 14 GDPR · Effective 13 November 2026"}
             </p>
             {" "}
             <h3>
@@ -273,131 +245,53 @@ export function LegalPage() {
             <h3>
               2. Categories of data we process
             </h3>
-            {" "}
             <ul>
-              <li>
-                <strong>
-                  {"Account & profile:"}
-                </strong>
-                {" "}
-                name, email, phone, password, photo, role (host/guest), city.
-              </li>
-              {" "}
-              <li>
-                <strong>
-                  Verification:
-                </strong>
-                {" "}
-                ID documents and video-verification data for Hosts.
-              </li>
-              {" "}
-              <li>
-                <strong>
-                  {"Listings & bookings:"}
-                </strong>
-                {" "}
-                menus, allergens, prices, reservations, attendance.
-              </li>
-              {" "}
-              <li>
-                <strong>
-                  Payments:
-                </strong>
-                {" "}
-                processed by our payment provider; we store transaction metadata, not full card numbers.
-              </li>
-              {" "}
-              <li>
-                <strong>
-                  Communications:
-                </strong>
-                {" "}
-                in-app messages, support requests, reviews.
-              </li>
-              {" "}
-              <li>
-                <strong>
-                  {"Technical & usage:"}
-                </strong>
-                {" "}
-                device, IP, app interactions, cookies/identifiers.
-              </li>
-              {" "}
-              <li>
-                <strong>
-                  Location:
-                </strong>
-                {" "}
-                approximate location to show nearby meals (with your permission).
-              </li>
+              <li><strong>{"Account & profile:"}</strong>{" name, email address, password (stored only as a hash), profile photo, city and country, language, notification and newsletter choices, and when you accepted the house rules."}</li>
+              <li><strong>{"Meals & bookings:"}</strong>{" what hosts publish (title, menu, allergens, photos, date, seats, contribution and grocery cost, town and an approximate point on the map), the exact street (shown only to guests the host has accepted), seat requests and their status."}</li>
+              <li><strong>{"Messages, reports & blocks:"}</strong>{" chats between guests and hosts, reports you send us and the people you block."}</li>
+              <li><strong>{"Technical data:"}</strong>{" IP address and browser details that every website and service necessarily receives, and the choices saved in your browser (see Cookies)."}</li>
+              <li><strong>{"Location:"}</strong>{" if you tap \"Use my location\", your browser's position is used only on your device to search nearby; it is not sent to us. If you type a place, that text is sent to the place search (see 4)."}</li>
+              <li><strong>{"Receipt photos:"}</strong>{" when a host scans a grocery receipt, it is read on the host's own device; the photo is not uploaded. Only the total is saved with the meal."}</li>
             </ul>
-            {" "}
+            <p>{"Bite does not process payments yet (you pay the host at the table), and it does not collect ID documents yet. If this changes, this policy will be updated first."}</p>
             <h3>
               {"3. Purposes & legal bases"}
             </h3>
-            {" "}
             <ul>
-              <li>
-                Providing the service and performing your contract —
-                {" "}
-                <strong>
-                  Art. 6(1)(b) GDPR
-                </strong>
-                .
-              </li>
-              {" "}
-              <li>
-                Safety, fraud prevention, service improvement and analytics —
-                {" "}
-                <strong>
-                  Art. 6(1)(f)
-                </strong>
-                {" "}
-                (legitimate interests).
-              </li>
-              {" "}
-              <li>
-                Optional cookies, marketing and precise location —
-                {" "}
-                <strong>
-                  Art. 6(1)(a)
-                </strong>
-                {" "}
-                (consent).
-              </li>
-              {" "}
-              <li>
-                Legal, tax and accounting obligations —
-                {" "}
-                <strong>
-                  Art. 6(1)(c)
-                </strong>
-                .
-              </li>
+              <li>{"Providing the service and performing your contract — "}<strong>Art. 6(1)(b) GDPR</strong>.</li>
+              <li>{"Safety (reports, blocks, house rules), preventing misuse and keeping the service running — "}<strong>Art. 6(1)(f)</strong>{" (legitimate interests)."}</li>
+              <li>{"Optional cookies and the newsletter — "}<strong>Art. 6(1)(a)</strong>{" (consent)."}</li>
+              <li>{"Legal obligations — "}<strong>Art. 6(1)(c)</strong>.</li>
             </ul>
-            {" "}
             <h3>
               {"4. Recipients & processors"}
             </h3>
-            {" "}
-            <p>
-              We share data only as needed with: our payment service provider, cloud hosting and infrastructure providers, communication/notification tools, and analytics providers — each bound by a data-processing agreement under Art. 28 GDPR. Between users, Hosts and Guests see the profile and booking information necessary to arrange a meal.
-            </p>
-            {" "}
+            <p>{"Bite uses these services. Each receives only what it needs for its task:"}</p>
+            <ul>
+              <li><strong>Supabase</strong>{" (Supabase Inc., USA): database, log-in and photo storage for the app. Servers in Frankfurt am Main, Germany."}</li>
+              <li><strong>Resend</strong>{" (Plus Five Five, Inc., USA): sends the app's emails (confirming your address, resetting your password). Servers in Ireland (EU)."}</li>
+              <li><strong>{"GitHub Pages"}</strong>{" (GitHub, Inc., a Microsoft company, USA): hosts the website bitetable.de; receives your IP address when you open a page."}</li>
+              <li><strong>{"Apple iCloud Mail"}</strong>{" (Apple Distribution International Ltd., Ireland): our mailbox hello@bitetable.de; receives the emails you send us."}</li>
+              <li><strong>{"Google Apps Script & Google Sheets"}</strong>{" (Google Ireland Ltd.): the survey and the newsletter list (see the Survey section)."}</li>
+              <li><strong>{"Photon by komoot"}</strong>{" (komoot GmbH, Germany): the place search in the app; receives the place or postcode you type and your IP address."}</li>
+              <li><strong>OpenFreeMap</strong>{" (map tiles from OpenStreetMap data): draws the map in the app; receives your IP address and the map area shown."}</li>
+              <li><strong>jsDelivr</strong>{" (public content delivery network): only when a host scans a receipt, the reading program and its German language data are downloaded from it; it receives the IP address."}</li>
+            </ul>
+            <p>{"Between users, guests and hosts see only the profile and booking information needed to arrange a meal. We do not sell personal data."}</p>
             <h3>
               5. International transfers
             </h3>
-            {" "}
-            <p>
-              Where a processor is outside the EU/EEA, transfers are safeguarded by an EU adequacy decision or the EU Standard Contractual Clauses with additional safeguards.
-            </p>
-            {" "}
+            <p>{"The app's data (Supabase) is stored in Germany and its emails are sent from Ireland. Some of the providers above are US companies; where data can reach the USA, the transfer is covered by the EU-U.S. Data Privacy Framework (where the provider is certified) or by the EU Standard Contractual Clauses."}</p>
+            <h3 lang="de">
+              {"Kurz auf Deutsch: Empfänger"}
+            </h3>
+            <p lang="de">{"Bite nutzt: Supabase (Datenbank, Login, Fotos; Server in Frankfurt am Main), Resend (E-Mails der App; Server in Irland), GitHub Pages (Website), Apple iCloud Mail (unser Postfach), Google Apps Script und Google Sheets (Umfrage und Newsletter), Photon von komoot (Ortssuche), OpenFreeMap (Karte) und jsDelivr (nur beim Scannen eines Kassenbons). Zahlungen und Ausweisdaten werden derzeit nicht verarbeitet. Wir verkaufen keine personenbezogenen Daten. Fragen: hello@bitetable.de."}</p>
             <h3>
               6. Retention
             </h3>
             {" "}
             <p>
-              We keep personal data only as long as necessary for the purposes above: account data for the life of your account, and afterwards only as required by statutory retention periods (e.g. up to 10 years for invoices under German commercial and tax law). Verification documents are deleted once no longer required.
+              We keep personal data only as long as necessary for the purposes above: account data for the life of your account, and afterwards only as required by statutory retention periods (e.g. up to 10 years for invoices under German commercial and tax law). When you ask us to delete your account, we delete your profile, meals and messages, except what we must keep by law.
             </p>
             {" "}
             <h3>
@@ -710,7 +604,7 @@ export function LegalPage() {
                 hello@bitetable.de
               </a>
               {" "}
-              from your registered address, or use "Download my data" / "Delete my account" in the app settings. We may ask you to verify your identity to protect your account.
+              from the address of your account and tell us what you need (a copy of your data, a correction, or deleting your account). We may ask you to confirm it is you, to protect your account.
             </p>
             {" "}
             <h3>
