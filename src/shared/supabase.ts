@@ -15,20 +15,22 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 
 /**
  * Demo or live?
- * - Demo (default for now): everything stays in this browser, made for pitches.
- * - Live: real accounts in Supabase. Switch with bite.html?live, back with bite.html?demo.
- *   The choice is remembered in this browser.
- * When the real app is complete the default flips to live.
+ * - Live (default since 2026-11-13): real accounts and real meals in Supabase. Everyone who opens bite.html sees it.
+ * - Demo: sample meals in Frankfurt, everything stays in this browser, made for pitches. bite.html?demo switches to it
+ *   (remembered in this browser), bite.html?live switches back.
+ * - bite.html?preview shows the demo once without remembering it (the app inside the landing page's laptop), so a
+ *   visitor who then opens the real app still lands on live.
  */
 const MODE_KEY = "bite_mode";
 function readMode(): "demo" | "live" {
   try {
     const params = new URLSearchParams(window.location.search);
+    if (params.has("preview")) return "demo";
     if (params.has("live")) localStorage.setItem(MODE_KEY, "live");
     if (params.has("demo")) localStorage.setItem(MODE_KEY, "demo");
-    return localStorage.getItem(MODE_KEY) === "live" ? "live" : "demo";
+    return localStorage.getItem(MODE_KEY) === "demo" ? "demo" : "live";
   } catch {
-    return "demo";
+    return "live";
   }
 }
 export const MODE = readMode();
