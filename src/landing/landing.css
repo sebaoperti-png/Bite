@@ -1356,3 +1356,4 @@ a.rs-go:hover { background: #160a2e; }
   .kn-cols { grid-template-columns: 1fr; gap: 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .kn, .kn.out { animation: none; } }
+.lp-demo-note { font-size: 14px; color: #7c6fa0; margin-right: 6px; }
