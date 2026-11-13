@@ -9,7 +9,7 @@ const check = (c, m) => { if (c) { pass++; console.log("ok  ", m); } else { fail
 (async () => {
   const browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"] });
   for (const [label, vp] of [["phone", { width: 390, height: 844 }], ["desktop", { width: 1400, height: 900 }]]) {
-    const ctx = await browser.newContext({ viewport: vp });
+    const ctx = await browser.newContext({ viewport: vp, geolocation: { latitude: 48.8376, longitude: 10.093 }, permissions: ["geolocation"] });
     const problems = [];
     ctx.on("response", (r) => { if (r.url().startsWith(SITE) && r.status() >= 400) problems.push(`${r.status()} ${r.url()}`); });
     for (const path of ["/", "/bite.html?live&lang=en", "/bite.html?demo&lang=de", "/legal.html", "/stand.html"]) {
@@ -51,6 +51,11 @@ const check = (c, m) => { if (c) { pass++; console.log("ok  ", m); } else { fail
         await p.getByRole("combobox").fill("Aalen");
         await p.locator(".lp-suggest button").first().waitFor({ timeout: 10000 });
         check((await p.locator(".lp-suggest button").first().innerText()).includes("Aalen"), `${label} live app: typing "Aalen" suggests Aalen`);
+        await p.locator(".lp-me").click();
+        await p.locator(".lp-map .mm canvas").waitFor({ timeout: 15000 }).catch(() => {});
+        await p.waitForTimeout(3000);
+        check(await p.locator(".lp-map .mm canvas").count() === 1 && await p.locator(".lp-map .mm-me").count() === 1 && (await p.locator(".lp-pick").innerText()).includes("Near you"),
+          `${label} live app: "Use my location" shows a real map with you on it`);
       }
       await p.close();
     }
