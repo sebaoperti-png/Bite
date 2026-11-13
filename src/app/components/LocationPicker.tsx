@@ -1,18 +1,23 @@
 // "Where?" — a place and a radius, like Kleinanzeigen: type any town, village, district or postcode in Germany
 // (suggestions as you type, from OpenStreetMap via geocode.ts) or use your location, then choose how far
 // around it to look ("Whole city", +2 … +100 km). The button shows how many meals match.
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { MapPin, LocateFixed, Search } from "lucide-react";
-import { AREAS, ANY_AREA, effectiveRadius, type SearchCriteria } from "../data";
+import { AREAS, ANY_AREA, effectiveRadius, type Meal, type SearchCriteria } from "../data";
 import { RADII, type Place } from "../geo";
 import { searchPlaces, geocodePlace, type Suggestion } from "../geocode";
 import { t, dec } from "../../shared/i18n";
 
-export function LocationPicker({ criteria, set, countFor, onDone }: {
+// the real map, loaded only when a place is chosen (same map as Listings → "Map")
+const MealMap = lazy(() => import("./MealMap"));
+
+export function LocationPicker({ criteria, set, countFor, matching, onDone }: {
   criteria: SearchCriteria;
   set: (patch: Partial<SearchCriteria>) => void;
   countFor: (patch: Partial<SearchCriteria>) => number;
+  /** the meals that match right now, drawn as pins on the little map */
+  matching?: Meal[];
   onDone: () => void;
 }) {
   const [text, setText] = useState(criteria.origin?.kind === "postal" ? criteria.origin.label.split(" · ")[0] : "");
@@ -93,19 +98,17 @@ export function LocationPicker({ criteria, set, countFor, onDone }: {
       {error && <p className="lp-err" role="alert">{error}</p>}
 
       {criteria.origin && (
-        <p className="lp-current"><MapPin size={14} /> {t("Around {place}", { place: criteria.origin.label })}</p>
+        <p className="lp-current"><MapPin size={14} /> {criteria.origin.kind === "me" ? t("Near you") : t("Around {place}", { place: criteria.origin.label })}</p>
       )}
-
-      <p className="lp-label">{t("Popular cities")}</p>
-      <div className="lp-chips">
-        {AREAS.map((a) => {
-          const on = !criteria.origin && criteria.area === a;
-          return <button key={a} type="button" className={`lp-chip ${on ? "on" : ""}`} onClick={() => useCity(a)}>{t(a)}</button>;
-        })}
-      </div>
 
       {(hasCity || criteria.origin) && (
         <>
+          {/* the real map of the circle you're searching in, with the meals inside it */}
+          <div className="lp-map">
+            <Suspense fallback={<div className="mm mm-compact"><div className="mm-loading">{t("Unfolding the map…")}</div></div>}>
+              <MealMap compact meals={matching ?? []} criteria={criteria} />
+            </Suspense>
+          </div>
           <p className="lp-label">{t("Distance")}</p>
           <div className="lp-radii" role="radiogroup" aria-label={t("Distance")}>
             {radii.map((x) => {
@@ -118,13 +121,16 @@ export function LocationPicker({ criteria, set, countFor, onDone }: {
               );
             })}
           </div>
-          {/* a little map of the circle you're searching in */}
-          <div className="lp-ring" aria-hidden>
-            <span className="lp-ring-circle" style={{ ["--s" as string]: x2scale(r) }} />
-            <span className="lp-ring-pin"><MapPin size={16} /></span>
-          </div>
         </>
       )}
+
+      <p className="lp-label">{t("Popular cities")}</p>
+      <div className="lp-chips">
+        {AREAS.map((a) => {
+          const on = !criteria.origin && criteria.area === a;
+          return <button key={a} type="button" className={`lp-chip ${on ? "on" : ""}`} onClick={() => useCity(a)}>{t(a)}</button>;
+        })}
+      </div>
 
       <motion.button type="button" className="lp-done" onClick={onDone} whileTap={{ scale: 0.97 }}>
         {n === 1 ? t("Show 1 meal") : t("Show {n} meals", { n })}
@@ -133,14 +139,12 @@ export function LocationPicker({ criteria, set, countFor, onDone }: {
   );
 }
 
-/** radius → size of the drawn circle (0 = whole city drawn as a large soft area) */
-const x2scale = (r: number) => (r === 0 ? 1 : Math.min(1, 0.28 + Math.log10(r) * 0.42));
 export const fmtKm = (d: number) => (d < 10 ? `${dec(d, 1)} km` : `${Math.round(d)} km`);
 
 /** "Frankfurt", "Frankfurt · +10 km", "60311 · Frankfurt · +10 km", "Your location · +5 km" (or `anyLabel` when nowhere is set) */
 export function placeSummary(c: SearchCriteria, anyLabel: string) {
   const r = effectiveRadius(c);
-  if (c.origin) return `${c.origin.label} · +${r} km`;
+  if (c.origin) return `${c.origin.kind === "me" ? t("Near you") : c.origin.label} · +${r} km`;
   if (c.area === ANY_AREA) return anyLabel;
   return r ? `${t(c.area)} · +${r} km` : t(c.area);
 }

@@ -39,15 +39,18 @@ function circle([lat, lng]: [number, number], km: number) {
 
 interface Point { meal: Meal; lngLat: [number, number] }
 
-export default function MealMap({ meals, criteria, onSelect, onSearchArea }: {
+export default function MealMap({ meals, criteria, onSelect, onSearchArea, compact = false }: {
   meals: Meal[];
   criteria: SearchCriteria;
-  onSelect: (m: Meal) => void;
-  onSearchArea: (place: Place, radiusKm: number) => void;
+  onSelect?: (m: Meal) => void;
+  onSearchArea?: (place: Place, radiusKm: number) => void;
+  /** a small preview (the "Where?" picker): no controls, pins only show where meals are */
+  compact?: boolean;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const markers = useRef<Marker[]>([]);
+  const me = useRef<Marker | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [moved, setMoved] = useState(false);
@@ -72,13 +75,14 @@ export default function MealMap({ meals, criteria, onSelect, onSearchArea }: {
       m = new maplibregl.Map({
         container: box.current, style: STYLE, bounds: GERMANY, fitBoundsOptions: { padding: 24 },
         attributionControl: { compact: true }, dragRotate: false, pitchWithRotate: false, maxZoom: 15, minZoom: 4,
+        interactive: !compact,
       });
     } catch {
       setFailed(true); // no WebGL: the list still works
       return;
     }
     m.touchZoomRotate.disableRotation();
-    m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    if (!compact) m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     m.on("load", () => {
       m.addSource("area", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       m.addLayer({ id: "area-fill", type: "fill", source: "area", paint: { "fill-color": "#9b4aff", "fill-opacity": 0.08 } });
@@ -89,8 +93,17 @@ export default function MealMap({ meals, criteria, onSelect, onSearchArea }: {
     const touched = (e: { originalEvent?: unknown }) => { if (e.originalEvent) setMoved(true); };
     m.on("dragstart", touched); m.on("zoomstart", touched);
     m.on("click", () => setSelected(null));
+    // tiles still loading when the map closes are cancelled on purpose: that is not an error
+    m.on("error", (e) => { const err = (e as { error?: Error }).error; if (err && err.name !== "AbortError" && !/aborted/i.test(err.message)) console.warn("map:", err.message); });
     map.current = m;
-    return () => { markers.current.forEach((k) => k.remove()); m.remove(); map.current = null; };
+    return () => {
+      markers.current.forEach((k) => k.remove()); me.current?.remove(); map.current = null;
+      // closing a map whose style is still loading makes MapLibre print an "AbortError": wait for it to finish first
+      let gone = false;
+      const kill = () => { if (!gone) { gone = true; m.remove(); } };
+      if (m.isStyleLoaded()) kill();
+      else { m.once("load", kill); m.once("error", kill); window.setTimeout(kill, 15000); }
+    };
   }, []);
 
   // ---------------------------------------------------------------- frame what was searched
@@ -99,18 +112,27 @@ export default function MealMap({ meals, criteria, onSelect, onSearchArea }: {
     if (!m || !ready) return;
     const src = m.getSource("area") as maplibregl.GeoJSONSource | undefined;
     src?.setData({ type: "FeatureCollection", features: centre && radius > 0 ? [circle(centre, radius)] : [] });
+    // a blue dot where the person is, when they searched around their own location
+    me.current?.remove(); me.current = null;
+    const o = criteria.origin;
+    if (o?.kind === "me") {
+      const dot = document.createElement("span");
+      dot.className = "mm-me";
+      dot.setAttribute("aria-label", t("Near you"));
+      me.current = new maplibregl.Marker({ element: dot }).setLngLat([o.lng, o.lat]).addTo(m);
+    }
     if (moved) return; // the person is exploring: don't jump around
     if (centre && radius > 0) {
       const c = circle(centre, radius).geometry.coordinates[0];
       const b = c.reduce((bb, p) => bb.extend(p as [number, number]), new maplibregl.LngLatBounds(c[0] as [number, number], c[0] as [number, number]));
-      m.fitBounds(b, { padding: 40, duration: 700, maxZoom: 13 });
+      m.fitBounds(b, { padding: compact ? 14 : 40, duration: compact ? 400 : 700, maxZoom: 13 });
     } else if (points.length) {
       const b = points.reduce((bb, p) => bb.extend(p.lngLat), new maplibregl.LngLatBounds(points[0].lngLat, points[0].lngLat));
       m.fitBounds(b, { padding: 70, duration: 700, maxZoom: 12 });
     } else {
       m.fitBounds(GERMANY, { padding: 24, duration: 700 });
     }
-  }, [ready, points, centre?.[0], centre?.[1], radius]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ready, points, centre?.[0], centre?.[1], radius, criteria.origin?.kind]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---------------------------------------------------------------- pins and groups
   useEffect(() => {
@@ -135,14 +157,16 @@ export default function MealMap({ meals, criteria, onSelect, onSearchArea }: {
           el.className = `mm-pin ${selected === meal.id ? "on" : ""}`;
           el.textContent = meal.price === 0 ? t("Free") : euro(meal.price);
           el.setAttribute("aria-label", `${tMaybe(meal.title)}, ${euro(meal.price)}`);
-          el.onclick = (e) => { e.stopPropagation(); setSelected(meal.id); };
+          el.onclick = (e) => { e.stopPropagation(); if (!compact) setSelected(meal.id); };
+          if (compact) el.tabIndex = -1;
           markers.current.push(new maplibregl.Marker({ element: el, anchor: "bottom" }).setLngLat(g.pts[0].lngLat).addTo(m));
         } else {
           el.className = "mm-group";
           el.innerHTML = `<b>${g.pts.length}</b><span>${t("meals")}</span>`;
           el.setAttribute("aria-label", t("{n} meals here, zoom in", { n: g.pts.length }));
           const b = g.pts.reduce((bb, p) => bb.extend(p.lngLat), new maplibregl.LngLatBounds(g.pts[0].lngLat, g.pts[0].lngLat));
-          el.onclick = (e) => { e.stopPropagation(); setSelected(null); m.fitBounds(b, { padding: 90, maxZoom: 15, duration: 600 }); };
+          el.onclick = (e) => { e.stopPropagation(); if (compact) return; setSelected(null); m.fitBounds(b, { padding: 90, maxZoom: 15, duration: 600 }); };
+          if (compact) el.tabIndex = -1;
           markers.current.push(new maplibregl.Marker({ element: el }).setLngLat(m.unproject([g.x, g.y])).addTo(m));
         }
       }
@@ -160,20 +184,20 @@ export default function MealMap({ meals, criteria, onSelect, onSearchArea }: {
     const half = Math.min(distanceKm([c.lat, c.lng], [b.getNorth(), c.lng]), distanceKm([c.lat, c.lng], [c.lat, b.getEast()]));
     const km = Math.max(2, Math.min(300, Math.round(half * 0.9)));
     setMoved(false);
-    onSearchArea({ label: t("Map area"), lat: c.lat, lng: c.lng, kind: "map" }, km);
+    onSearchArea?.({ label: t("Map area"), lat: c.lat, lng: c.lng, kind: "map" }, km);
   };
 
   const sel = points.find((p) => p.meal.id === selected)?.meal;
   const dist = sel ? mealDistance(sel, criteria) : null;
 
   return (
-    <div className="mm">
+    <div className={`mm ${compact ? "mm-compact" : ""}`}>
       <div ref={box} className="mm-canvas" role="region" aria-label={t("Map of meals")} />
       {failed && <div className="mm-fallback">{t("The map cannot be shown on this device. Use the list instead.")}</div>}
       {!ready && !failed && <div className="mm-loading">{t("Unfolding the map…")}</div>}
 
       <AnimatePresence>
-        {moved && ready && (
+        {moved && ready && !compact && (
           <motion.button key="here" className="mm-here" onClick={searchHere} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <Search size={14} strokeWidth={2.6} /> {t("Search this area")}
           </motion.button>
@@ -181,14 +205,14 @@ export default function MealMap({ meals, criteria, onSelect, onSearchArea }: {
       </AnimatePresence>
 
       {ready && points.length === 0 && (
-        <div className="mm-empty">{t("No meals here yet. Zoom out or search another town.")}</div>
+        <div className="mm-empty">{compact ? t("No meals in this area yet") : t("No meals here yet. Zoom out or search another town.")}</div>
       )}
-      {unplaced > 0 && ready && <p className="mm-note">{t("{n} meals without a place on the map are only in the list", { n: unplaced })}</p>}
+      {unplaced > 0 && ready && !compact && <p className="mm-note">{t("{n} meals without a place on the map are only in the list", { n: unplaced })}</p>}
 
       <AnimatePresence>
         {sel && (
           <motion.div key={sel.id} className="mm-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 24 }} transition={{ type: "spring", stiffness: 320, damping: 28 }}>
-            <button className="mm-card-main" onClick={() => onSelect(sel)}>
+            <button className="mm-card-main" onClick={() => onSelect?.(sel)}>
               <img src={sel.image} alt="" />
               <span className="mm-card-text">
                 <b>{tMaybe(sel.title)}</b>

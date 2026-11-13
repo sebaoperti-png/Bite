@@ -255,6 +255,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
               criteria={criteria}
               set={set}
               countFor={(patch) => store.meals.filter((m) => matchesCriteria(m, { ...criteria, service: activeService, ...patch }, store.seatsLeft(m))).length}
+              matching={store.meals.filter((m) => matchesCriteria(m, { ...criteria, service: activeService }, store.seatsLeft(m)))}
               onDone={() => setOpenPicker(null)}
             />
           )}
@@ -367,7 +368,7 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
               <p className="dh-resa-text">
                 {reservationParts(criteria).map((part, i) =>
                   typeof part === "string" ? <span key={i}>{part}</span> : (
-                    <button key={i} className="dh-resa-pick" onClick={() => openPicker(part.id)}>{part.value}<ChevronDown size={16} strokeWidth={2.6} /></button>
+                    <button key={i} className="dh-resa-pick" data-pick={part.id} onClick={() => openPicker(part.id)}>{part.value}<ChevronDown size={16} strokeWidth={2.6} /></button>
                   ),
                 )}
               </p>
