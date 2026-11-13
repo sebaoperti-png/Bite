@@ -1321,3 +1321,6 @@ a.rs-go:hover { background: #160a2e; }
 @media (prefers-reduced-motion: reduce) { .tb-hot { animation: none; } }
 .tb-hot.on { opacity: 0; }
 .tb-hot.on:hover, .tb-hot.on:focus-visible { opacity: .95; }
+/* "Coming" lines on the Safety menu pages: what Bite does not do yet, said honestly */
+.sh-card.mc li.soon { color: #8a7aa8; }
+.mc-soon { display: inline-block; margin-right: 7px; padding: 1px 7px; border-radius: 999px; border: 1px solid rgba(107,33,217,0.35); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #6b21d9; vertical-align: 1px; }
