@@ -300,7 +300,7 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
     setTone(t);
     setWriting(true);
     setThinking(0);
-    const text = writeDescription({ mealName: form.mealName, eventTitle: form.eventTitle, cuisine: form.cuisineType, serviceType: form.serviceType, firstName: profile.name.split(" ")[0] }, t);
+    const text = writeDescription({ mealName: form.mealName, eventTitle: form.eventTitle, cuisine: form.cuisineType, serviceType: form.serviceType, firstName: profile.name.split(" ")[0], ingredients: form.ingredientsText, diet: [...form.dietary] }, t);
     const words = text.split(" ");
     pause.current = [
       window.setTimeout(() => setThinking(1), 650),
