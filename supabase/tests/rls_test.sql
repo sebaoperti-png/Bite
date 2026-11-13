@@ -102,7 +102,7 @@ select t_fails($$ insert into bookings (meal_id, guest_id, seats, status, total_
 select t_fails($$ select request_booking('11111111-1111-1111-1111-111111111111', 4) $$, 'Ben cannot book more seats than exist');
 select request_booking('11111111-1111-1111-1111-111111111111', 2, 'Hi Anna! I am vegetarian, is that ok?');
 select t_ok((select status from bookings) = 'requested', 'Ben''s booking starts as a request');
-select t_ok((select total_cents from bookings) = 1344, 'total = 2 x 6.00 + 12% = 13.44');
+select t_ok((select total_cents from bookings) = 1200, 'total = 2 x 6.00, no Bite fee while payments are not in the app');
 select t_ok((select count(*) from messages) = 1, 'Ben''s note arrives in the chat');
 select t_fails($$ select request_booking('11111111-1111-1111-1111-111111111111', 1) $$, 'Ben cannot book twice');
 select t_nochange($$ update bookings set status = 'confirmed' $$, 'Ben cannot confirm his own booking');
@@ -176,6 +176,20 @@ select t_ok((select host_rating from meal_cards) = 5.0 and (select host_reviews 
 select t_ok((select count(*) from bookings) = 0, 'but still no bookings');
 select t_as('00000000-0000-0000-0000-00000000000b');
 select t_fails($$ select request_booking('11111111-1111-1111-1111-111111111111', 1) $$, 'past meals cannot be booked');
+-- reviews both ways (0007)
+select t_fails($$ select review_guest((select id from bookings), 5, 'me') $$, 'a guest cannot review themself as a guest');
+select review_booking((select id from bookings), 4, repeat('x', 900));
+select t_ok((select rating = 4 and length(comment) = 500 from reviews), 'a review can be changed, and long words are cut to 500');
+select t_as('00000000-0000-0000-0000-00000000000a');
+select review_guest((select id from bookings), 5, 'Lovely guest, brought dessert');
+select t_ok((select rating from guest_rating('00000000-0000-0000-0000-00000000000b')) = 5.0, 'the host rates the guest, and other hosts can see the average');
+select t_fails($$ select review_booking((select id from bookings), 1) $$, 'the host cannot review their own meal as a guest');
+select t_as('00000000-0000-0000-0000-00000000000d');
+select t_fails($$ select review_guest((select id from bookings b), 1, 'stranger') $$, 'a stranger cannot review a guest');
+select t_ok((select count(*) from guest_reviews) = 0, 'a stranger cannot read reviews about a guest');
+select t_ok((select count(*) from host_review_list('00000000-0000-0000-0000-00000000000a')) = 1 and (select author from host_review_list('00000000-0000-0000-0000-00000000000a')) = 'Ben', 'a host''s reviews are public with the guest''s first name only');
+select t_as('00000000-0000-0000-0000-00000000000b');
+select t_ok((select count(*) from guest_reviews) = 1, 'Ben can read what Anna wrote about him');
 
 -- ===== step 3-5 additions
 reset role;
