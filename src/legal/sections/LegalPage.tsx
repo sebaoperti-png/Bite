@@ -248,7 +248,7 @@ export function LegalPage() {
             <ul>
               <li><strong>{"Account & profile:"}</strong>{" name, email address, password (stored only as a hash), profile photo, city and country, language, notification and newsletter choices, and when you accepted the house rules."}</li>
               <li><strong>{"Meals & bookings:"}</strong>{" what hosts publish (title, menu, allergens, photos, date, seats, contribution and grocery cost, town and an approximate point on the map), the exact street (shown only to guests the host has accepted), seat requests and their status."}</li>
-              <li><strong>{"Messages, reports & blocks:"}</strong>{" chats between guests and hosts, reports you send us and the people you block."}</li>
+              <li><strong>{"Messages, reviews, reports & blocks:"}</strong>{" chats between guests and hosts; reviews after a dinner (a guest's first name, stars and words appear on the host's page; what a host writes about a guest is seen only by that guest, and other hosts see just the average); reports you send us and the people you block."}</li>
               <li><strong>{"Technical data:"}</strong>{" IP address and browser details that every website and service necessarily receives, and the choices saved in your browser (see Cookies)."}</li>
               <li><strong>{"Location:"}</strong>{" if you tap \"Use my location\", your browser's position is used only on your device to search nearby; it is not sent to us. If you type a place, that text is sent to the place search (see 4)."}</li>
               <li><strong>{"Receipt photos:"}</strong>{" when a host scans a grocery receipt, it is read on the host's own device; the photo is not uploaded. Only the total is saved with the meal."}</li>
