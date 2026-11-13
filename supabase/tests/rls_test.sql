@@ -54,26 +54,32 @@ select t_as('00000000-0000-0000-0000-00000000000a');
 -- the price cap: groceries 24 € for 4 people (Anna + 3 guests) = 6 € each, cap 7 €
 select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city)
   values (auth.uid(),'No cost','eat-together',600,3,now()+interval '1 day','Aalen') $$, 'a paid meal needs its grocery cost');
-select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof)
-  values (auth.uid(),'Greedy','eat-together',800,3,now()+interval '1 day','Aalen','{"kind":"receipt","total":24,"people":4}') $$, 'a price above the cap is refused (8 € > 7 €)');
-select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof)
-  values (auth.uid(),'Rounding profit','eat-together',500,9,now()+interval '1 day','Aalen','{"kind":"receipt","total":40,"people":10}') $$, 'guests can never pay more than the groceries together (9 × 5 € > 40 €)');
-select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof)
-  values (auth.uid(),'Cents','eat-together',650,3,now()+interval '1 day','Aalen','{"kind":"receipt","total":24,"people":4}') $$, 'the contribution is whole euros');
-select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof)
-  values (auth.uid(),'Odd proof','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"vibes","total":24,"people":4}') $$, 'an unknown kind of cost is refused');
-select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof)
-  values (auth.uid(),'Huge','eat-together',2000,3,now()+interval '1 day','Aalen','{"kind":"declared","total":5000,"people":4}') $$, 'a grocery cost above 1000 € is refused');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
+  values (auth.uid(),'Greedy','eat-together',800,3,now()+interval '1 day','Aalen','{"kind":"receipt","total":24,"people":4}', 'Lamb, onions, apricots, couscous', now()) $$, 'a price above the cap is refused (8 € > 7 €)');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
+  values (auth.uid(),'Rounding profit','eat-together',500,9,now()+interval '1 day','Aalen','{"kind":"receipt","total":40,"people":10}', 'Lamb, onions, apricots, couscous', now()) $$, 'guests can never pay more than the groceries together (9 × 5 € > 40 €)');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
+  values (auth.uid(),'Cents','eat-together',650,3,now()+interval '1 day','Aalen','{"kind":"receipt","total":24,"people":4}', 'Lamb, onions, apricots, couscous', now()) $$, 'the contribution is whole euros');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
+  values (auth.uid(),'Odd proof','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"vibes","total":24,"people":4}', 'Lamb, onions, apricots, couscous', now()) $$, 'an unknown kind of cost is refused');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
+  values (auth.uid(),'Huge','eat-together',2000,3,now()+interval '1 day','Aalen','{"kind":"declared","total":5000,"people":4}', 'Lamb, onions, apricots, couscous', now()) $$, 'a grocery cost above 1000 € is refused');
 select t_ok(public.price_cap_cents(4200, 4, 'receipt') = 900 and public.price_cap_cents(4000, 9, 'receipt') = 400 and public.price_cap_cents(400, 6, 'estimate') = 0, 'the database cap matches the app (42 €/5 → 9 €, 40 €/10 → 4 €, 4 €/7 → free)');
 insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, status)
 values (auth.uid(), 'Free soup', 'pickup', 0, 2, now() + interval '2 days', 'Aalen', 'draft');
 select t_ok((select count(*) from meals where title = 'Free soup') = 1, 'a free meal needs no grocery cost');
 delete from meals where title = 'Free soup';
-insert into meals (id, host_id, title, service_type, price_cents, seats, starts_at, city, area, cost_proof)
-values ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000a',
-        'Tajine', 'eat-together', 600, 3, now() + interval '2 days', 'Aalen', 'Hirschbach', '{"kind":"receipt","total":24,"people":4}');
+-- ingredients and the host's declaration (0008)
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, host_declared_at)
+  values (auth.uid(),'No ingredients','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"receipt","total":24,"people":4}', now()) $$, 'a published meal must list its ingredients');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients)
+  values (auth.uid(),'No promise','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"receipt","total":24,"people":4}', 'Rice, beans') $$, 'a published meal needs the host''s declaration');
+insert into meals (id, host_id, title, service_type, price_cents, seats, starts_at, city, area, cost_proof, ingredients, host_declared_at)
+  values ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000a',
+        'Tajine', 'eat-together', 600, 3, now() + interval '2 days', 'Aalen', 'Hirschbach', '{"kind":"receipt","total":24,"people":4}', 'Lamb, onions, apricots, couscous', now());
 select t_fails($$ update meals set price_cents = 1500 where id = '11111111-1111-1111-1111-111111111111' $$, 'the host cannot raise the price above the cap later');
 select t_fails($$ update meals set cost_proof = null where id = '11111111-1111-1111-1111-111111111111' $$, 'the host cannot remove the grocery cost later');
+select t_ok((select host_declared_at > now() - interval '1 minute' from meals where id = '11111111-1111-1111-1111-111111111111'), 'the declaration time is set by the database');
 insert into meal_addresses values ('11111111-1111-1111-1111-111111111111', 'Brunnenstr. 1, Aalen');
 update profiles set verified = true where id = auth.uid();
 select t_ok((select verified from profiles where id = auth.uid()) = false, 'a user cannot mark themselves as verified');
@@ -190,6 +196,18 @@ select t_ok((select count(*) from guest_reviews) = 0, 'a stranger cannot read re
 select t_ok((select count(*) from host_review_list('00000000-0000-0000-0000-00000000000a')) = 1 and (select author from host_review_list('00000000-0000-0000-0000-00000000000a')) = 'Ben', 'a host''s reviews are public with the guest''s first name only');
 select t_as('00000000-0000-0000-0000-00000000000b');
 select t_ok((select count(*) from guest_reviews) = 1, 'Ben can read what Anna wrote about him');
+select t_ok((select count(*) from my_guest_reviews()) = 1 and (select author from my_guest_reviews()) = 'Anna', 'Ben sees his reviews as a guest, with the host''s first name');
+-- following (0008)
+insert into follows (follower_id, followee_id) values (auth.uid(), '00000000-0000-0000-0000-00000000000a');
+select t_ok((select count(*) from my_follows()) = 1 and (select name from my_follows()) = 'Anna H.', 'Ben follows Anna and sees her in his list');
+select t_ok(follower_count('00000000-0000-0000-0000-00000000000a') = 1, 'Anna''s follower count is 1');
+select t_fails($$ insert into follows (follower_id, followee_id) values (auth.uid(), auth.uid()) $$, 'nobody can follow themselves');
+select t_fails($$ insert into follows (follower_id, followee_id) values ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000a') $$, 'nobody can follow in someone else''s name');
+select t_as('00000000-0000-0000-0000-00000000000a');
+select t_ok((select count(*) from follows) = 0, 'Anna cannot see who follows her, only the number');
+select t_as('00000000-0000-0000-0000-00000000000b');
+delete from follows where followee_id = '00000000-0000-0000-0000-00000000000a';
+select t_ok(follower_count('00000000-0000-0000-0000-00000000000a') = 0, 'Ben can unfollow');
 
 -- ===== step 3-5 additions
 reset role;
