@@ -61,3 +61,11 @@
 .sf-place-card { flex: 1; min-width: 0; background: #fbf7ef; border-radius: 14px; padding: 10px 12px; border: 1px dashed rgba(107,33,217,0.28); }
 .sf-place-kicker { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #9a8bb8; }
 .sf-name { width: 100%; background: transparent; border: none; border-bottom: 1.5px solid rgba(107,33,217,0.2); outline: none; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; padding: 2px 0; color: #160a2e; }
+
+/* Safety tips (SafetyTipsSheet / SafetyTipsStrip) */
+.sf-tips-lead { margin: 4px 0 6px; font-size: 13px; line-height: 1.5; color: #6a5a8c; text-align: center; }
+.sf-strip { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border-radius: 14px; background: #eefaf4; border: 1px solid rgba(10,156,98,0.25); color: #0a6e47; font-size: 12.5px; line-height: 1.4; }
+.sf-strip svg { flex-shrink: 0; }
+.sf-strip span { flex: 1; min-width: 0; color: #24533f; }
+.sf-strip button { flex-shrink: 0; padding: 5px 10px; border-radius: 999px; background: #fff; border: 1px solid rgba(10,156,98,0.35); color: #0a6e47; font-size: 12px; font-weight: 800; }
+.sf-strip.compact { padding: 8px 10px; font-size: 12px; }
