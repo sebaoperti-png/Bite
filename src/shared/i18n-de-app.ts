@@ -763,6 +763,8 @@ const DE_UI: Record<string, string> = {
   "Your browser can't share its location": "Dein Browser kann den Standort nicht teilen",
   "Location not shared — type a city or postcode instead": "Standort nicht freigegeben – gib stattdessen eine Stadt oder PLZ ein",
   "Around {place}": "Rund um {place}",
+  "Near you": "In deiner Nähe",
+  "No meals in this area yet": "Hier gibt es noch keine Essen",
   "Cities": "Städte",
   "Distance": "Umkreis",
   "Whole city": "Ganze Stadt",
