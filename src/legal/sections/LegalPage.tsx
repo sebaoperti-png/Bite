@@ -76,7 +76,7 @@ export function LegalPage() {
               <strong>
                 Bite — Sebastiano Operti
               </strong>
-              , Frankfurt am Main, Germany. Last updated 13 July 2026.
+              , Aalen, Germany. Last updated 13 November 2026.
             </p>
             {" "}
             <div style={{ marginTop: "14px", background: "#fef6e7", border: "1px solid #f6dfb0", borderRadius: "12px", padding: "13px 16px", fontSize: "13.5px", color: "#7a5a12" }}>
@@ -752,7 +752,7 @@ export function LegalPage() {
             </h3>
             {" "}
             <p>
-              You may complain to your local data-protection authority. Our lead authority is the Hessian Commissioner for Data Protection and Freedom of Information (HBDI), Wiesbaden, Germany.
+              You may complain to your local data-protection authority. Our lead authority is the State Commissioner for Data Protection and Freedom of Information Baden-Württemberg (LfDI BW), Stuttgart, Germany.
             </p>
           </section>
           {" "}
@@ -772,10 +772,10 @@ export function LegalPage() {
                 Bite — Sebastiano Operti
               </strong>
               <br />
-              {" [Street & number]"}
+              {" Brunnenstraße 25"}
               <br />
               {" "}
-              60311 Frankfurt am Main
+              73430 Aalen
               <br />
               {" "}
               Germany
