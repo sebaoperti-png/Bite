@@ -1,6 +1,8 @@
 // Writes a meal description for hosts from what they already filled in (runs in the browser, no API key).
 // It recognises the dish from the meal name / title (tiramisu, ramen, lasagne…) and writes about that dish;
 // if the dish is unknown it falls back to the cuisine. Three tones; the host can cycle through them and edit the result.
+// It never invents ingredients that clash with what the host said: once the ingredient list is filled in, the
+// description names those ingredients; vegan or vegetarian meals never get meat, fish (or, if vegan, dairy and eggs).
 import type { ServiceType } from "./data";
 import { getLang } from "../shared/i18n";
 
@@ -17,6 +19,10 @@ interface Input {
   cuisine: string;
   serviceType: ServiceType;
   firstName: string;
+  /** the host's ingredient list, if already written */
+  ingredients?: string;
+  /** dietary ids picked in the hosting flow ("vegan", "vegetarian", …) */
+  diet?: string[];
 }
 
 type Kind = "dessert" | "baked" | "main" | "starter" | "brunch";
@@ -32,6 +38,12 @@ interface Dish {
 // Order matters: more specific dishes first (cheesecake before cake, pancakes before cake…)
 const DISHES: Dish[] = [
   // Desserts
+  { words: ["creme brulee", "brulee"], kind: "dessert", place: "France", touch: "silky vanilla custard under a crackling caramel top" },
+  { words: ["kaiserschmarrn", "schmarrn"], kind: "dessert", place: "Austria", verb: "made", touch: "fluffy torn pancake, caramelised edges, icing sugar and plum compote" },
+  { words: ["pastel de nata", "pasteis de nata", "nata"], kind: "dessert", place: "Portugal", verb: "baked", touch: "crisp, flaky pastry and a warm, wobbly custard with a blistered top" },
+  { words: ["mango sticky rice"], kind: "dessert", place: "Thailand", touch: "sweet coconut sticky rice and ripe mango" },
+  { words: ["crostata", "torta della nonna", "dolce"], kind: "dessert", place: "Italy", verb: "baked", touch: "buttery shortcrust and a filling made like at nonna's" },
+  { words: ["dampfnudel", "germknodel"], kind: "dessert", verb: "steamed", touch: "soft, steamed yeast dough and warm vanilla sauce" },
   { words: ["tiramisu"], kind: "dessert", place: "Italy", verb: "layered", touch: "espresso-soaked savoiardi, silky mascarpone cream and a generous dusting of cocoa" },
   { words: ["panna cotta"], kind: "dessert", place: "Italy", touch: "vanilla-scented cream, a gentle wobble and a bright berry coulis" },
   { words: ["cannoli"], kind: "dessert", place: "Sicily", touch: "crisp shells, sweet ricotta and a little candied orange" },
@@ -47,6 +59,8 @@ const DISHES: Dish[] = [
   { words: ["gelato", "ice cream", "sorbet", "eis"], kind: "dessert", verb: "churned", touch: "real fruit, fresh cream and no shortcuts" },
   { words: ["crumble", "cobbler"], kind: "dessert", verb: "baked", touch: "seasonal fruit, a buttery crumble topping and a scoop of something cold" },
   { words: ["tart", "pie", "tarte"], kind: "dessert", verb: "baked", touch: "crisp homemade pastry and a filling that changes with the season" },
+  { words: ["flammkuchen", "tarte flambee"], kind: "main", place: "Alsace", verb: "baked", touch: "a paper-thin crust, crème fraîche, onions and a very hot oven" },
+  { words: ["quiche"], kind: "main", place: "France", verb: "baked", touch: "crisp shortcrust and a silky, savoury egg filling" },
   { words: ["torte", "kuchen", "cake"], kind: "baked", touch: "real butter, free-range eggs and a soft, tender crumb" },
   { words: ["cookie", "biscuit", "kekse"], kind: "baked", touch: "brown butter, chunks of chocolate and soft, chewy middles" },
   { words: ["pudding", "dessert", "sweet", "chocolate", "schoko"], kind: "dessert", touch: "good chocolate, fresh cream and a sweet tooth's attention to detail" },
@@ -56,6 +70,40 @@ const DISHES: Dish[] = [
   { words: ["pizza"], kind: "main", place: "Italy", verb: "baked", touch: "a slow-proved dough, San Marzano tomatoes and the hottest oven I can manage" },
   { words: ["bread", "brot", "sourdough", "bagel", "pretzel", "brezel"], kind: "baked", touch: "a slow-fermented dough, a crackly crust and a soft, open crumb" },
   { words: ["empanada"], kind: "main", place: "Argentina", verb: "baked", touch: "flaky pastry and a well-spiced, juicy filling" },
+
+  // Italian classics
+  { words: ["parmigiana"], kind: "main", place: "Southern Italy", verb: "baked", touch: "fried aubergine, a slow tomato sauce, basil and melted cheese in layers" },
+  { words: ["vitello tonnato"], kind: "starter", place: "Piedmont", touch: "thinly sliced veal, a creamy tuna and caper sauce and a little lemon" },
+  { words: ["arancini", "arancine"], kind: "starter", place: "Sicily", verb: "fried", touch: "golden, crisp rice balls with a soft, melting filling" },
+  { words: ["ossobuco"], kind: "main", place: "Milan", verb: "slow-cooked", touch: "tender braised veal shank, gremolata and saffron risotto" },
+  { words: ["polenta"], kind: "main", place: "Northern Italy", touch: "creamy polenta stirred slowly and a rich topping" },
+  { words: ["bruschetta", "antipast"], kind: "starter", place: "Italy", touch: "toasted bread, ripe tomatoes, good olive oil and little plates to share" },
+  { words: ["caponata"], kind: "starter", place: "Sicily", touch: "sweet and sour aubergine, capers, olives and a splash of vinegar" },
+  // German classics
+  { words: ["roulade", "rouladen"], kind: "main", place: "Germany", verb: "slow-braised", touch: "tender rolled beef, mustard, pickles and a deep, dark gravy" },
+  { words: ["sauerbraten"], kind: "main", place: "Germany", verb: "slow-braised", touch: "a marinated roast, a sweet-sour gravy and dumplings" },
+  { words: ["currywurst", "bratwurst", "wurst"], kind: "main", place: "Germany", verb: "grilled", touch: "proper sausages, a tangy curry ketchup and crispy fries" },
+  { words: ["frikadelle", "bulette", "klopse", "meatball", "polpette", "kofte", "köfte"], kind: "main", verb: "made", touch: "juicy, well-seasoned meatballs and a sauce made from scratch" },
+  // French and the rest of the world
+  { words: ["ratatouille"], kind: "main", place: "Provence", verb: "slow-cooked", touch: "summer vegetables, olive oil, garlic and herbs from Provence" },
+  { words: ["coq au vin", "boeuf bourguignon", "bourguignon"], kind: "main", place: "France", verb: "slow-braised", touch: "a long braise in red wine, mushrooms, bacon and little onions" },
+  { words: ["gratin"], kind: "main", place: "France", verb: "baked", touch: "thin layers, cream and a golden, bubbling top" },
+  { words: ["ceviche"], kind: "starter", place: "Peru", verb: "made", touch: "very fresh fish cured in lime, chilli, red onion and coriander" },
+  { words: ["jollof"], kind: "main", place: "West Africa", verb: "slow-cooked", touch: "smoky tomato and pepper rice with warm spices" },
+  { words: ["injera", "wot", "doro"], kind: "main", place: "Ethiopia", verb: "slow-cooked", touch: "spongy injera to share and rich, spiced stews to scoop up with it" },
+  { words: ["borscht", "borsch"], kind: "main", place: "Ukraine", touch: "deep-red beetroot, a slow broth, dill and a spoon of sour cream" },
+  { words: ["peking duck", "duck"], kind: "main", verb: "roasted", touch: "crisp, lacquered skin, thin pancakes, spring onion and hoisin" },
+  { words: ["tteokbokki"], kind: "main", place: "Korea", touch: "chewy rice cakes in a sweet, spicy gochujang sauce" },
+  { words: ["fish and chips", "fish & chips"], kind: "main", place: "Britain", verb: "fried", touch: "crisp beer batter, thick-cut chips and mushy peas" },
+  { words: ["teriyaki", "katsu", "tonkatsu"], kind: "main", place: "Japan", touch: "a glossy homemade sauce, steamed rice and pickles on the side" },
+  { words: ["laksa"], kind: "main", place: "Malaysia", touch: "a spicy coconut broth, noodles and lots of fresh toppings" },
+  { words: ["nasi goreng", "satay"], kind: "main", place: "Indonesia", touch: "sweet soy, chilli, peanuts and a fried egg on top" },
+  { words: ["stir fry", "stir-fry", "tofu"], kind: "main", verb: "wok-fried", touch: "crisp vegetables, a hot wok and a glossy homemade sauce" },
+  { words: ["arepa"], kind: "main", place: "Venezuela", verb: "grilled", touch: "crisp corn cakes split open and generously filled" },
+  { words: ["feijoada"], kind: "main", place: "Brazil", verb: "slow-cooked", touch: "black beans slow-cooked for hours, rice, greens and orange slices" },
+  { words: ["khachapuri"], kind: "main", place: "Georgia", verb: "baked", touch: "a boat of soft bread, molten cheese and an egg yolk stirred in at the table" },
+  { words: ["lahmacun", "pide", "borek", "börek"], kind: "main", place: "Turkey", verb: "baked", touch: "thin, crisp dough, a spiced topping, lemon and fresh herbs" },
+  { words: ["plov", "pilaf", "pilau"], kind: "main", place: "Central Asia", verb: "slow-cooked", touch: "fragrant rice cooked with carrots, spices and tender meat" },
 
   // Pasta, rice & noodles
   { words: ["lasagna", "lasagne"], kind: "main", place: "Italy", verb: "baked", touch: "a slow-cooked ragù, silky béchamel and fresh pasta sheets" },
@@ -127,19 +175,70 @@ const CUISINE_WORDS: Record<string, { place: string; touch: string }> = {
   Vietnamese: { place: "Vietnam", touch: "fresh herbs, lime and bright, fragrant flavours" },
 };
 
-const norm = (s: string) => s.toLowerCase();
+// lower case without accents, so "Tiramisù", "Crème brûlée" and "Knödel" match however they are typed
+const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-/** Finds the dish the host is making, from the meal name first, then the event title. */
+/** Finds the dish the host is making, from the meal name first, then the event title.
+ *  A menu ("Antipasto, lasagne e tiramisù") is described by its main course. */
 export function detectDish(mealName: string, eventTitle: string): Dish | null {
   for (const text of [mealName, eventTitle]) {
     const t = norm(text);
     if (!t.trim()) continue;
     // Short words must start a word ("dal", "pie"); longer ones may sit inside German compounds ("Apfelkuchen")
-    const hit = DISHES.find((d) => d.words.some((w) => new RegExp(`${w.length <= 4 ? "(^|[^a-zà-ÿ])" : ""}${w}(e?s)?(?![a-zà-ÿ])`, "i").test(t)));
-    if (hit) return hit;
+    const hits: { d: Dish; at: number; end: number }[] = [];
+    for (const d of DISHES) {
+      for (const w of d.words) {
+        const m = new RegExp(`${w.length <= 4 ? "(^|[^a-z])" : ""}${esc(norm(w))}(e?s)?(?![a-z])`, "i").exec(t);
+        if (!m) continue;
+        const at = m.index, end = m.index + m[0].length;
+        // a word already claimed by a more specific dish earlier in the list ("cheesecake" before "cake") is not counted again
+        if (!hits.some((h) => at < h.end && end > h.at)) hits.push({ d, at, end });
+        break;
+      }
+    }
+    if (!hits.length) continue;
+    const mains = hits.filter((h) => h.d.kind === "main");
+    const pool = mains.length ? mains : hits;
+    return pool.sort((a, b) => a.at - b.at)[0].d;
   }
   return null;
 }
+
+// What the meal is made of, from the host's own list: the first few real ingredients (not salt, pepper, water, oil)
+const BASICS = /^(salt|salz|sale|pepper|pfeffer|pepe|water|wasser|acqua|oil|ol|olio|olive oil|olivenol|sugar|zucker|zucchero|butter|burro)$/;
+export function ingredientTouch(list: string | undefined, de = false): string | null {
+  if (!list) return null;
+  const clean = list
+    .replace(/\(.*?\)/g, "")                                                          // "béchamel (milk, butter)" → "béchamel"
+    .replace(/\d+([.,/]\d+)?\s*(kg|g|ml|cl|l|el|tl|tbsp|tsp|cups?|stk|pcs|x)?\b\.?/gi, ""); // quantities
+  const items = clean.split(/[,;\n•·]+|\s(?:und|and|e|y|et)\s/i)
+    .map((x) => x.replace(/^[-*.\s]+|[.\s]+$/g, "").replace(/\s+/g, " "))
+    .filter((x) => x.length > 1 && x.length < 40);
+  const real = items.filter((x) => !BASICS.test(norm(x)));
+  // in English an ingredient sits mid-sentence, so "Pasta sheets" reads "pasta sheets" (German nouns keep their capital)
+  const pick = (real.length >= 2 ? real : items).slice(0, 4).map((x) => (de ? x : x.charAt(0).toLowerCase() + x.slice(1)));
+  if (pick.length === 0) return null;
+  if (pick.length === 1) return pick[0];
+  return `${pick.slice(0, -1).join(", ")} ${de ? "und" : "and"} ${pick[pick.length - 1]}`;
+}
+
+type Diet = "vegan" | "vegetarian" | null;
+const VEGAN_WORDS = /\b(vegan|plant[- ]based|pflanzlich)/;
+const VEGGIE_WORDS = /\b(vegetari|veggie|vegetarisch|sin carne|senza carne|ohne fleisch|meatless|tofu)/;
+function dietOf(f: Input): Diet {
+  const text = norm(`${f.mealName} ${f.eventTitle}`);
+  if (f.diet?.includes("vegan") || VEGAN_WORDS.test(text)) return "vegan";
+  if (f.diet?.includes("vegetarian") || VEGGIE_WORDS.test(text)) return "vegetarian";
+  return null;
+}
+// words that a vegetarian (or vegan) description must not promise
+const MEAT = /(meat|guanciale|bacon|beef|veal|pork|chicken|duck|lamb|sausage|fish|tuna|seafood|ragu|ragù|patties|anchov|prawn|shrimp|stock|broth)/i;
+const ANIMAL = /(egg|cheese|cream|butter|mascarpone|ricotta|pecorino|parmigiano|feta|yoghurt|béchamel|bechamel|honey|milk|brioche|crème|custard)/i;
+const VEG_TOUCH: Record<"vegan" | "vegetarian", string> = {
+  vegan: "seasonal vegetables, good olive oil, fresh herbs and plants only",
+  vegetarian: "seasonal vegetables, fresh herbs and a lot of flavour",
+};
 
 const KIND_NOUN: Record<Kind, string> = { dessert: "dessert", baked: "bake", main: "dish", starter: "spread", brunch: "brunch" };
 const KIND_VERB: Record<Kind, string> = { dessert: "made", baked: "baked", main: "cooked", starter: "made", brunch: "made" };
@@ -150,12 +249,16 @@ export function writeDescription(f: Input, tone: Tone): string {
   const cuisine = CUISINE_WORDS[f.cuisine];
   const kind: Kind = found?.kind ?? "main";
   const sweet = kind === "dessert" || kind === "baked";
-  const touch = found?.touch ?? cuisine?.touch ?? "fresh ingredients and a lot of love";
+  const diet = dietOf(f);
+  const clashes = (x: string) => !!diet && (MEAT.test(x) || (diet === "vegan" && ANIMAL.test(x)));
+  // the host's own ingredients first; otherwise what the dish or cuisine is known for, unless it clashes with the diet
+  let touch = ingredientTouch(f.ingredients) ?? found?.touch ?? cuisine?.touch ?? "fresh ingredients and a lot of love";
+  if (!ingredientTouch(f.ingredients) && clashes(touch)) touch = cuisine && !clashes(cuisine.touch) ? cuisine.touch : VEG_TOUCH[diet!];
   const place = cuisine?.place ?? found?.place ?? null;
   const verb = found?.verb ?? KIND_VERB[kind];
   const noun = KIND_NOUN[kind];
   const name = f.firstName.trim();
-  if (getLang() === "de") return writeGerman(f, tone, found, kind, touch, place, verb);
+  if (getLang() === "de") return writeGerman(f, tone, found, kind, touch, place, verb, ingredientTouch(f.ingredients, true));
   const what = sweet ? "something sweet" : "good food";
 
   // The sentences that change with the format: sit at my table, pick up, or cook together
@@ -279,6 +382,46 @@ const TOUCH_DE: Record<string, string> = {
   "charcoal, yoghurt and fresh flatbread": "Holzkohle, Joghurt und frischem Fladenbrot",
   "fresh herbs, lime and bright, fragrant flavours": "frischen Kräutern, Limette und hellen, duftenden Aromen",
   "fresh ingredients and a lot of love": "frischen Zutaten und viel Liebe",
+  "silky vanilla custard under a crackling caramel top": "seidiger Vanillecreme unter einer knackenden Karamellkruste",
+  "fluffy torn pancake, caramelised edges, icing sugar and plum compote": "fluffigem, zerrupftem Teig, karamellisierten Rändern, Puderzucker und Zwetschgenröster",
+  "crisp, flaky pastry and a warm, wobbly custard with a blistered top": "knusprigem Blätterteig und warmer, zarter Puddingcreme mit gebräunter Oberfläche",
+  "sweet coconut sticky rice and ripe mango": "süßem Kokos-Klebreis und reifer Mango",
+  "buttery shortcrust and a filling made like at nonna's": "buttrigem Mürbeteig und einer Füllung wie bei der Nonna",
+  "soft, steamed yeast dough and warm vanilla sauce": "weichem, gedämpftem Hefeteig und warmer Vanillesoße",
+  "a paper-thin crust, crème fraîche, onions and a very hot oven": "hauchdünnem Boden, Crème fraîche, Zwiebeln und einem sehr heißen Ofen",
+  "crisp shortcrust and a silky, savoury egg filling": "knusprigem Mürbeteig und einer cremigen, herzhaften Eierfüllung",
+  "fried aubergine, a slow tomato sauce, basil and melted cheese in layers": "Schichten aus gebratener Aubergine, langsam gekochter Tomatensoße, Basilikum und geschmolzenem Käse",
+  "thinly sliced veal, a creamy tuna and caper sauce and a little lemon": "hauchdünnem Kalbfleisch, cremiger Thunfisch-Kapern-Soße und etwas Zitrone",
+  "golden, crisp rice balls with a soft, melting filling": "goldenen, knusprigen Reisbällchen mit weicher, schmelzender Füllung",
+  "tender braised veal shank, gremolata and saffron risotto": "zart geschmorter Kalbshaxe, Gremolata und Safranrisotto",
+  "creamy polenta stirred slowly and a rich topping": "cremiger, langsam gerührter Polenta und einem kräftigen Topping",
+  "toasted bread, ripe tomatoes, good olive oil and little plates to share": "geröstetem Brot, reifen Tomaten, gutem Olivenöl und kleinen Tellern zum Teilen",
+  "sweet and sour aubergine, capers, olives and a splash of vinegar": "süßsaurer Aubergine, Kapern, Oliven und einem Schuss Essig",
+  "tender rolled beef, mustard, pickles and a deep, dark gravy": "zarten Rinderrouladen, Senf, Gewürzgurken und einer kräftigen, dunklen Soße",
+  "a marinated roast, a sweet-sour gravy and dumplings": "einem marinierten Braten, süßsaurer Soße und Klößen",
+  "proper sausages, a tangy curry ketchup and crispy fries": "richtigen Würsten, würzigem Curryketchup und knusprigen Pommes",
+  "juicy, well-seasoned meatballs and a sauce made from scratch": "saftigen, gut gewürzten Fleischbällchen und einer selbstgemachten Soße",
+  "summer vegetables, olive oil, garlic and herbs from Provence": "Sommergemüse, Olivenöl, Knoblauch und Kräutern der Provence",
+  "a long braise in red wine, mushrooms, bacon and little onions": "langem Schmoren in Rotwein, Pilzen, Speck und kleinen Zwiebeln",
+  "thin layers, cream and a golden, bubbling top": "dünnen Schichten, Sahne und einer goldenen, blubbernden Kruste",
+  "very fresh fish cured in lime, chilli, red onion and coriander": "ganz frischem Fisch, in Limette gegart, mit Chili, roten Zwiebeln und Koriander",
+  "smoky tomato and pepper rice with warm spices": "rauchigem Tomaten-Paprika-Reis mit warmen Gewürzen",
+  "spongy injera to share and rich, spiced stews to scoop up with it": "fluffigem Injera zum Teilen und würzigen Eintöpfen zum Aufnehmen",
+  "deep-red beetroot, a slow broth, dill and a spoon of sour cream": "tiefroter Rote Bete, langsam gekochter Brühe, Dill und einem Löffel Schmand",
+  "crisp, lacquered skin, thin pancakes, spring onion and hoisin": "knuspriger, glasierter Haut, dünnen Pfannkuchen, Frühlingszwiebeln und Hoisin",
+  "chewy rice cakes in a sweet, spicy gochujang sauce": "bissfesten Reiskuchen in süß-scharfer Gochujang-Soße",
+  "crisp beer batter, thick-cut chips and mushy peas": "knusprigem Bierteig, dicken Pommes und Erbsenpüree",
+  "a glossy homemade sauce, steamed rice and pickles on the side": "einer glänzenden hausgemachten Soße, gedämpftem Reis und eingelegtem Gemüse",
+  "a spicy coconut broth, noodles and lots of fresh toppings": "scharfer Kokosbrühe, Nudeln und vielen frischen Toppings",
+  "sweet soy, chilli, peanuts and a fried egg on top": "süßer Sojasoße, Chili, Erdnüssen und einem Spiegelei obendrauf",
+  "crisp vegetables, a hot wok and a glossy homemade sauce": "knackigem Gemüse, einem heißen Wok und einer glänzenden hausgemachten Soße",
+  "crisp corn cakes split open and generously filled": "knusprigen Maisfladen, aufgeschnitten und großzügig gefüllt",
+  "black beans slow-cooked for hours, rice, greens and orange slices": "stundenlang gegarten schwarzen Bohnen, Reis, Grünkohl und Orangenscheiben",
+  "a boat of soft bread, molten cheese and an egg yolk stirred in at the table": "einem Schiffchen aus weichem Brot, geschmolzenem Käse und einem Eigelb, das am Tisch untergerührt wird",
+  "thin, crisp dough, a spiced topping, lemon and fresh herbs": "dünnem, knusprigem Teig, würzigem Belag, Zitrone und frischen Kräutern",
+  "fragrant rice cooked with carrots, spices and tender meat": "duftendem Reis mit Karotten, Gewürzen und zartem Fleisch",
+  "seasonal vegetables, good olive oil, fresh herbs and plants only": "saisonalem Gemüse, gutem Olivenöl, frischen Kräutern und rein pflanzlich",
+  "seasonal vegetables, fresh herbs and a lot of flavour": "saisonalem Gemüse, frischen Kräutern und viel Geschmack",
 };
 
 // "wenn ich … vermisse" (accusative)
@@ -287,21 +430,24 @@ const PLACE_DE: Record<string, string> = {
   India: "Indien", Italy: "Italien", Japan: "Japan", Korea: "Korea", Lebanon: "den Libanon", Liguria: "Ligurien", Mexico: "Mexiko",
   Morocco: "Marokko", "North Africa": "Nordafrika", Rome: "Rom", Sicily: "Sizilien", Spain: "Spanien", Swabia: "Schwaben",
   Thailand: "Thailand", Turkey: "die Türkei", Vietnam: "Vietnam", "the Mediterranean": "das Mittelmeer", "the US": "die USA",
+  Portugal: "Portugal", Alsace: "das Elsass", "Southern Italy": "Süditalien", Piedmont: "das Piemont", Milan: "Mailand", "Northern Italy": "Norditalien",
+  Germany: "Deutschland", Provence: "die Provence", Peru: "Peru", "West Africa": "Westafrika", Ethiopia: "Äthiopien", Ukraine: "die Ukraine",
+  Britain: "Großbritannien", Malaysia: "Malaysia", Indonesia: "Indonesien", Venezuela: "Venezuela", Brazil: "Brasilien", Georgia: "Georgien", "Central Asia": "Zentralasien",
 };
 
 const VERB_DE: Record<string, string> = {
   baked: "gebacken", churned: "gerührt", fried: "frittiert", grilled: "gegrillt", layered: "geschichtet", made: "zubereitet",
   rolled: "gerollt", "slow-cooked": "langsam geschmort", "slow-roasted": "langsam gebraten", smoked: "geräuchert",
-  tossed: "angemacht", "wok-fried": "im Wok gebraten", cooked: "gekocht",
+  tossed: "angemacht", "wok-fried": "im Wok gebraten", cooked: "gekocht", steamed: "gedämpft", "slow-braised": "langsam geschmort", roasted: "gebraten",
 };
 
 // All neuter nouns, so "das …, das ich mache" always works
 const NOUN_DE: Record<Kind, string> = { dessert: "Dessert", baked: "Gebäck", main: "Gericht", starter: "Gericht", brunch: "Frühstück" };
 
-function writeGerman(f: Input, tone: Tone, found: Dish | null, kind: Kind, touchEn: string, placeEn: string | null, verbEn: string): string {
+function writeGerman(f: Input, tone: Tone, found: Dish | null, kind: Kind, touchEn: string, placeEn: string | null, verbEn: string, ownDe: string | null): string {
   const dish = f.mealName.trim() || f.eventTitle.trim() || "ein hausgemachtes Abendessen";
   const sweet = kind === "dessert" || kind === "baked";
-  const touch = TOUCH_DE[touchEn] ?? touchEn;
+  const touch = ownDe ?? TOUCH_DE[touchEn] ?? touchEn;
   const place = placeEn ? PLACE_DE[placeEn] ?? placeEn : null;
   const verb = VERB_DE[verbEn] ?? "zubereitet";
   const name = f.firstName.trim();
