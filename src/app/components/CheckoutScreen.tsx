@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, Minus, Plus, Shield, Lock, CreditCard, CheckCircle, Calendar, MapPin, Users, Leaf } from "lucide-react";
 import confetti from "canvas-confetti";
 import { feeFor, euro, type Meal } from "../data";
+import { SafetyTipsStrip } from "./SafetySheets";
 import { useStore, type Booking } from "../store";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
@@ -135,6 +136,9 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
             <p style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{t("Nothing is charged now")}</p>
             <p style={{ fontSize: 12, color: "#7c6fa0", lineHeight: 1.5, marginTop: 2 }}>{t("{name} first accepts your request. Paying in the app is coming soon; until then you settle the grocery share with the host.", { name: meal.host.split(" ")[0] })}</p>
           </div>
+        ) : null}
+        {store.live ? (
+          <div className="mt-2.5"><SafetyTipsStrip compact /></div>
         ) : (
         <div className="flex items-center gap-3 p-3 rounded-2xl" style={{ background: "#f7f4fd", border: "1.5px solid #6b21d9" }}>
           <div className="w-11 h-8 rounded-md flex items-center justify-center" style={{ background: "#160a2e" }}>

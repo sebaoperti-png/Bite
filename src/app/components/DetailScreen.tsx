@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SafetyActions, ReportSheet, BlockSheet, type ReportTarget } from "./SafetySheets";
+import { SafetyActions, ReportSheet, BlockSheet, openSafetyTips, type ReportTarget } from "./SafetySheets";
 import { personOfMeal, type Person } from "../store";
 import { LikeHeart } from "../../shared/Motion";
 import { Cloche, TableSeats } from "../../shared/Restaurant";
@@ -159,6 +159,11 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         {!meal.ownedByMe && (
           <button onClick={() => setSafetyOpen(true)} className="mt-3 flex items-center gap-1.5" style={{ fontSize: 12, fontWeight: 600, color: "#9a8bb8" }}>
             <Flag size={12} strokeWidth={2.4} /> {t("Something not right? Report or block")}
+          </button>
+        )}
+        {!meal.ownedByMe && (
+          <button onClick={openSafetyTips} className="mt-2 flex items-center gap-1.5" style={{ fontSize: 12, fontWeight: 600, color: "#6b21d9" }}>
+            <ShieldCheck size={12} strokeWidth={2.4} /> {t("Safety tips for meeting neighbours")}
           </button>
         )}
       </div>

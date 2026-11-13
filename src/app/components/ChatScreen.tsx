@@ -3,7 +3,7 @@ import { ChevronLeft, Send, CheckCircle, Star, Leaf, Wine, Clock, MapPin, Calend
 import { motion, AnimatePresence } from "motion/react";
 import { euro, type Meal } from "../data";
 import { useStore, timeLabel, bookingStatusText, personOfConversation, type ChatMessage, type Person } from "../store";
-import { SafetyActions, ReportSheet, BlockSheet, type ReportTarget } from "./SafetySheets";
+import { SafetyActions, ReportSheet, BlockSheet, SafetyTipsStrip, openSafetyTips, type ReportTarget } from "./SafetySheets";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
 import { t, tMaybe, dateLabel } from "../../shared/i18n";
@@ -130,6 +130,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   const messages = (
     <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-3 [&>*]:flex-shrink-0" style={{ scrollbarWidth: "none" }}>
       {!isDesktop && confirmation}
+      {!isDesktop && <SafetyTipsStrip />}
       {conv.messages.length === 0 && (
         <p className="text-center py-8" style={{ fontSize: 13, color: "#7c6fa0" }}>{t("Say hello to {name} — ask about the menu, allergies or timing.", { name: conv.name.split(" ")[0] })}</p>
       )}
@@ -223,9 +224,11 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
               <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e" }}>{t("Good to know")}</p>
               <ul className="mt-2 flex flex-col gap-1.5" style={{ fontSize: 12.5, color: "#4a3a6e" }}>
                 <li>{t("• Keep the chat inside Bite, so we can help if something goes wrong.")}</li>
-                <li>{t("• Never pay or send money outside Bite.")}</li>
+                <li>{t("• Never share bank details, ID photos or codes.")}</li>
+                <li>{t("• Pay only at the table, never in advance.")}</li>
                 <li>{t("• Something wrong? Tap ··· above to report or block. We read every report.")}</li>
               </ul>
+              <button type="button" onClick={openSafetyTips} className="mt-2" style={{ fontSize: 12.5, fontWeight: 800, color: "#6b21d9" }}>{t("All safety tips")}</button>
             </div>
           </aside>
         )}

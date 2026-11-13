@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { EmptyPlate } from "../../shared/Restaurant";
+import { openSafetyTips } from "./SafetySheets";
 import { PlusMenu } from "./PlusMenu";
 import { MobileWeekMenu } from "./WeekMenu";
 import { LocationPicker, placeSummary } from "./LocationPicker";
@@ -9,7 +10,7 @@ import { COUNTRIES, countryByName, postalError, placeLabel, localPlace } from ".
 import {
   MapPin, Calendar, Clock, Users, Search, ChevronRight, ShoppingBag, Utensils, ChefHat, Home, MessageCircle, User, X, Check,
   Star, Bell, BadgeCheck, Globe, Shield, Ban, CheckCircle, Camera, Settings, CreditCard, UserPlus, BookOpen, Heart, LogOut,
-  RotateCcw, FileText, LifeBuoy, Leaf, Plus, Minus, Trash2, Eye, Sparkles, ChevronDown,
+  RotateCcw, FileText, LifeBuoy, Leaf, Plus, Minus, Trash2, Eye, Sparkles, ChevronDown, ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import logoImg from "../logo.png";
@@ -525,6 +526,7 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
     { Icon: Leaf,       label: t("Dietary preferences"), sub: profile.dietary.length ? profile.dietary.map((d) => t(d)).join(" · ") : t("None set"), onClick: () => setSheet("dietary") },
     { Icon: CreditCard, label: t("Payment methods"),     sub: store.live ? t("For now you pay at the table") : t("Visa ···· 4242 (demo)"), onClick: () => setSheet("payment") },
     { Icon: UserPlus,   label: t("Invite friends"),      sub: t("Bring your neighbours to the table"), onClick: invite },
+    { Icon: ShieldCheck, label: t("Safety tips"),        sub: t("How to meet neighbours safely"), onClick: openSafetyTips },
     { Icon: Globe,      label: t("About Bite"),          sub: t("How it works, safety and hosting on bitetable.de"), onClick: () => { window.top!.location.href = "./?from=app"; } },
     { Icon: Settings,   label: t("Settings"),            sub: store.live ? t("Notifications, language, blocked people") : t("Notifications, language, Bite news, demo data"), onClick: () => setSheet("settings") },
   ];

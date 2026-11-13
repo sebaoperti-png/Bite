@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ShieldAlert, Ban, Flag, Check, Camera, ChevronRight, Phone } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Ban, Flag, Check, Camera, ChevronRight, Phone } from "lucide-react";
 import { Sheet } from "./Sheet";
 import { SheetHeader } from "./HomeScreen";
 import { usePhotoPicker } from "./Avatar";
@@ -175,6 +175,11 @@ export function SafetyActions({ open, onClose, person, mealId, onReport, onBlock
             <ChevronRight size={16} />
           </button>
         ))}
+        <button className="sf-row" onClick={() => { onClose(); window.setTimeout(() => window.dispatchEvent(new Event("bite:safety-tips")), 180); }}>
+          <span className="sf-row-icon"><ShieldCheck size={17} strokeWidth={2.2} /></span>
+          <span className="sf-row-text"><b>{t("Safety tips")}</b><em>{t("How to meet neighbours safely")}</em></span>
+          <ChevronRight size={16} />
+        </button>
         <p className="sf-note">{t("Bite's team reads every report. Read our safety rules on bitetable.de.")}</p>
       </div>
     </Sheet>
@@ -186,7 +191,7 @@ export const HOUSE_RULES: { title: string; text: string }[] = [
   { title: "Say what's in it", text: "List the allergens you know of and answer guests' questions honestly." },
   { title: "Price it fairly", text: "Ask only for your share of the groceries. Bite is for sharing costs, not for profit." },
   { title: "Respect at the table", text: "No discrimination, no pressure, no unwanted advances. Everyone may leave at any time." },
-  { title: "Keep it on Bite", text: "Chat and arrange everything in the app. Never ask guests to pay outside Bite." },
+  { title: "Keep it on Bite", text: "Chat and arrange everything in the app. Ask only for the agreed share, at the table, never in advance." },
   { title: "Be there, or say so early", text: "If you have to cancel, do it as soon as you know. Your guests are counting on you." },
 ];
 
@@ -265,5 +270,63 @@ export function ProfileGateSheet({ open, reason, onClose, onDone }: { open: bool
         {!photo && <p className="sf-note">{t("Your photo is shown only to people on Bite.")}</p>}
       </div>
     </Sheet>
+  );
+}
+
+/* ── Safety tips: while Bite has no ID checks or payments in the app yet, these keep meeting strangers safe ── */
+export const SAFETY_TIPS: { title: string; text: string }[] = [
+  { title: "Keep chatting on Bite", text: "Talk to the host or guest in the Bite chat. Don't move to WhatsApp or give your phone number before you've met." },
+  { title: "Keep your personal data to yourself", text: "Never share bank details, ID photos, passwords or codes. Bite will never ask you for them." },
+  { title: "Pay only at the table", text: "Pay your share when you arrive, never in advance. Cash or PayPal at the meal are fine. PayPal \"Friends and family\" has no buyer protection, so don't use it to pay before." },
+  { title: "Tell someone where you're going", text: "For your first dinners, tell a friend the address and time, or bring them along if the host agrees." },
+  { title: "Say what you can't eat", text: "Write your allergies in the chat before the day and ask what's in each dish." },
+  { title: "Trust your gut", text: "You can leave at any time. In danger, call 110 or 112. Then report the person in the app: we read every report." },
+];
+
+/** Opens the tips from anywhere (the safety menu, the chat, the checkout) */
+export function useSafetyTips() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const on = () => setOpen(true);
+    window.addEventListener("bite:safety-tips", on);
+    return () => window.removeEventListener("bite:safety-tips", on);
+  }, []);
+  return { open, setOpen, sheet: <SafetyTipsSheet open={open} onClose={() => setOpen(false)} /> };
+}
+export const openSafetyTips = () => window.dispatchEvent(new Event("bite:safety-tips"));
+
+export function SafetyTipsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  return (
+    <Sheet open={open} onClose={onClose} mobileMaxHeight="92%">
+      <SheetHeader title={t("Safety tips")} onClose={onClose} />
+      <div className="overflow-y-auto px-5 pt-4 pb-6 sf-body" style={{ scrollbarWidth: "none", maxHeight: "72vh" }}>
+        <div className="sf-menu">
+          <p className="sf-menu-kicker">{t("While Bite is in its early days")}</p>
+          <h3 className="sf-menu-title">{t("Six tips for meeting neighbours")}</h3>
+          <p className="sf-tips-lead">{t("ID checks and payments in the app are still coming. Until then, these keep every dinner safe.")}</p>
+          <ol className="sf-rules">
+            {SAFETY_TIPS.map((r, i) => (
+              <li key={r.title}>
+                <span className="sf-no">{i + 1}</span>
+                <span><b>{t(r.title)}</b><em>{t(r.text)}</em></span>
+              </li>
+            ))}
+          </ol>
+          <p className="sf-menu-foot">{t("Questions or a problem? hello@bitetable.de")}</p>
+        </div>
+        <button className="sf-btn" onClick={onClose}>{t("Got it")}</button>
+      </div>
+    </Sheet>
+  );
+}
+
+/** A short reminder for the top of a chat or the booking page, with a link to all the tips */
+export function SafetyTipsStrip({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={`sf-strip ${compact ? "compact" : ""}`}>
+      <ShieldCheck size={16} strokeWidth={2.2} />
+      <span>{t("Stay safe: keep the chat on Bite, never share bank details, pay only at the table.")}</span>
+      <button type="button" onClick={openSafetyTips}>{t("All tips")}</button>
+    </div>
   );
 }
