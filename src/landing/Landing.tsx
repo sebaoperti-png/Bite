@@ -14,6 +14,7 @@ import { LandingBecomeAHost } from "./sections/LandingBecomeAHost";
 import { LandingSavings } from "./sections/LandingSavings";
 import { LandingFooter } from "./sections/LandingFooter";
 import { LandingCookieConsent } from "./sections/LandingCookieConsent";
+import { LandingKitchenNote } from "./sections/LandingKitchenNote";
 import { useLang, t } from "../shared/i18n";
 import { LandingMobileStickyCta } from "./sections/LandingMobileStickyCta";
 
@@ -120,6 +121,7 @@ export function Landing() {
       <LandingHelpCustomerService />
       <LandingFooter />
       <LandingCookieConsent {...cookieProps} />
+      <LandingKitchenNote ready={!showCookies} />
       <LandingMobileStickyCta />
       <LandingAssistant />
 
