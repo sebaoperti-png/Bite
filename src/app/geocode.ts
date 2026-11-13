@@ -22,8 +22,13 @@ export async function searchPlaces(q: string, signal?: AbortSignal): Promise<Sug
   const key = query.toLowerCase();
   if (cache.has(key)) return cache.get(key)!;
   const url = `${API}?q=${encodeURIComponent(query)}&limit=12&lang=de&osm_tag=place&bbox=${GERMANY_BBOX.join(",")}`;
+  // a slow or unreachable place search must not leave the person waiting: after 4 s the offline tables answer
+  const ctrl = new AbortController();
+  const onAbort = () => ctrl.abort();
+  signal?.addEventListener("abort", onAbort);
+  const timer = window.setTimeout(() => ctrl.abort(), 4000);
   try {
-    const res = await fetch(url, { signal });
+    const res = await fetch(url, { signal: ctrl.signal });
     if (!res.ok) throw new Error(String(res.status));
     const data = await res.json() as { features: { properties: Record<string, string>; geometry: { coordinates: [number, number] } }[] };
     const seen = new Set<string>();
@@ -49,8 +54,11 @@ export async function searchPlaces(q: string, signal?: AbortSignal): Promise<Sug
     cache.set(key, top);
     return top;
   } catch (e) {
-    if ((e as Error).name === "AbortError") throw e;
+    if (signal?.aborted) throw e; // the person typed on: this search is no longer wanted
     return offline(query);
+  } finally {
+    window.clearTimeout(timer);
+    signal?.removeEventListener("abort", onAbort);
   }
 }
 

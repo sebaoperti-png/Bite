@@ -29,6 +29,7 @@ export interface MealRow {
   cost_proof: Meal["costProof"] | null; status: "draft" | "published" | "cancelled";
   host_name: string; host_photo: string | null; host_verified: boolean; host_bio: string | null;
   seats_left: number; host_rating: number | null; host_reviews: number;
+  ingredients?: string; allergens?: string[]; allergy_notes?: string; host_declared_at?: string | null;
 }
 
 export function mealFromRow(r: MealRow, me: string | null, address?: string): Meal & { seatsLeft: number } {
@@ -63,6 +64,10 @@ export function mealFromRow(r: MealRow, me: string | null, address?: string): Me
     startsAt: r.starts_at,
     cancelled: r.status === "cancelled",
     seatsLeft: r.seats_left,
+    ingredientsText: r.ingredients || undefined,
+    allergens: r.allergens ?? [],
+    allergyNotes: r.allergy_notes || undefined,
+    hostDeclared: !!r.host_declared_at,
   };
 }
 
@@ -79,13 +84,14 @@ async function fetchBookings() {
 /** Everything the signed-in person needs, in one go */
 export async function fetchAll(me: string) {
   const since = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString();
-  const [mealsRes, addrRes, bookingsRes, convRes, likesRes, blocksRes] = await Promise.all([
+  const [mealsRes, addrRes, bookingsRes, convRes, likesRes, blocksRes, followsRes] = await Promise.all([
     supabase.from("meal_cards").select("*").gte("starts_at", since).order("starts_at"),
     supabase.from("meal_addresses").select("meal_id,address"),
     fetchBookings(),
     supabase.from("conversations").select("*, host:profiles!conversations_host_id_fkey(name,photo_url), guest:profiles!conversations_guest_id_fkey(name,photo_url), messages(id,sender_id,body,created_at,read_at)").order("created_at", { ascending: false }),
     supabase.from("likes").select("meal_id"),
     supabase.from("blocks").select("blocked_id, person:profiles!blocks_blocked_id_fkey(name,photo_url)"),
+    supabase.rpc("my_follows"), // until migration 0008 is applied this fails quietly: nobody is followed
   ]);
   const err = mealsRes.error || addrRes.error || bookingsRes.error || convRes.error || likesRes.error || blocksRes.error;
   if (err) throw err;
@@ -140,7 +146,8 @@ export async function fetchAll(me: string) {
 
   const liked = (likesRes.data ?? []).map((l) => l.meal_id as string);
   const blocked: Person[] = (blocksRes.data ?? []).map((b: any) => ({ id: b.blocked_id, name: b.person?.name || "Bite", avatar: b.person?.photo_url || initialAvatar(b.person?.name || "B") }));
-  return { meals, seatsLeft, conversations, bookings, pending, liked, blocked };
+  const following: Person[] = followsRes.error || !Array.isArray(followsRes.data) ? [] : followsRes.data.map((f: any) => ({ id: f.id, name: f.name || "Bite", avatar: f.photo_url || initialAvatar(f.name || "B") }));
+  return { meals, seatsLeft, conversations, bookings, pending, liked, blocked, following };
 }
 
 // ---------------------------------------------------------------- writes
@@ -175,6 +182,8 @@ export interface NewMeal {
   id: string; title: string; description: string; serviceType: ServiceType; price: number; seats: number;
   dateISO: string; time: string; city: string; area: string; address: string; tags: string[];
   image?: string; gallery: string[]; costProof?: Meal["costProof"];
+  /** every ingredient, the allergens it contains, notes, and the host's declaration (0008) */
+  ingredients: string; allergens: string[]; allergyNotes: string; declared: boolean;
 }
 
 export async function publishMeal(me: string, m: NewMeal) {
@@ -187,6 +196,8 @@ export async function publishMeal(me: string, m: NewMeal) {
     id: m.id, host_id: me, title: m.title.slice(0, 80), description: m.description, service_type: m.serviceType,
     price_cents: Math.round(m.price * 100), seats: m.seats, starts_at: startsAt, city: m.city, area: m.area,
     tags: m.tags, lat: spot?.lat ?? null, lng: spot?.lng ?? null, image_url: urls[0] ?? null, gallery: urls.slice(1), cost_proof: m.costProof ?? null, status: "published",
+    ingredients: m.ingredients.slice(0, 2000), allergens: m.allergens, allergy_notes: m.allergyNotes.slice(0, 500),
+    host_declared_at: m.declared ? new Date().toISOString() : null,
   });
   if (error) throw error;
   const addr = await supabase.from("meal_addresses").insert({ meal_id: m.id, address: m.address });
@@ -205,7 +216,7 @@ export interface HostReview { rating: number; comment: string; at: number; autho
 export async function fetchHostReviews(hostId: string): Promise<HostReview[]> {
   const { data, error } = await supabase.rpc("host_review_list", { p_host: hostId });
   if (error) throw error;
-  return (data ?? []).map((r: any) => ({ rating: r.rating, comment: r.comment ?? "", at: Date.parse(r.created_at), author: r.author || "Guest", photo: r.author_photo || initialAvatar(r.author || "G"), meal: r.meal_title }));
+  return (Array.isArray(data) ? data : []).map((r: any) => ({ rating: r.rating, comment: r.comment ?? "", at: Date.parse(r.created_at), author: r.author || "Guest", photo: r.author_photo || initialAvatar(r.author || "G"), meal: r.meal_title }));
 }
 /** what a host sees about a guest asking for a seat */
 export async function fetchGuestRating(guestId: string): Promise<{ rating: number; reviews: number } | null> {
@@ -252,3 +263,17 @@ export function dataError(message: string | undefined, t: (s: string) => string)
 }
 
 export const FEE = SERVICE_FEE;
+
+// ---------------------------------------------------------------- following and your own reviews
+export const followPerson = (me: string, id: string) => supabase.from("follows").insert({ follower_id: me, followee_id: id });
+export const unfollowPerson = (me: string, id: string) => supabase.from("follows").delete().eq("follower_id", me).eq("followee_id", id);
+export async function fetchFollowerCount(id: string): Promise<number> {
+  const { data, error } = await supabase.rpc("follower_count", { p_user: id });
+  return error ? 0 : Number(data ?? 0);
+}
+/** what hosts wrote about you as a guest */
+export async function fetchMyGuestReviews(): Promise<HostReview[]> {
+  const { data, error } = await supabase.rpc("my_guest_reviews");
+  if (error || !Array.isArray(data)) return [];
+  return data.map((r: any) => ({ rating: r.rating, comment: r.comment ?? "", at: Date.parse(r.created_at), author: r.author || "Host", photo: r.author_photo || initialAvatar(r.author || "H"), meal: r.meal_title }));
+}

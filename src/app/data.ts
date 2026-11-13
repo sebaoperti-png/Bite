@@ -27,6 +27,13 @@ export interface Meal {
   description: string;
   hostBio: string;
   ingredients?: string[];
+  /** Every ingredient, as the host wrote it (live: required to publish) */
+  ingredientsText?: string;
+  /** Which of the 14 EU allergens the meal contains (ids: gluten, crustaceans, eggs, …) and the host's notes */
+  allergens?: string[];
+  allergyNotes?: string;
+  /** The host confirmed the declaration before publishing (live: the time is set by the database) */
+  hostDeclared?: boolean;
   /** Extra dish photos shown after the cover on the meal page */
   gallery?: string[];
   /** How the contribution was set: from the host's receipt or Bite's estimate */
@@ -529,4 +536,23 @@ export function matchesCriteria(meal: Meal, c: SearchCriteria, seatsLeft: number
   const fields = [meal.title, meal.host, meal.description, meal.location, ...meal.tags];
   if (q && ![...fields, ...fields.map((f) => t(f))].some((f) => f.toLowerCase().includes(q))) return false;
   return true;
+}
+
+/** The 14 allergens EU law names (Regulation 1169/2011, Annex II), in the order hosts see them */
+export const EU_ALLERGENS: { id: string; label: string }[] = [
+  { id: "gluten", label: "Gluten (wheat, rye, barley, oats)" }, { id: "crustaceans", label: "Crustaceans" }, { id: "eggs", label: "Eggs" },
+  { id: "fish", label: "Fish" }, { id: "peanuts", label: "Peanuts" }, { id: "soy", label: "Soy" }, { id: "milk", label: "Milk (incl. lactose)" },
+  { id: "nuts", label: "Tree nuts" }, { id: "celery", label: "Celery" }, { id: "mustard", label: "Mustard" }, { id: "sesame", label: "Sesame" },
+  { id: "sulphites", label: "Sulphites" }, { id: "lupin", label: "Lupin" }, { id: "molluscs", label: "Molluscs" },
+];
+export const allergenLabel = (id: string) => EU_ALLERGENS.find((a) => a.id === id)?.label ?? id;
+/** "free from" tags that the search filters use, from a host's declared allergen list */
+export function freeFromTags(allergens: string[]) {
+  const has = (x: string) => allergens.includes(x);
+  return [
+    ...(!has("gluten") ? ["Gluten-free"] : []),
+    ...(!has("milk") ? ["Dairy-free"] : []),
+    ...(!has("eggs") ? ["Egg-free"] : []),
+    ...(!has("nuts") && !has("peanuts") ? ["Nut-free"] : []),
+  ];
 }

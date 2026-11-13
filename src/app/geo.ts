@@ -43,6 +43,8 @@ const PLZ2: Record<string, [string, number, number]> = {
   "70": ["Stuttgart", 48.78, 9.18], "71": ["Ludwigsburg", 48.9, 9.19], "72": ["Tübingen", 48.52, 9.06], "76": ["Karlsruhe", 49.01, 8.4], "79": ["Freiburg", 48.0, 7.84],
   "80": ["Munich", 48.14, 11.58], "81": ["Munich", 48.12, 11.6], "85": ["Ingolstadt", 48.77, 11.42], "86": ["Augsburg", 48.37, 10.9], "89": ["Ulm", 48.4, 9.99],
   "90": ["Nuremberg", 49.45, 11.08], "93": ["Regensburg", 49.01, 12.1], "97": ["Würzburg", 49.79, 9.95], "99": ["Erfurt", 50.98, 11.03],
+  // every other postcode region (first two digits), so a postcode always finds its area even offline
+  "02": ["Bautzen", 51.18, 14.42], "03": ["Cottbus", 51.76, 14.33], "15": ["Frankfurt (Oder)", 52.34, 14.55], "16": ["Eberswalde", 52.83, 13.82], "17": ["Neubrandenburg", 53.56, 13.26], "25": ["Itzehoe", 53.92, 9.52], "27": ["Verden", 52.92, 9.23], "29": ["Celle", 52.62, 10.08], "31": ["Hildesheim", 52.15, 9.95], "32": ["Herford", 52.11, 8.67], "41": ["Mönchengladbach", 51.19, 6.44], "42": ["Wuppertal", 51.26, 7.15], "46": ["Oberhausen", 51.47, 6.85], "49": ["Osnabrück", 52.28, 8.05], "54": ["Trier", 49.75, 6.64], "56": ["Koblenz", 50.36, 7.59], "57": ["Siegen", 50.87, 8.02], "58": ["Hagen", 51.36, 7.47], "59": ["Hamm", 51.68, 7.82], "67": ["Kaiserslautern", 49.44, 7.77], "73": ["Ostwürttemberg", 48.8, 9.9], "74": ["Heilbronn", 49.14, 9.22], "75": ["Pforzheim", 48.89, 8.7], "77": ["Offenburg", 48.47, 7.94], "78": ["Villingen-Schwenningen", 48.06, 8.46], "82": ["Starnberg", 48.0, 11.34], "83": ["Rosenheim", 47.86, 12.12], "84": ["Landshut", 48.54, 12.15], "87": ["Kempten", 47.73, 10.31], "88": ["Ravensburg", 47.78, 9.61], "91": ["Erlangen", 49.6, 11.0], "92": ["Amberg", 49.44, 11.86], "94": ["Passau", 48.57, 13.43], "95": ["Bayreuth", 49.95, 11.58], "96": ["Bamberg", 49.89, 10.89], "98": ["Suhl", 50.61, 10.69],
 };
 
 export const RADII = [0, 2, 5, 10, 20, 50, 100];
@@ -71,10 +73,17 @@ export function cityName(input: string): string | null {
   return Object.keys(CITIES).find((c) => c.toLowerCase() === q) ?? null;
 }
 
+// a closer look where the two-digit regions are wide (Ostalb: Aalen, Ellwangen, Schwäbisch Gmünd, Heidenheim)
+const PLZ3: Record<string, [string, number, number]> = {
+  "730": ["Göppingen", 48.70, 9.65], "734": ["Aalen", 48.84, 10.09], "735": ["Schwäbisch Gmünd", 48.80, 9.80],
+  "736": ["Schorndorf", 48.80, 9.53], "737": ["Esslingen", 48.74, 9.31], "895": ["Heidenheim", 48.68, 10.15],
+};
 /** A German postcode → the middle of its postcode area */
 export function placeFromPostcode(code: string): Place | null {
-  const m = code.trim().match(/^(\d{2})\d{3}$/);
-  if (!m || !PLZ2[m[1]]) return null;
-  const [town, lat, lng] = PLZ2[m[1]];
+  const m = code.trim().match(/^((\d{2})\d)\d{2}$/);
+  if (!m) return null;
+  const hit = PLZ3[m[1]] ?? PLZ2[m[2]];
+  if (!hit) return null;
+  const [town, lat, lng] = hit;
   return { label: `${code.trim()} · ${town}`, lat, lng, kind: "postal" };
 }

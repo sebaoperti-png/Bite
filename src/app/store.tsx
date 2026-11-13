@@ -59,6 +59,8 @@ interface Data {
   pending?: string[];
   /** demo: people you blocked (live mode keeps them in the database) */
   blocked?: Person[];
+  /** demo: people you follow */
+  following?: Person[];
 }
 
 const ago = (min: number) => Date.now() - min * 60_000;
@@ -211,6 +213,13 @@ interface Store extends Data {
   // safety
   blocked: Person[];
   isBlocked: (id: string) => boolean;
+  /** people you follow (a neighbour you enjoyed eating with) */
+  following: Person[];
+  isFollowing: (id: string) => boolean;
+  follow: (p: Person) => void;
+  unfollow: (id: string) => void;
+  /** live: your own account id */
+  myId: string | null;
   block: (p: Person) => Promise<void>;
   unblock: (id: string) => Promise<void>;
   report: (r: ReportInput) => Promise<void>;
@@ -230,7 +239,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const refreshRef = useRef<() => Promise<void>>(async () => {});
   const [me, setMe] = useState<string | null>(null);
   type LiveState = Awaited<ReturnType<typeof L.fetchAll>>;
-  const EMPTY_LIVE: LiveState = { meals: [], seatsLeft: {}, conversations: [], bookings: [], pending: [], liked: [], blocked: [] };
+  const EMPTY_LIVE: LiveState = { meals: [], seatsLeft: {}, conversations: [], bookings: [], pending: [], liked: [], blocked: [], following: [] };
   const [live, setLive] = useState<LiveState>(EMPTY_LIVE);
   const [liveLoading, setLiveLoading] = useState(IS_LIVE);
   // meals published from this device that are still uploading (shown at once, replaced by the real row)
@@ -490,6 +499,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     showToast,
     blocked: data.blocked ?? [],
     isBlocked: (id) => blockedIds.has(id),
+    following: data.following ?? [],
+    isFollowing: (id) => (data.following ?? []).some((p) => p.id === id),
+    follow: (p) => {
+      setData((d) => ({ ...d, following: [p, ...(d.following ?? []).filter((x) => x.id !== p.id)] }));
+      showToast(t("You follow {name}. Their new tables show up first.", { name: p.name.split(" ")[0] }));
+    },
+    unfollow: (id) => {
+      setData((d) => ({ ...d, following: (d.following ?? []).filter((x) => x.id !== id) }));
+      showToast(t("Unfollowed"));
+    },
+    myId: null,
     block: async (p) => {
       setData((d) => ({ ...d, blocked: [...(d.blocked ?? []).filter((x) => x.id !== p.id), p] }));
       showToast(t("{name} is blocked. You will not see each other's meals or messages.", { name: p.name.split(" ")[0] }));
@@ -574,6 +594,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           id, title: m.title, description: m.description, serviceType: m.serviceType, price: m.price, seats: m.seats,
           dateISO: m.dateISO ?? new Date().toISOString().slice(0, 10), time: m.time, city: m.city ?? "", area: "",
           address: m.street ?? m.location, tags: m.tags, image: m.image, gallery: m.gallery ?? [], costProof: m.costProof,
+          ingredients: m.ingredientsText ?? "", allergens: m.allergens ?? [], allergyNotes: m.allergyNotes ?? "", declared: !!m.hostDeclared,
         }).then(() => {
           void refresh().then(() => setOptimistic((o) => o.filter((x) => x.id !== id)));
         }).catch((e) => {
@@ -612,6 +633,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       blocked: live.blocked,
       isBlocked: (id: string) => liveBlocked.has(id),
+      following: live.following,
+      isFollowing: (id: string) => live.following.some((p) => p.id === id),
+      follow: (p: Person) => {
+        if (!uid) return;
+        setLive((l) => ({ ...l, following: [p, ...l.following.filter((x) => x.id !== p.id)] }));
+        void L.followPerson(uid, p.id).then(({ error }) => {
+          if (error && !/duplicate/i.test(error.message)) { fail(error); refreshSoon(); }
+          else showToast(t("You follow {name}. Their new tables show up first.", { name: p.name.split(" ")[0] }));
+        });
+      },
+      unfollow: (id: string) => {
+        if (!uid) return;
+        setLive((l) => ({ ...l, following: l.following.filter((x) => x.id !== id) }));
+        void L.unfollowPerson(uid, id).then(({ error }) => { if (error) { fail(error); refreshSoon(); } else showToast(t("Unfollowed")); });
+      },
+      myId: uid,
       block: async (p: Person) => {
         if (!uid) return;
         const { error } = await L.blockPerson(uid, p.id);

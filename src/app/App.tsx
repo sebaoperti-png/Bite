@@ -298,6 +298,7 @@ function AppInner() {
                   onMessage={() => withAccount(t("Create a free account to message the host."), () => { const st = storeRef.current; st.openConversation(meal).then((id) => openChat(id)).catch((e: Error) => st.showToast(e.message)); })}
                   onOpenChat={(id) => openChat(id)}
                   onUnpublished={() => navigate("home", true)}
+                  withAccount={(reason, then) => withAccount(reason, () => then(storeRef.current))}
                 />
               ) : missing)}
               {screen === "checkout" && (meal ? (
