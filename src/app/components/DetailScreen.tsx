@@ -12,6 +12,7 @@ import { useIsDesktop } from "../useIsDesktop";
 import { Sheet } from "./Sheet";
 import { SheetHeader } from "./HomeScreen";
 import { localPlace } from "../location";
+import { exactShare } from "../costing";
 import { t, tMaybe, dateLabel, dec } from "../../shared/i18n";
 
 const SAMPLE_REVIEWS = [
@@ -285,17 +286,20 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
     <div className="rounded-2xl p-4" style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(107,33,217,0.07)" }}>
       <div className="flex items-center gap-2 mb-3">
         <span className="px-2.5 py-1 rounded-full" style={{ fontSize: 12, fontWeight: 800, background: proof.kind === "receipt" ? "#e5f7f0" : "#ede8fb", color: proof.kind === "receipt" ? "#0a7c4e" : "#6b21d9" }}>
-          {proof.kind === "receipt" ? t("Receipt-backed") : t("Estimated by Bite")}
+          {proof.kind === "receipt" ? t("Receipt-backed") : proof.kind === "declared" ? t("Stated by the host") : t("Estimated by Bite")}
         </span>
-        <span style={{ fontSize: 12, color: "#7c6fa0" }}>{proof.kind === "receipt" ? t("Host scanned the grocery receipt") : t("Based on the menu and table size")}</span>
+        <span style={{ fontSize: 12, color: "#7c6fa0" }}>{proof.kind === "receipt" ? t("Host scanned the grocery receipt") : proof.kind === "declared" ? t("Typed in by the host, without a scanned receipt") : t("Based on the menu and table size")}</span>
       </div>
       <div className="flex items-center justify-between gap-2 flex-wrap" style={{ fontSize: isDesktop ? 15 : 13.5, color: "#160a2e" }}>
         <span>{t("Groceries")}{" "}<b>{euro(proof.total)}</b></span>
         <span style={{ color: "#a99cc8" }}>÷</span>
         <span><b>{proof.people}</b>{" "}{t("people (host included)")}</span>
         <span style={{ color: "#a99cc8" }}>=</span>
-        <span className="px-2.5 py-1 rounded-lg" style={{ background: "#6b21d9", color: "#fff", fontWeight: 900 }}>{t("{price} each", { price: euro(meal.price) })}</span>
+        <span className="px-2.5 py-1 rounded-lg" style={{ background: "#6b21d9", color: "#fff", fontWeight: 900 }}>{t("{price} each", { price: euro(exactShare(proof.total, proof.people)) })}</span>
       </div>
+      {Math.abs(exactShare(proof.total, proof.people) - meal.price) >= 0.005 && (
+        <p style={{ fontSize: 13, color: "#160a2e", marginTop: 10, lineHeight: 1.5 }}>{t("The host asks {price} per guest: the fair share rounded to whole euros.", { price: euro(meal.price) })}</p>
+      )}
       <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 10, lineHeight: 1.5 }}>{t("Price cap: hosts can't charge more than the real cost per person — nobody makes a profit, everyone eats for less.")}</p>
     </div>
   ));

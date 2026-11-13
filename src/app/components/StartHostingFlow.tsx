@@ -5,7 +5,7 @@ import { generate } from "../../lib/ui-generation.js";
 import { useStore } from "../store";
 import { labelForISO, euro, type Meal, type ServiceType } from "../data";
 import { writeDescription, TONES, type Tone } from "../descriptionWriter";
-import { estimateGroceries, fairShare as shareOf, priceCap, readReceipt, type CostSource } from "../costing";
+import { estimateGroceries, exactShare, suggestedPrice, priceCap, looksTooHigh, readReceipt, type CostSource } from "../costing";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ChevronLeft, ChevronRight, ChefHat, MapPin, Clock, Users, Star,
@@ -70,6 +70,10 @@ interface FormData {
   costSource: CostSource | null;
   receiptPreview: string;
   receiptItems: number;
+  /** the total the scan found (null = nothing scanned); a typed total that differs makes the cost "declared" */
+  receiptRead?: number | null;
+  /** the scan found a total but couldn't double-check it against the items or the card payment */
+  receiptUnsure?: boolean;
   pricePerGuest: number;
   freeEvent: boolean;
   discountEnabled: boolean;
@@ -104,7 +108,7 @@ const INITIAL: FormData = {
   adultsOnly: false, familyFriendly: true, guestsBringFriends: false, privateEvent: false, genderPreference: "no-preference",
   address: "", city: "", date: "", startTime: "19:00", endTime: "22:00",
   venue: "indoor", parkingAvailable: false, publicTransport: true,
-  groceryCost: 42, costSource: null, receiptPreview: "", receiptItems: 0, pricePerGuest: 6, freeEvent: false, discountEnabled: false, discountPercent: 10,
+  groceryCost: 42, costSource: null, receiptPreview: "", receiptItems: 0, receiptRead: null, receiptUnsure: false, pricePerGuest: 6, freeEvent: false, discountEnabled: false, discountPercent: 10,
   smokingAllowed: false, alcoholAllowed: true, petsPresent: false, shoesOff: false, houseRules: "",
   photos: [MOCK_PHOTOS[0]], coverIdx: 0,
 };
@@ -133,8 +137,14 @@ function stepError(step: number, f: FormData): string {
   if (step === 4 && !f.freeEvent) {
     if (!f.costSource) return t("Scan your receipt or let Bite estimate the grocery cost");
     if (f.groceryCost <= 0) return t("Enter what the groceries cost");
+    if (f.groceryCost > 1000) return t("That's more than a home dinner costs. Check the total.");
+    if (f.costSource === "receipt" && f.receiptUnsure) return t("Check the total from your receipt and tap \"That's right\"");
     const cap = priceCap(f.groceryCost, f.maxGuests + 1, f.costSource);
+    if (cap < 1) return t("The groceries are too little to split. Make it free (\"It's on me\") or check the total.");
+    if (f.pricePerGuest < 1 || !Number.isInteger(f.pricePerGuest)) return t("Choose a contribution per guest");
     if (f.pricePerGuest > cap) return t("The price cap is {price} per guest — you can't charge more than the real cost", { price: euro(cap) });
+    const est = estimateGroceries({ cuisine: f.cuisineType, people: f.maxGuests + 1, appetizers: !!f.appetizers.trim(), dessert: !!f.desserts.trim(), drinks: f.drinksIncluded });
+    if (f.costSource === "declared" && looksTooHigh(f.groceryCost, est.total)) return t("That's much more than this menu usually costs ({price}). Scan the receipt to use this total.", { price: euro(est.total) });
   }
   if (step === 6 && f.photos.length === 0) return t("Add at least one photo");
   return "";
@@ -692,14 +702,20 @@ function Step4({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
 }
 
 const people = (f: FormData) => f.maxGuests + 1;
+/** what guests are told about the grocery cost: "receipt" only if a scan found exactly this total
+ *  (drafts saved by older versions had no scan record, so they count as stated by the host) */
+const proofKind = (f: FormData): CostSource | null =>
+  f.costSource === "receipt" && (f.receiptRead == null || Math.abs(f.receiptRead - f.groceryCost) >= 0.005) ? "declared" : f.costSource;
 
 function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
+  const store = useStore();
   const [reading, setReading] = useState<number | null>(null);
   const [readError, setReadError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const n = people(form);
   const estimate = estimateGroceries({ cuisine: form.cuisineType, people: n, appetizers: !!form.appetizers.trim(), dessert: !!form.desserts.trim(), drinks: form.drinksIncluded });
-  const share = shareOf(form.groceryCost, n);
+  const share = exactShare(form.groceryCost, n);
+  const scanned = form.costSource === "receipt" || form.costSource === "declared";
   const cap = form.costSource ? priceCap(form.groceryCost, n, form.costSource) : 0;
   const covered = form.pricePerGuest * form.maxGuests;
   const yourShare = Math.max(0, Math.round((form.groceryCost - covered) * 100) / 100);
@@ -708,11 +724,14 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   const applyCost = (total: number, source: CostSource) => {
     set("groceryCost", total);
     set("costSource", source);
-    set("pricePerGuest", Math.min(shareOf(total, n), priceCap(total, n, source)));
+    set("pricePerGuest", suggestedPrice(total, n, source));
   };
+  // a typed total stays "receipt" only if it is exactly what the scan found
+  const typeTotal = (v: number) => applyCost(v, form.receiptRead != null && Math.abs(v - form.receiptRead) < 0.005 ? "receipt" : "declared");
   useEffect(() => {
     if (form.costSource === "estimate" && estimate.total !== form.groceryCost) applyCost(estimate.total, "estimate");
     if (form.costSource && form.pricePerGuest > cap) set("pricePerGuest", cap);
+    if (form.costSource && cap >= 1 && form.pricePerGuest < 1) set("pricePerGuest", suggestedPrice(form.groceryCost, n, form.costSource));
   }, [estimate.total, form.maxGuests]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const scan = async (image: File | string) => {
@@ -722,10 +741,13 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       set("receiptPreview", preview);
       const input = typeof image === "string" ? image : await resizeImage(image, 1600);
       const res = await readReceipt(input, (p) => setReading(p));
-      if (res.total) { applyCost(Math.round(res.total * 100) / 100, "receipt"); set("receiptItems", res.items); }
-      else { set("costSource", "receipt"); setReadError(t("We couldn't find the total — type it in below.")); }
+      if (res.total) {
+        const total = Math.round(res.total * 100) / 100;
+        applyCost(total, "receipt"); set("receiptItems", res.items); set("receiptRead", total); set("receiptUnsure", !res.confident);
+      } else { set("receiptRead", null); set("receiptUnsure", false); set("costSource", "declared"); setReadError(t("We couldn't find the total — type it in below.")); }
     } catch {
-      set("costSource", "receipt");
+      set("receiptRead", null); set("receiptUnsure", false);
+      set("costSource", "declared");
       setReadError(t("Couldn't read the receipt (no connection?). Type the total in below."));
     } finally {
       setReading(null);
@@ -747,10 +769,10 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   );
 
   const Option = ({ id, Icon, title, sub }: { id: CostSource; Icon: React.ElementType; title: string; sub: string }) => {
-    const on = form.costSource === id;
+    const on = id === "receipt" ? scanned : form.costSource === id;
     return (
       <motion.button
-        onClick={() => (id === "estimate" ? applyCost(estimate.total, "estimate") : (set("costSource", "receipt"), !form.receiptPreview && fileRef.current?.click()))}
+        onClick={() => (id === "estimate" ? applyCost(estimate.total, "estimate") : (form.receiptRead != null && Math.abs(form.groceryCost - form.receiptRead) < 0.005 ? applyCost(form.receiptRead, "receipt") : form.costSource !== "declared" && applyCost(0, "declared"), !form.receiptPreview && fileRef.current?.click()))}
         className="flex-1 text-left p-4 rounded-2xl"
         style={{ background: on ? lightPurple : "#fff", border: `2px solid ${on ? purple : "rgba(107,33,217,0.12)"}` }}
         whileTap={{ scale: 0.97 }}
@@ -783,7 +805,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           </div>
           <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={e => { const f = e.target.files?.[0]; if (f) scan(f); e.target.value = ""; }} />
 
-          {form.costSource === "receipt" && (
+          {scanned && (
             <Card>
               <div className="flex items-start gap-3">
                 {form.receiptPreview ? (
@@ -807,20 +829,32 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                     </>
                   ) : (
                     <>
-                      {form.receiptPreview && !readError && form.groceryCost > 0 && (
+                      {form.receiptPreview && !readError && form.costSource === "receipt" && form.groceryCost > 0 && (
                         <p style={{ fontSize: 13.5, color: "#0a7c4e", fontWeight: 800 }}>{t("✓ Found {price} on your receipt", { price: euro(form.groceryCost) })}</p>
+                      )}
+                      {form.costSource === "receipt" && form.receiptUnsure && !readError && (
+                        <div style={{ marginTop: 4 }}>
+                          <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700 }}>{t("Please check it: the photo was hard to read.")}</p>
+                          <button onClick={() => set("receiptUnsure", false)} className="mt-1.5 px-3 py-1.5 rounded-full" style={{ fontSize: 12.5, fontWeight: 800, color: "#fff", background: purple }}>{t("That's right")}</button>
+                        </div>
+                      )}
+                      {form.costSource === "declared" && form.groceryCost > 0 && !readError && (
+                        <p style={{ fontSize: 12.5, color: "#7c6fa0", fontWeight: 700 }}>{form.receiptRead != null ? t("You changed the total, so guests will see it as stated by you.") : t("Typed by you: guests will see it as stated by you, not receipt-backed.")}</p>
+                      )}
+                      {form.groceryCost > 0 && looksTooHigh(form.groceryCost, estimate.total) && (
+                        <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700, marginTop: 4 }}>{t("That's much more than this menu usually costs ({price}). Only include the shopping for this dinner.", { price: euro(estimate.total) })}</p>
                       )}
                       {readError && <p style={{ fontSize: 13, color: "#c05e00", fontWeight: 700 }}>{readError}</p>}
                       <label className="block mt-2">
                         <span style={{ fontSize: 12, fontWeight: 700, color: "#7c6fa0" }}>{t("Total paid (check it matches)")}</span>
                         <div className="flex items-center gap-2 mt-1">
                           <span style={{ fontSize: 18, fontWeight: 900, color: purple }}>€</span>
-                          <input type="number" inputMode="decimal" min={1} max={500} step="0.01" value={form.groceryCost || ""} onChange={e => { const v = Number(e.target.value); if (v >= 0) applyCost(v, "receipt"); }} style={{ ...inputStyle, width: 120, padding: "8px 12px", fontSize: 16, fontWeight: 800 }} />
+                          <input type="number" inputMode="decimal" min={1} max={500} step="0.01" value={form.groceryCost || ""} onChange={e => { const v = Math.round(Number(e.target.value) * 100) / 100; if (v >= 0 && v <= 5000) typeTotal(v); }} style={{ ...inputStyle, width: 120, padding: "8px 12px", fontSize: 16, fontWeight: 800 }} />
                         </div>
                       </label>
                       <div className="flex gap-3 mt-3 flex-wrap">
                         <button onClick={() => fileRef.current?.click()} style={{ fontSize: 12.5, fontWeight: 800, color: purple }}>{form.receiptPreview ? t("Scan another") : t("Take a photo")}</button>
-                        <button onClick={() => scan("app/sample-receipt.jpg")} style={{ fontSize: 12.5, fontWeight: 700, color: "#7c6fa0" }}>{t("Try a sample receipt")}</button>
+                        {!store.live && <button onClick={() => scan("app/sample-receipt.jpg")} style={{ fontSize: 12.5, fontWeight: 700, color: "#7c6fa0" }}>{t("Try a sample receipt")}</button>}
                       </div>
                     </>
                   )}
@@ -847,16 +881,23 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
             </Card>
           )}
 
-          {form.costSource && form.groceryCost > 0 && (
+          {form.costSource && form.groceryCost > 0 && cap < 1 && (
+            <Card>
+              <p style={{ fontSize: 13.5, color: "#c05e00", fontWeight: 700, lineHeight: 1.5 }}>{t("{price} is too little to split between {n} people without someone paying more than their share. Make it free, or check the total.", { price: euro(form.groceryCost), n })}</p>
+              <button onClick={() => set("freeEvent", true)} style={{ marginTop: 10, fontSize: 13, fontWeight: 800, color: purple }}>{t("Make it free")}</button>
+            </Card>
+          )}
+
+          {form.costSource && form.groceryCost > 0 && cap >= 1 && (
             <>
               <Card>
                 <Label>{t("Contribution per guest")}</Label>
-                <Stepper value={form.pricePerGuest} onChange={v => set("pricePerGuest", v)} min={1} max={cap} big />
+                <Stepper value={Math.min(Math.max(1, form.pricePerGuest), cap)} onChange={v => set("pricePerGuest", v)} min={1} max={cap} big />
                 <div className="flex gap-2 mt-3 flex-wrap">
                   <span className="px-2.5 py-1 rounded-full" style={{ background: "#e5f7f0", fontSize: 12, fontWeight: 800, color: "#0a7c4e" }}>{t("Fair share {price}", { price: euro(share) })}</span>
                   <span className="px-2.5 py-1 rounded-full" style={{ background: "#fff0f3", fontSize: 12, fontWeight: 800, color: "#e9345a" }}>{t("Price cap {price}", { price: euro(cap) })}</span>
                 </div>
-                <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 8, lineHeight: 1.5 }}>{form.costSource === "receipt" ? t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: at most the real cost per person (+5% for rounding).") : t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: at most the real cost per person (+15% because it's an estimate).")}</p>
+                <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 8, lineHeight: 1.5 }}>{form.costSource === "estimate" ? t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +15% (it's an estimate), rounded to whole euros, and the guests together never pay more than the groceries.") : t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +5%, rounded to whole euros, and the guests together never pay more than the groceries.")}</p>
               </Card>
 
               <div style={{ background: "linear-gradient(135deg, #6b21d9, #9b4aff)", borderRadius: 20, padding: "18px 16px" }}>
@@ -865,9 +906,9 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                 <p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 2 }}>{t("instead of {price} for the whole table, with a full table of {n}", { price: euro(form.groceryCost), n: form.maxGuests })}</p>
                 <div style={{ borderTop: "1px solid rgba(255,255,255,0.15)", marginTop: 14, paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
                   {[
-                    { label: form.costSource === "receipt" ? t("Groceries (receipt)") : t("Groceries (estimate)"), val: euro(form.groceryCost) },
+                    { label: form.costSource === "receipt" ? t("Groceries (receipt)") : form.costSource === "declared" ? t("Groceries (stated by you)") : t("Groceries (estimate)"), val: euro(form.groceryCost) },
                     { label: t("Guests chip in ({n} × {price})", { n: form.maxGuests, price: euro(form.pricePerGuest) }), val: `−${euro(covered)}` },
-                    { label: t("Each guest pays"), val: t("{price} + 12% service fee", { price: euro(form.pricePerGuest) }), bold: true },
+                    { label: t("Each guest pays"), val: store.live ? t("{price}, at the table", { price: euro(form.pricePerGuest) }) : t("{price} + 12% service fee", { price: euro(form.pricePerGuest) }), bold: true },
                   ].map(({ label, val, bold }) => (
                     <div key={label} className="flex justify-between gap-3">
                       <span style={{ fontSize: 12.5, color: bold ? "#fff" : "rgba(255,255,255,0.75)", fontWeight: bold ? 700 : 400 }}>{label}</span>
@@ -1182,7 +1223,7 @@ function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () 
       {!form.freeEvent && (
         <Card>
           <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", marginBottom: 4 }}>{t("Cost sharing")}</p>
-          <Row label={t("Groceries")} value={`${euro(form.groceryCost)} · ${form.costSource === "receipt" ? t("receipt") : t("estimate")}`} />
+          <Row label={t("Groceries")} value={`${euro(form.groceryCost)} · ${proofKind(form) === "receipt" ? t("receipt") : proofKind(form) === "declared" ? t("stated by you") : t("estimate")}`} />
           <Row label={t("Contribution per guest")} value={euro(form.pricePerGuest)} />
           <Row label={t("Price cap per guest")} value={form.costSource ? euro(priceCap(form.groceryCost, form.maxGuests + 1, form.costSource)) : "—"} />
           <Row label={t("Your share")} value={euro(Math.round(Math.max(0, form.groceryCost - covered) * 100) / 100)} />
@@ -1309,7 +1350,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
       serviceType: form.serviceType,
       image: form.photos[form.coverIdx] ?? form.photos[0],
       gallery: form.photos.filter((_, i) => i !== form.coverIdx),
-      costProof: form.freeEvent || !form.costSource ? undefined : { kind: form.costSource, total: form.groceryCost, people: form.maxGuests + 1 },
+      costProof: form.freeEvent || !form.costSource ? undefined : { kind: proofKind(form)!, total: form.groceryCost, people: form.maxGuests + 1 },
       tags: [form.cuisineType, ...[...form.dietary].map(d => DIET_TO_TAG[d]).filter(Boolean)],
       location: `${form.address.trim()}, ${form.city.trim()}`,
       // live mode saves these separately (the street stays private until a guest is confirmed)
