@@ -17,6 +17,7 @@ import { StoreProvider, useStore } from "./store";
 import { DEFAULT_CRITERIA, type Meal, type SearchCriteria } from "./data";
 import { useLang } from "../shared/i18n";
 import { t, locale } from "../shared/i18n";
+import { useSafetyTips } from "./components/SafetySheets";
 
 export type { ServiceType, Meal } from "./data";
 export { MEALS, dayLabel } from "./data";
@@ -62,6 +63,7 @@ export default function App() {
 function AppInner() {
   const isDesktop = useIsDesktop();
   const store = useStore();
+  const tips = useSafetyTips();
   // No splash or welcome screen: the app opens straight on Home (or on log-in after a log-out)
   // bite.html?host opens the hosting flow straight away (used by the landing page's "I want to host" button)
   const [route, setRoute] = useState<Route>(() => {
@@ -200,6 +202,7 @@ function AppInner() {
 
   return (
     <div className="bite-shell">
+      {tips.sheet}
       {showTopBar && (
         <DesktopTopBar
           active={activeNav}
