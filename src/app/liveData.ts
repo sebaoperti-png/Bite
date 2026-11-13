@@ -56,6 +56,7 @@ export function mealFromRow(r: MealRow, me: string | null, address?: string): Me
     costProof: r.cost_proof ?? undefined,
     ownedByMe: !!me && r.host_id === me,
     hostId: r.host_id,
+    city: r.city,
     lat: r.lat ?? undefined,
     lng: r.lng ?? undefined,
     hostVerified: r.host_verified,
@@ -139,6 +140,22 @@ async function uploadPhoto(me: string, mealId: string, idx: number, src: string)
   const { error } = await supabase.storage.from("meal-photos").upload(path, blob, { contentType: blob.type || "image/jpeg", upsert: false });
   if (error) throw error;
   return supabase.storage.from("meal-photos").getPublicUrl(path).data.publicUrl;
+}
+
+/**
+ * Meals saved without coordinates (the place service was down when they were published, or older meals) get
+ * their town's position here, so they still show on the map and in a "near Aalen" search.
+ */
+export async function fillCoords<M extends Meal>(meals: M[]): Promise<Map<string, { lat: number; lng: number }>> {
+  const out = new Map<string, { lat: number; lng: number }>();
+  const towns = [...new Set(meals.filter((m) => m.lat == null && m.city).map((m) => m.city!))];
+  const spots = await Promise.all(towns.map((c) => approximateSpot(c).catch(() => null)));
+  const byTown = new Map(towns.map((c, i) => [c, spots[i]]));
+  for (const m of meals) {
+    const s = m.lat == null && m.city ? byTown.get(m.city) : null;
+    if (s) out.set(m.id, s);
+  }
+  return out;
 }
 
 export interface NewMeal {

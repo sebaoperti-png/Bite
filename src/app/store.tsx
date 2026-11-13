@@ -230,6 +230,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [optimistic, setOptimistic] = useState<Meal[]>([]);
   const refreshTimer = useRef<number>();
 
+  // meals without coordinates get their town's position, so the map and the radius search still find them
+  const placeMissing = async (meals: Meal[]) => {
+    if (!meals.some((m) => m.lat == null)) return;
+    const spots = await L.fillCoords(meals);
+    if (spots.size) setLive((l) => ({ ...l, meals: l.meals.map((m) => (spots.has(m.id) && m.lat == null ? { ...m, ...spots.get(m.id)! } : m)) }));
+  };
+
   const refresh = useCallback(async () => {
     if (!IS_LIVE) return;
     const uid = userId.current;
@@ -239,8 +246,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const { data: rows } = await supabase.from("meal_cards").select("*").eq("status", "published").gte("starts_at", new Date().toISOString()).order("starts_at");
         const meals = ((rows ?? []) as L.MealRow[]).map((r) => L.mealFromRow(r, null));
         setLive({ ...EMPTY_LIVE, meals, seatsLeft: Object.fromEntries(meals.map((m) => [m.id, m.seatsLeft])) });
+        void placeMissing(meals);
       } else {
-        setLive(await L.fetchAll(uid));
+        const fresh = await L.fetchAll(uid);
+        setLive(fresh);
+        void placeMissing(fresh.meals);
       }
     } catch {
       // keep what we have; the next change or reload tries again
