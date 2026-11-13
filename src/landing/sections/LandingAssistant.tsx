@@ -41,8 +41,10 @@ export function LandingAssistant() {
 
   // A small "Ask me" nudge appears a few seconds after the page opens
   useEffect(() => {
+    // …and steps aside again after a while, so it never sits on top of the page for long
     const t = window.setTimeout(() => setNudge(true), 9000);
-    return () => window.clearTimeout(t);
+    const t2 = window.setTimeout(() => setNudge(false), 17000);
+    return () => { window.clearTimeout(t); window.clearTimeout(t2); };
   }, []);
 
   useEffect(() => {

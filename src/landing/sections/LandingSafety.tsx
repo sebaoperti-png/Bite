@@ -1,7 +1,8 @@
-// SAFETY — a scroll story. The section sticks to the screen while four protection layers lock,
-// one by one, each setting one thing on a table; when all four are set a cloche reveals the Bite "b" and the
-// headline "It's the product." takes over — on phones too, in a compact layout that fits one screen. With reduced
-// motion the story plays on its own once the section is on screen, without locking the scroll.
+// SAFETY — set the table yourself. Four layers of protection, each one thing on a table seen from above:
+// the glass and place card (verified people), the plate (food & hygiene), the cutlery (payments), the placemat
+// (your data). Tap them in any order (or "Set the table for me"); each one shows its menu page on the right and
+// gets ticked on the waiter's slip. When all four are on the table a cloche reveals the Bite "b" and the safety
+// receipt prints. No scroll locking: the section scrolls like any other, on every screen size.
 import { useEffect, useRef, useState } from "react";
 import { Course } from "../../shared/Restaurant";
 import { t } from "../../shared/i18n";
@@ -45,82 +46,51 @@ const RECEIPT = [
   { k: "Insurance", v: "every event" },
 ];
 
-const FINAL = 5; // stage after the 4 layers: the seal
-// where in the scroll (0–1) each layer locks, and where the seal comes
-const STARTS = [0.08, 0.24, 0.4, 0.56, 0.72];
-
-/** Scroll progress through the tall wrapper (desktop and phones), or a timed sequence (reduced motion) → stage 0…5 */
-function useStage(wrapRef: React.RefObject<HTMLDivElement>) {
-  const [stage, setStage] = useState(0);
-  const [scrolly, setScrolly] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: no-preference)"); // phones too: a compact one-screen layout (landing.css)
-    const update = () => setScrolly(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    if (scrolly) {
-      let raf = 0;
-      const onScroll = () => {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => {
-          const r = el.getBoundingClientRect();
-          const p = Math.min(1, Math.max(0, -r.top / (r.height - window.innerHeight)));
-          // while the story holds the screen, floating buttons step aside (phones: they would cover the card)
-          document.body.classList.toggle("sh-active", r.top <= 0 && r.bottom >= window.innerHeight);
-          // 0–8% intro, four layers until 72%, then the seal
-          setStage(p < STARTS[0] ? 0 : p < STARTS[1] ? 1 : p < STARTS[2] ? 2 : p < STARTS[3] ? 3 : p < STARTS[4] ? 4 : FINAL);
-        });
-      };
-      onScroll();
-      window.addEventListener("scroll", onScroll, { passive: true });
-      window.addEventListener("resize", onScroll);
-      return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); cancelAnimationFrame(raf); document.body.classList.remove("sh-active"); };
-    }
-    // Phones: play the story once it is on screen
-    let timer = 0;
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting || timer) return;
-      let s = 0;
-      timer = window.setInterval(() => { s += 1; setStage(s); if (s >= FINAL) window.clearInterval(timer); }, 1100);
-    }, { threshold: 0.35 });
-    io.observe(el);
-    return () => { io.disconnect(); window.clearInterval(timer); };
-  }, [scrolly, wrapRef]);
-
-  return { stage, scrolly };
-}
+// where each layer's thing sits on the table (in the 600×600 drawing), for the tap targets
+const SPOTS: [number, number][] = [[472, 160], [300, 312], [172, 300], [440, 404]];
+const THINGS = ["the glass", "the plate", "the cutlery", "the placemat"];
 
 export function LandingSafety() {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const { stage, scrolly } = useStage(wrapRef);
-  const locked = Math.min(stage, 4);
-  const sealed = stage >= FINAL;
-  // phones: tapping a bubble shows that layer's card (until the scroll moves on)
+  const [placed, setPlaced] = useState<number[]>([]);
   const [picked, setPicked] = useState<number | null>(null);
-  useEffect(() => { setPicked(null); }, [stage]);
-  const shownIdx = picked ?? (locked > 0 ? locked - 1 : -1);
-  const current = shownIdx >= 0 && (!sealed || picked !== null) ? LAYERS[shownIdx] : null;
+  const [sealed, setSealed] = useState(false);
+  const auto = useRef<number[]>([]);
+  const tableRef = useRef<HTMLDivElement>(null);
+  // phones: while the table is on screen, the floating Ask Bite button steps aside so it never covers a tap target
+  useEffect(() => {
+    const el = tableRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => document.body.classList.toggle("sh-active", e.isIntersecting), { threshold: 0.25 });
+    io.observe(el);
+    return () => { io.disconnect(); document.body.classList.remove("sh-active"); };
+  }, []);
+  const locked = placed.length;
+  const isOn = (i: number) => placed.includes(i);
 
-  // tapping a bubble that is not locked yet scrolls to the moment it locks (so it pops)
-  const goTo = (i: number) => {
-    const el = wrapRef.current;
-    if (!el || !scrolly) { setPicked(i); return; }
-    if (i < locked) { setPicked(i); return; }
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top: top + (el.offsetHeight - window.innerHeight) * (STARTS[i] + 0.03), behavior: "smooth" });
+  // all four on the table → the cloche, then the receipt
+  useEffect(() => {
+    if (placed.length < 4) return;
+    const id = window.setTimeout(() => { setSealed(true); setPicked(null); }, 900);
+    return () => window.clearTimeout(id);
+  }, [placed.length]);
+  useEffect(() => () => auto.current.forEach(window.clearTimeout), []);
+
+  const place = (i: number) => {
+    setPicked(i);
+    setPlaced((p) => (p.includes(i) ? p : [...p, i]));
   };
+  const setAll = () => {
+    const rest = [0, 1, 2, 3].filter((i) => !placed.includes(i));
+    rest.forEach((i, k) => auto.current.push(window.setTimeout(() => place(i), k * 700)));
+  };
+  const shownIdx = picked ?? -1;
+  const current = shownIdx >= 0 ? LAYERS[shownIdx] : null;
+  const lastPlaced = placed[placed.length - 1];
 
   return (
     <section className="dk-out-light sh-section" id="safety" style={{ position: "relative", isolation: "isolate", ["--dust-top" as string]: "0px", ["--dust-bottom" as string]: "380px" }}>
       <div className="chalk-dust" aria-hidden />
-      <div ref={wrapRef} className={`sh-wrap ${scrolly ? "scrolly" : ""}`}>
+      <div className="sh-wrap">
         <div className={`sh-sticky ${sealed ? "sealed" : ""}`}>
           <div className="sh-bg" aria-hidden />
 
@@ -138,12 +108,12 @@ export function LandingSafety() {
               </div>
               <ol className="os-list">
                 {LAYERS.map((l, i) => {
-                  const done = i < locked;
-                  const now = i === locked - 1 && !sealed;
+                  const done = isOn(i);
+                  const now = i === lastPlaced && !sealed;
                   return (
                     <li key={l.title} className={`os-row ${done ? "done" : ""} ${now ? "now" : ""}`}>
                       <span className="os-num">0{i + 1}</span>
-                      <span className="os-name">{t(l.title)}</span>
+                      <button type="button" className="os-name" onClick={() => place(i)}>{t(l.title)}</button>
                       <i className="os-dots" aria-hidden />
                       <svg className="os-tick" viewBox="0 0 28 24" aria-hidden><path d="M3 13c3 2 5 5 7 8 4-8 9-14 16-19" pathLength="1" /></svg>
                     </li>
@@ -152,7 +122,7 @@ export function LandingSafety() {
               </ol>
               <div className="os-foot">
                 <span className="os-plates" aria-hidden>
-                  {LAYERS.map((l, i) => <i key={l.title} className={i < locked ? "on" : ""} />)}
+                  {LAYERS.map((l, i) => <i key={l.title} className={isOn(i) ? "on" : ""} />)}
                 </span>
                 <span><b>{locked}/4</b> {t("set")}</span>
               </div>
@@ -164,8 +134,8 @@ export function LandingSafety() {
           {/* Centre: a table seen from above. Each layer of protection sets one thing on it, with a handwritten label:
               the glass and place card (verified people), the plate (food & hygiene), the cutlery and napkin (payments),
               the placemat (your data). At the end a cloche comes down on the plate and lifts to reveal the Bite "b". */}
-          <div className={`tb ${sealed ? "sealed" : ""}`} aria-hidden>
-            <svg viewBox="0 0 600 600" className="tb-svg">
+          <div ref={tableRef} className={`tb ${sealed ? "sealed" : ""} ${locked ? "started" : ""}`}>
+            <svg viewBox="0 0 600 600" className="tb-svg" aria-hidden>
               <defs>
                 <radialGradient id="tb-cloth" cx="50%" cy="45%" r="60%"><stop offset="0" stopColor="#fffdf7" /><stop offset="1" stopColor="#efe6d6" /></radialGradient>
                 <pattern id="tb-weave" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="rgba(107,33,217,0.05)" strokeWidth="1" /></pattern>
@@ -179,22 +149,22 @@ export function LandingSafety() {
               <circle cx="300" cy="300" r="246" fill="none" stroke="rgba(107,33,217,0.12)" strokeWidth="2" strokeDasharray="2 7" />
 
               {/* 4 · placemat (data & privacy) */}
-              <g className={`tb-item tb-mat ${locked >= 4 ? "on" : ""}`}>
+              <g className={`tb-item tb-mat ${isOn(3) ? "on" : ""}`} onClick={() => place(3)}>
                 <rect x="118" y="168" width="364" height="270" rx="26" fill="#e9defb" />
                 <rect x="130" y="180" width="340" height="246" rx="20" fill="none" stroke="#b39ddb" strokeWidth="2" strokeDasharray="5 6" />
                 <g transform="translate(440 396)" fill="none" stroke="#6b21d9" strokeWidth="2.4" strokeLinecap="round"><rect x="-9" y="-3" width="18" height="14" rx="3" /><path d="M-5-3v-4a5 5 0 0 1 10 0v4" /></g>
               </g>
               {/* 3 · cutlery + napkin (payments) */}
-              <g className={`tb-item tb-fork ${locked >= 3 ? "on" : ""}`}>
+              <g className={`tb-item tb-fork ${isOn(2) ? "on" : ""}`} onClick={() => place(2)}>
                 <path d="M152 222l40-10 10 160-40 10z" fill="#fff" stroke="rgba(107,33,217,0.15)" strokeWidth="1.5" />
                 <g transform="translate(172 300)"><rect x="-11" y="-8" width="22" height="15" rx="3" fill="none" stroke="#6b21d9" strokeWidth="2" /><path d="M-11-3h22" stroke="#6b21d9" strokeWidth="2" /></g>
                 <path d="M170 210v40M162 210v18a8 8 0 0 0 16 0v-18M170 250v130" fill="none" stroke="#8f84a8" strokeWidth="6" strokeLinecap="round" />
               </g>
-              <g className={`tb-item tb-knife ${locked >= 3 ? "on" : ""}`}>
+              <g className={`tb-item tb-knife ${isOn(2) ? "on" : ""}`} onClick={() => place(2)}>
                 <path d="M432 208c-10 0-14 26-14 46h14v128" fill="none" stroke="#8f84a8" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
               </g>
               {/* 2 · plate (food & hygiene) */}
-              <g className={`tb-item tb-plate ${locked >= 2 ? "on" : ""}`}>
+              <g className={`tb-item tb-plate ${isOn(1) ? "on" : ""}`} onClick={() => place(1)}>
                 <circle cx="300" cy="310" r="100" fill="rgba(46,16,96,0.12)" transform="translate(0 8)" />
                 <circle cx="300" cy="310" r="100" fill="#fff" />
                 <circle cx="300" cy="310" r="74" fill="none" stroke="rgba(107,33,217,0.12)" strokeWidth="3" />
@@ -224,12 +194,12 @@ export function LandingSafety() {
                 ))}
               </g>
               {/* 1 · glass + place card (verified people) */}
-              <g className={`tb-item tb-glass ${locked >= 1 ? "on" : ""}`}>
+              <g className={`tb-item tb-glass ${isOn(0) ? "on" : ""}`} onClick={() => place(0)}>
                 <circle cx="472" cy="166" r="36" fill="rgba(46,16,96,0.12)" transform="translate(4 8)" />
                 <circle cx="472" cy="166" r="36" fill="url(#tb-glass)" stroke="rgba(107,33,217,0.25)" strokeWidth="2" />
                 <circle className="tb-ripple" cx="472" cy="166" r="22" fill="none" stroke="rgba(107,33,217,0.25)" strokeWidth="1.5" />
               </g>
-              <g className={`tb-item tb-card ${locked >= 1 ? "on" : ""}`}>
+              <g className={`tb-item tb-card ${isOn(0) ? "on" : ""}`} onClick={() => place(0)}>
                 <path d="M200 128h196l6 40H194z" fill="#fffdf7" stroke="rgba(107,33,217,0.2)" strokeWidth="1.5" />
                 <text x="298" y="155" textAnchor="middle" fontFamily="'Instrument Serif', serif" fontStyle="italic" fontSize="22" fill="#3b1a78">{t("Your host · verified")}</text>
                 <circle cx="396" cy="128" r="11" fill="#0a9c62" /><path d="M391 128l3.5 3.5 6-7" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
@@ -242,27 +212,15 @@ export function LandingSafety() {
                 <rect x="192" y="314" width="216" height="10" rx="5" fill="#6b5f86" />
               </g>
             </svg>
-            {/* handwritten labels, each appears with its object */}
+            {/* tap targets: a pulsing "+" where each thing goes, a tick once it is set */}
             {LAYERS.map((l, i) => (
-              <span key={l.title} className={`tb-label l${i} ${i < locked ? "on" : ""}`}>{t(l.title)}</span>
+              <button key={l.title} type="button" className={`tb-hot ${isOn(i) ? "on" : ""} ${picked === i ? "picked" : ""}`}
+                style={{ left: `${(SPOTS[i][0] / 600) * 100}%`, top: `${(SPOTS[i][1] / 600) * 100}%`, ["--d" as string]: `${i * 0.35}s` }}
+                onClick={() => place(i)} aria-label={isOn(i) ? t(l.title) : t("Set {thing}: {layer}", { thing: t(THINGS[i]), layer: t(l.title) })}>
+                <svg viewBox="0 0 24 24" aria-hidden>{isOn(i) ? <path d="M6 12.5l4 4L18 8" /> : <path d="M12 6v12M6 12h12" />}</svg>
+                <span className="tb-hot-label">{t(l.title)}</span>
+              </button>
             ))}
-          </div>
-
-          {/* Phones: the four layers as bubbles that pop when they lock (tap one to jump there) */}
-          <div className="sh-bubbles" role="tablist" aria-label={t("Layers of protection")}>
-            {LAYERS.map((l, i) => {
-              const state = i < locked ? "popped" : i === locked && !sealed ? "next" : "idle";
-              return (
-                <button key={l.title} role="tab" aria-selected={shownIdx === i} className={`shb ${state} ${shownIdx === i ? "shown" : ""}`} onClick={() => goTo(i)} style={{ ["--i" as string]: i }}>
-                  <span className="shb-bubble" aria-hidden />
-                  <span className="shb-drops" aria-hidden>{Array.from({ length: 8 }, (_, k) => <i key={k} style={{ ["--a" as string]: `${k * 45}deg` }} />)}</span>
-                  <span className="shb-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{i < locked ? <path d="M5 12.5l4.5 4.5L19 7.5" /> : l.icon}</svg>
-                  </span>
-                  <span className="shb-label">{t(l.title)}</span>
-                </button>
-              );
-            })}
           </div>
 
           {/* Right: what the layer that just locked covers, and the safety receipt at the end */}
@@ -294,12 +252,18 @@ export function LandingSafety() {
                 <h3>{t(current.title)}</h3>
                 <ul>{current.points.map((p) => <li key={p}>{t(p)}</li>)}</ul>
                 <div className="mc-foot">{t("Served at every dinner")}</div>
+                {sealed ? (
+                  <button type="button" className="mc-next" onClick={() => setPicked(null)}>{t("Back to the safety receipt")}</button>
+                ) : locked < 4 ? (
+                  <p className="mc-left">{t("{n} of 4 set · tap the next thing on the table", { n: locked })}</p>
+                ) : null}
               </div>
             ) : (
               <div className="sh-card mc sh-hint">
                 <div className="mc-top"><span>{t("Tonight")}</span><i aria-hidden /><span>{t("House rules")}</span></div>
                 <h3>{t("Every dinner is protected across four layers.")}</h3>
-                <p>{scrolly ? t("Scroll to lock them, one by one ↓") : t("Watch them lock, one by one.")}</p>
+                <p>{t("Tap the glass, the plate, the cutlery and the placemat to set the table.")}</p>
+                <button type="button" className="mc-next" onClick={setAll}>{t("Set the table for me")}</button>
               </div>
             )}
           </div>
