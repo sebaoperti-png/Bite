@@ -12,3 +12,4 @@ Setting up `bite_e2e`: create the database, run `supabase/tests/supabase_shim.sq
 
 | `hosting_price.test.cjs` | The price step of Start hosting: estimate, a real receipt photo read in the browser, the sample receipt, typed totals (honest "Stated by the host" label), too high / too little, the cap on the stepper, the meal page | demo mode, needs internet once for the OCR language data |
 | `geo_location.test.cjs` | "Use my location" in the Where? picker: real map with a you-are-here dot, pins, "Near you", refused location | `SITE=https://bitetable.de` to check the published site |
+| `landing_safety.test.cjs` | Landing Safety section: tap to set the table, 2 of 4, the cloche and the safety receipt, five screen sizes | `SITE=https://bitetable.de` for the published site |
