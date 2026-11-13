@@ -164,7 +164,7 @@ const nav = async (p, desk, name) => {
     await step(`${label}: hosting with the house rules`, async () => {
       const d = new Date(Date.now() + 3 * 86400000);
       const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      const form = { serviceType: "eat-together", eventTitle: "Sim night", mealName: "Simulation risotto", cuisineType: "Italian", description: "A test dinner.", mainDishes: "Risotto", appetizers: "", desserts: "", drinksIncluded: true, dietary: [], allergens: [], allergyNotes: "", maxGuests: 4, minGuests: 1, address: "Teststraße 1", city: "Aalen", date: iso, startTime: "19:30", endTime: "22:00", groceryCost: 20, costSource: "receipt", pricePerGuest: 4, freeEvent: false, photos: ["app/img/1554054204-800x533.jpg"], coverIdx: 0 };
+      const form = { serviceType: "eat-together", eventTitle: "Sim night", mealName: "Simulation risotto", cuisineType: "Italian", description: "A test dinner.", mainDishes: "Risotto", appetizers: "", desserts: "", drinksIncluded: true, dietary: [], allergens: [], allergyNotes: "", maxGuests: 4, minGuests: 1, address: "Teststraße 1", city: "Aalen", date: iso, startTime: "19:30", endTime: "22:00", groceryCost: 20, costSource: "receipt", pricePerGuest: 4, freeEvent: false, photos: ["app/img/1554054204-800x533.jpg"], coverIdx: 0, ingredientsText: "Lamb, apricots, onions, couscous (wheat), olive oil, cinnamon, salt", declared: true };
       const publish = async () => {
         await p.evaluate((f) => localStorage.setItem("bite_hosting_draft", JSON.stringify({ step: 7, form: f })), form);
         await p.goto(`${BASE}/bite.html?demo&host&lang=en`); await p.waitForTimeout(1500);

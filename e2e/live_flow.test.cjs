@@ -60,6 +60,7 @@ async function logIn(page, email) {
   const browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"] });
   const anna = await personContext(browser, "Anna");
   const ben = await personContext(browser, "Ben");
+  ben.page.on("pageerror", (e) => console.log("PAGEERR", e.message));
 
   // ---------------------------------------------------------------- Anna publishes
   await logIn(anna.page, "anna@test.local");
@@ -69,9 +70,9 @@ async function logIn(page, email) {
   const form = {
     serviceType: "eat-together", eventTitle: "Tajine night", mealName: "Lamb tajine with apricots", cuisineType: "Moroccan",
     description: "Slow-cooked tajine like my grandmother makes it.", mainDishes: "Lamb tajine", appetizers: "Zaalouk", desserts: "Mint tea",
-    drinksIncluded: true, dietary: [], allergens: [], allergyNotes: "", maxGuests: 4, minGuests: 1,
+    drinksIncluded: true, dietary: [], allergens: ["gluten"], allergyNotes: "Cooked with almonds nearby.", maxGuests: 4, minGuests: 1,
     address: "Brunnenstraße 25", city: "Aalen", date: dateISO, startTime: "19:30", endTime: "22:00",
-    groceryCost: 28, costSource: "receipt", pricePerGuest: 5, freeEvent: false, photos: [PHOTO], coverIdx: 0,
+    groceryCost: 28, costSource: "receipt", pricePerGuest: 5, freeEvent: false, photos: [PHOTO], coverIdx: 0, ingredientsText: "Lamb, apricots, onions, couscous (wheat), olive oil, cinnamon, salt", declared: true,
   };
   await anna.page.evaluate((f) => localStorage.setItem("bite_hosting_draft", JSON.stringify({ step: 7, form: f })), form);
   await anna.page.goto(`${BASE}/bite.html?host&lang=en`);
@@ -90,6 +91,7 @@ async function logIn(page, email) {
   check(meals.length === 1, "the meal is saved in the database");
   const meal = meals[0];
   check(meal && meal.title === "Lamb tajine with apricots" && meal.price_cents === 500 && meal.seats === 4 && meal.city === "Aalen", "title, price (5.00), seats and city are correct");
+  check(meal && meal.ingredients.includes("couscous") && meal.allergens.join() === "gluten" && meal.allergy_notes.includes("almonds") && !!meal.host_declared_at, "ingredients, allergens, notes and the host's declaration are saved");
   check(meal && meal.address === "Brunnenstraße 25", "the street is stored separately (private)");
   const hh = meal && new Date(meal.starts_at);
   check(meal && hh.getHours() === 19 && hh.getMinutes() === 30, "the start time is 19:30 local time");
@@ -147,6 +149,7 @@ async function logIn(page, email) {
   check(detail.includes("Lamb tajine with apricots"), "Ben opens the meal page");
   check(!detail.includes("Brunnenstraße"), "Ben does not see the street before he is accepted");
   check(detail.includes("New host on Bite") && !detail.includes("Verified host"), "no false 'verified' claim for a host Bite has not checked");
+  check(/what's in it/i.test(detail) && detail.includes("couscous") && /contains gluten/i.test(detail) && detail.includes("not in a professional kitchen"), "the meal page shows every ingredient, the allergens and the home-kitchen note");
   await ben.page.screenshot({ path: "/tmp/flow_2_detail.png" });
   await ben.page.getByRole("button", { name: /Eat together|Book|Join|€/ }).last().click();
   await ben.page.getByText("Create a free account to ask for a seat").waitFor({ timeout: 8000 });
@@ -164,7 +167,7 @@ async function logIn(page, email) {
   await ben.page.getByRole("button", { name: /Ask for 1 seat/ }).click();
   await passProfileGate(ben.page, "Who is coming?");
   check(true, "Ben is asked for a photo before his first request");
-  await ben.page.getByRole("heading", { name: "Request sent!" }).waitFor({ timeout: 8000 });
+  await ben.page.getByRole("heading", { name: "Request sent!" }).waitFor({ timeout: 8000 }).catch(async (e) => { await ben.page.screenshot({ path: "/tmp/flow_err.png" }); console.log("BODY", (await ben.page.locator("body").innerText()).slice(0, 600)); throw e; });
   check(true, "Ben sees 'Request sent!'");
   await ben.page.screenshot({ path: "/tmp/flow_3_request.png" });
   const bk = await q("select * from bookings");
@@ -204,6 +207,19 @@ async function logIn(page, email) {
   const annaMsgs = await anna.page.locator("body").innerText();
   check(annaMsgs.includes("Ben") && annaMsgs.includes("bring dessert"), "Anna sees Ben's message in her inbox");
   await anna.page.screenshot({ path: "/tmp/flow_6_inbox.png" });
+  await anna.page.getByText("Ben").first().click();
+  await anna.page.waitForTimeout(1000);
+  const annaInput = anna.page.locator("input[type=text], input:not([type])").last();
+  await annaInput.fill("Yes please, tiramisu would be perfect!");
+  await annaInput.press("Enter");
+  await anna.page.waitForTimeout(1200);
+  await ben.page.goto(`${BASE}/bite.html?live&lang=en`);
+  await ben.page.waitForTimeout(1800);
+  await ben.page.getByRole("button", { name: /Messages/ }).last().click();
+  await ben.page.waitForTimeout(800);
+  await ben.page.getByText("Anna").first().click();
+  await ben.page.waitForTimeout(1200);
+  check((await ben.page.locator("body").innerText()).includes("tiramisu would be perfect"), "Anna's reply reaches Ben: messages work both ways");
 
   // ---------------------------------------------------------------- after the dinner: reviews both ways
   await q("update meals set starts_at = now() - interval '2 hours'");
@@ -233,6 +249,41 @@ async function logIn(page, email) {
   const gr = await q("select rating, comment from guest_reviews");
   check(gr.length === 1 && gr[0].rating === 4 && gr[0].comment.includes("dessert"), "Anna rates Ben as a guest, saved separately");
   await anna.page.screenshot({ path: "/tmp/flow_6b_reviews.png" });
+  // follow, your reviews, the passport (still after the dinner)
+  await ben.page.goto(`${BASE}/bite.html?live&lang=en&meal=${meal.id}`);
+  await ben.page.waitForTimeout(1800);
+  const followBtn = ben.page.getByRole("button", { name: "Follow", exact: true });
+  await followBtn.waitFor({ timeout: 8000 }).catch(async () => { await ben.page.screenshot({ path: "/tmp/flow_follow.png" }); console.log("   buttons:", (await ben.page.getByRole("button").allInnerTexts()).join(" | ").slice(0, 600)); });
+  await followBtn.click();
+  await ben.page.getByRole("button", { name: "Following", exact: true }).waitFor({ timeout: 5000 }).catch(() => {});
+  await ben.page.waitForTimeout(800);
+  const fl = await q("select * from follows");
+  check(fl.length === 1 && fl[0].follower_id.startsWith("bbbbbbbb") && fl[0].followee_id.startsWith("aaaaaaaa"), "Ben follows Anna (saved)");
+  check(await ben.page.getByRole("button", { name: "Following", exact: true }).count() === 1, "the button turns into 'Following'");
+  await ben.page.goto(`${BASE}/bite.html?live&lang=en`);
+  await ben.page.waitForTimeout(1800);
+  await ben.page.getByRole("button", { name: "Profile" }).last().click();
+  await ben.page.waitForTimeout(1500);
+  const prof = await ben.page.locator("body").innerText();
+  await ben.page.screenshot({ path: "/tmp/flow_prof.png", fullPage: true });
+  check(/1 of \d+ cuisines stamped/.test(prof), "after the dinner Ben's passport has its first stamp (Moroccan)");
+  check(prof.includes("4★ as guest") || prof.includes("4.0★ as guest") || /4(\.0)?★ as guest/.test(prof), "Ben's profile shows his rating as a guest");
+  await ben.page.getByText("Your reviews").first().click();
+  await ben.page.waitForTimeout(1500);
+  await ben.page.getByRole("button", { name: /As a guest/ }).click();
+  await ben.page.waitForTimeout(500);
+  check((await ben.page.locator("body").innerText()).includes("brought dessert"), "Ben reads what Anna wrote about him");
+  await ben.page.keyboard.press("Escape"); await ben.page.waitForTimeout(500);
+  await ben.page.goto(`${BASE}/bite.html?live&lang=en`); await ben.page.waitForTimeout(1500);
+  await ben.page.getByRole("button", { name: "Profile" }).last().click(); await ben.page.waitForTimeout(1200);
+  await ben.page.getByText("People you follow").first().click();
+  await ben.page.waitForTimeout(800);
+  check((await ben.page.locator("body").innerText()).includes("Anna"), "'People you follow' lists Anna");
+  await ben.page.screenshot({ path: "/tmp/flow_6c_following.png" });
+  await anna.page.goto(`${BASE}/bite.html?live&lang=en`); await anna.page.waitForTimeout(1500);
+  await anna.page.getByRole("button", { name: "Profile" }).last().click(); await anna.page.waitForTimeout(1500);
+  const annaProf = await anna.page.locator("body").innerText();
+  check(/5★ as host|5\.0★ as host/.test(annaProf), "Anna's profile shows her rating as a host");
   await q("update meals set starts_at = now() + interval '3 days'");
 
   // ---------------------------------------------------------------- someone new: the welcome tour and the first steps

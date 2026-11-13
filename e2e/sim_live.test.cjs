@@ -180,7 +180,7 @@ const submit = async (page) => {
   await step("village", async () => {
     const d = new Date(Date.now() + 4 * 86400000);
     const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    const form = { serviceType: "eat-together", eventTitle: "Village night", mealName: "Hüttlingen Käsespätzle", cuisineType: "German", description: "Spätzle like at home.", mainDishes: "Käsespätzle", appetizers: "", desserts: "", drinksIncluded: true, dietary: [], allergens: [], allergyNotes: "", maxGuests: 5, minGuests: 1, address: "Hauptstraße 3", city: "Hüttlingen", date: iso, startTime: "18:30", endTime: "21:00", groceryCost: 20, costSource: "receipt", pricePerGuest: 4, freeEvent: false, photos: [PHOTO], coverIdx: 0 };
+    const form = { serviceType: "eat-together", eventTitle: "Village night", mealName: "Hüttlingen Käsespätzle", cuisineType: "German", description: "Spätzle like at home.", mainDishes: "Käsespätzle", appetizers: "", desserts: "", drinksIncluded: true, dietary: [], allergens: [], allergyNotes: "", maxGuests: 5, minGuests: 1, address: "Hauptstraße 3", city: "Hüttlingen", date: iso, startTime: "18:30", endTime: "21:00", groceryCost: 20, costSource: "receipt", pricePerGuest: 4, freeEvent: false, photos: [PHOTO], coverIdx: 0, ingredientsText: "Lamb, apricots, onions, couscous (wheat), olive oil, cinnamon, salt", declared: true };
     await anna.evaluate((f) => localStorage.setItem("bite_hosting_draft", JSON.stringify({ step: 7, form: f })), form);
     await anna.goto(`${BASE}/bite.html?live&host&lang=en`); await anna.waitForTimeout(1500);
     await anna.getByRole("button", { name: /Publish event/ }).click();

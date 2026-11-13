@@ -102,7 +102,7 @@ async function handle({ method, url, headers, body }) {
       const keys = Object.keys(body || {}).filter((k) => IDENT.test(k));
       const args = keys.map((k, i) => `${k} => $${i + 1}`).join(", ");
       // functions that return a table come back as a JSON array, like PostgREST does
-      const TABLE_FNS = ["host_review_list", "guest_rating"];
+      const TABLE_FNS = ["host_review_list", "guest_rating", "my_follows", "my_guest_reviews"];
       const sql = TABLE_FNS.includes(fn) ? `select coalesce(json_agg(t), '[]'::json) as v from public.${fn}(${args}) t` : `select public.${fn}(${args}) as v`;
       const r = await asUser(sub, sql, keys.map((k) => body[k]));
       return json(200, r.rows[0].v);

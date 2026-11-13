@@ -11,7 +11,7 @@ const euros = (s) => Number(String(s).replace(/[^\d,.]/g, "").replace(",", "."))
 
 const d = new Date(Date.now() + 3 * 86400000);
 const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-const FORM = { serviceType: "eat-together", eventTitle: "Price night", mealName: "Price test risotto", cuisineType: "Italian", description: "A test dinner.", mainDishes: "Risotto", appetizers: "Bruschetta", desserts: "", drinksIncluded: false, dietary: [], allergens: [], allergyNotes: "", maxGuests: 4, minGuests: 1, address: "Teststraße 1", city: "Aalen", date: iso, startTime: "19:30", endTime: "22:00", groceryCost: 42, costSource: null, pricePerGuest: 6, freeEvent: false, photos: ["app/img/1554054204-800x533.jpg"], coverIdx: 0 };
+const FORM = { serviceType: "eat-together", eventTitle: "Price night", mealName: "Price test risotto", cuisineType: "Italian", description: "A test dinner.", mainDishes: "Risotto", appetizers: "Bruschetta", desserts: "", drinksIncluded: false, dietary: [], allergens: [], allergyNotes: "", maxGuests: 4, minGuests: 1, address: "Teststraße 1", city: "Aalen", date: iso, startTime: "19:30", endTime: "22:00", groceryCost: 42, costSource: null, pricePerGuest: 6, freeEvent: false, photos: ["app/img/1554054204-800x533.jpg"], coverIdx: 0, ingredientsText: "Lamb, apricots, onions, couscous (wheat), olive oil, cinnamon, salt", declared: true };
 
 (async () => {
   const browser = await chromium.launch();
