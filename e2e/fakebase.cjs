@@ -54,7 +54,8 @@ function filters(search, startIdx = 1) {
 // The embedded selects the app makes, written as SQL
 const SELECTS = {
   bookings: `select b.*, case when p.id is null then null else json_build_object('name', p.name, 'photo_url', p.photo_url) end as guest,
-               (select json_build_object('rating', r.rating) from reviews r where r.booking_id = b.id) as review
+               (select json_build_object('rating', r.rating, 'comment', r.comment) from reviews r where r.booking_id = b.id) as review,
+               (select json_build_object('rating', g.rating, 'comment', g.comment) from guest_reviews g where g.booking_id = b.id) as guest_review
              from bookings b left join profiles p on p.id = b.guest_id`,
   conversations: `select c.*, json_build_object('name', h.name, 'photo_url', h.photo_url) as host,
                     json_build_object('name', g.name, 'photo_url', g.photo_url) as guest,
@@ -100,7 +101,10 @@ async function handle({ method, url, headers, body }) {
       const fn = rpc[1];
       const keys = Object.keys(body || {}).filter((k) => IDENT.test(k));
       const args = keys.map((k, i) => `${k} => $${i + 1}`).join(", ");
-      const r = await asUser(sub, `select public.${fn}(${args}) as v`, keys.map((k) => body[k]));
+      // functions that return a table come back as a JSON array, like PostgREST does
+      const TABLE_FNS = ["host_review_list", "guest_rating"];
+      const sql = TABLE_FNS.includes(fn) ? `select coalesce(json_agg(t), '[]'::json) as v from public.${fn}(${args}) t` : `select public.${fn}(${args}) as v`;
+      const r = await asUser(sub, sql, keys.map((k) => body[k]));
       return json(200, r.rows[0].v);
     }
 

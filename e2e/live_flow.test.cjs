@@ -16,7 +16,7 @@ const q = async (sql, p) => (await pool.query(sql, p)).rows;
 const PHOTO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
 async function personContext(browser, label) {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } }); await ctx.addInitScript(() => { try { if (!location.search.includes("tourtest")) localStorage.setItem("bite_tour_v1", "1"); } catch {} });
   ctx.uploads = [];
   await ctx.route(`${SB}/**`, async (route) => {
     const req = route.request();
@@ -168,7 +168,7 @@ async function logIn(page, email) {
   check(true, "Ben sees 'Request sent!'");
   await ben.page.screenshot({ path: "/tmp/flow_3_request.png" });
   const bk = await q("select * from bookings");
-  check(bk.length === 1 && bk[0].status === "requested" && bk[0].total_cents === 560, "the booking is a request for 1 seat, total 5.60 (5.00 + 12%)");
+  check(bk.length === 1 && bk[0].status === "requested" && bk[0].total_cents === 500, "the booking is a request for 1 seat, total 5.00 (no Bite fee while payments are not in the app)");
   await ben.page.waitForTimeout(2500);
   check((await ben.page.locator("body").innerText()).includes("waiting for Anna"), "the chat shows the request is waiting for Anna");
 
@@ -204,6 +204,50 @@ async function logIn(page, email) {
   const annaMsgs = await anna.page.locator("body").innerText();
   check(annaMsgs.includes("Ben") && annaMsgs.includes("bring dessert"), "Anna sees Ben's message in her inbox");
   await anna.page.screenshot({ path: "/tmp/flow_6_inbox.png" });
+
+  // ---------------------------------------------------------------- after the dinner: reviews both ways
+  await q("update meals set starts_at = now() - interval '2 hours'");
+  await ben.page.goto(`${BASE}/bite.html?live&lang=en`);
+  await ben.page.waitForTimeout(2200);
+  check((await ben.page.locator("body").innerText()).includes("How was dinner with Anna?"), "after the dinner Ben is asked on Home how it was");
+  await ben.page.locator(".rv-nudge").first().click();
+  await ben.page.getByRole("radio", { name: "5 stars" }).click();
+  await ben.page.getByRole("button", { name: "Delicious" }).click();
+  await ben.page.getByRole("textbox", { name: "Your review" }).fill("Delicious. The best tajine in Aalen!");
+  await ben.page.getByRole("button", { name: "Send review" }).click();
+  await ben.page.waitForTimeout(1500);
+  const rv = await q("select rating, comment from reviews");
+  check(rv.length === 1 && rv[0].rating === 5 && rv[0].comment.includes("best tajine"), "Ben's stars and words are saved");
+  check(!(await ben.page.locator(".rv-nudge").count()), "the reminder goes away once he has rated");
+  await anna.page.goto(`${BASE}/bite.html?live&lang=en&meal=${meal.id}`);
+  await anna.page.waitForTimeout(2200);
+  await anna.page.getByText(/1 review/).first().click();
+  await anna.page.waitForTimeout(1200);
+  const annaPage = await anna.page.locator("body").innerText();
+  check(annaPage.includes("best tajine in Aalen") && annaPage.includes("Ben"), "the review shows on the meal page with Ben's first name");
+  await anna.page.getByRole("button", { name: "Rate Ben" }).click();
+  await anna.page.getByRole("radio", { name: "4 stars" }).click();
+  await anna.page.getByRole("textbox", { name: "Your review" }).fill("Friendly, brought dessert.");
+  await anna.page.getByRole("button", { name: "Send review" }).click();
+  await anna.page.waitForTimeout(1500);
+  const gr = await q("select rating, comment from guest_reviews");
+  check(gr.length === 1 && gr[0].rating === 4 && gr[0].comment.includes("dessert"), "Anna rates Ben as a guest, saved separately");
+  await anna.page.screenshot({ path: "/tmp/flow_6b_reviews.png" });
+  await q("update meals set starts_at = now() + interval '3 days'");
+
+  // ---------------------------------------------------------------- someone new: the welcome tour and the first steps
+  const newbie = await personContext(browser, "Newbie");
+  await newbie.page.goto(`${BASE}/bite.html?live&lang=en&tourtest`);
+  await newbie.page.getByText("Find a table near you").waitFor({ timeout: 6000 });
+  check(true, "a first-time visitor gets the welcome tour");
+  for (let k = 0; k < 3; k++) await newbie.page.getByRole("button", { name: "Next" }).click();
+  await newbie.page.getByRole("button", { name: "Start exploring" }).click();
+  await newbie.page.waitForTimeout(600);
+  const nb = await newbie.page.locator("body").innerText();
+  check(!nb.includes("Start exploring") && nb.includes("Your first steps on Bite") && nb.includes("0/5"), "after the tour Home shows 'Your first steps' (0/5)");
+  await newbie.page.reload(); await newbie.page.waitForTimeout(1500);
+  check(!(await newbie.page.getByText("Start exploring").count()), "the tour does not come back");
+  await newbie.ctx.close();
 
   // ---------------------------------------------------------------- Anna cancels the meal
   await anna.page.goto(`${BASE}/bite.html?live&lang=en&meal=${meal.id}`);

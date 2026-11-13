@@ -18,7 +18,7 @@ const step = async (name, fn) => { try { await fn(); } catch (e) { fail++; conso
 const text = async (page) => (await page.locator("body").innerText()).replace(/\s+/g, " ");
 
 async function person(browser, label) {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } }); await ctx.addInitScript(() => { try { localStorage.setItem("bite_tour_v1", "1"); } catch {} });
   await ctx.route(`${SB}/**`, async (route) => {
     const req = route.request();
     if (req.url().includes("/realtime/")) return route.abort();

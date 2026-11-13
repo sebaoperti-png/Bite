@@ -9,7 +9,7 @@ const check = (c, m) => { if (c) { pass++; console.log("ok  ", m); } else { fail
 (async () => {
   const browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"] });
   for (const [label, vp] of [["phone", { width: 390, height: 844 }], ["desktop", { width: 1400, height: 900 }]]) {
-    const ctx = await browser.newContext({ viewport: vp, geolocation: { latitude: 48.8376, longitude: 10.093 }, permissions: ["geolocation"] });
+    const ctx = await browser.newContext({ viewport: vp, geolocation: { latitude: 48.8376, longitude: 10.093 }, permissions: ["geolocation"] }); await ctx.addInitScript(() => { try { localStorage.setItem("bite_tour_v1", "1"); } catch {} });
     const problems = [];
     ctx.on("response", (r) => { if (r.url().startsWith(SITE) && r.status() >= 400) problems.push(`${r.status()} ${r.url()}`); });
     for (const path of ["/", "/bite.html?live&lang=en", "/bite.html?demo&lang=de", "/legal.html", "/stand.html"]) {

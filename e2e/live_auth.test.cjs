@@ -19,7 +19,7 @@ let pass = 0, fail = 0;
 const check = (cond, msg) => { if (cond) { pass++; console.log("ok  ", msg); } else { fail++; console.log("FAIL", msg); } };
 
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } }); await ctx.addInitScript(() => { try { localStorage.setItem("bite_tour_v1", "1"); } catch {} });
 const page = await ctx.newPage();
 page.on("pageerror", (e) => { fail++; console.log("PAGE ERROR", e.message); });
 

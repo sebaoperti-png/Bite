@@ -6,7 +6,7 @@ Run the built app first: `npm run build && npx vite preview --port 4173`.
 | --- | --- | --- |
 | `demo_smoke.test.cjs` | The demo still books a meal and sends nothing to a server | none |
 | `live_auth.test.cjs` | Live sign-up, log-in, password reset, profile saving, log-out | Supabase mocked |
-| `live_flow.test.cjs` | Two people: host publishes (photo upload, private street), guest asks for a seat, host accepts, address revealed, chat both ways, host cancels and the booking is cancelled | `fakebase.cjs`: real SQL with Bite's real security rules on a local PostgreSQL (`bite_e2e`), nothing leaves the machine |
+| `live_flow.test.cjs` | Two people: host publishes (photo upload, private street), guest asks for a seat, host accepts, address revealed, chat both ways, reviews both ways after the dinner, a newcomer's welcome tour and first steps, host cancels and the booking is cancelled | `fakebase.cjs`: real SQL with Bite's real security rules on a local PostgreSQL (`bite_e2e`), nothing leaves the machine |
 
 Setting up `bite_e2e`: create the database, run `supabase/tests/supabase_shim.sql`, then every file in `supabase/migrations/` except `*_storage.sql`, then add two users to `auth.users` (anna@test.local, ben@test.local). `fakebase.cjs` needs `npm install pg`.
 
