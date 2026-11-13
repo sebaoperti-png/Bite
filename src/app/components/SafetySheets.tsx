@@ -287,7 +287,11 @@ export const SAFETY_TIPS: { title: string; text: string }[] = [
 export function useSafetyTips() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    const on = () => setOpen(true);
+    const on = () => {
+      setOpen(true);
+      try { localStorage.setItem("bite_steps_tips", "1"); } catch { /* ignore */ }
+      window.dispatchEvent(new Event("bite:steps"));
+    };
     window.addEventListener("bite:safety-tips", on);
     return () => window.removeEventListener("bite:safety-tips", on);
   }, []);

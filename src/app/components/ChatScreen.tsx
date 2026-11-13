@@ -3,6 +3,7 @@ import { ChevronLeft, Send, CheckCircle, Star, Leaf, Wine, Clock, MapPin, Calend
 import { motion, AnimatePresence } from "motion/react";
 import { euro, type Meal } from "../data";
 import { useStore, timeLabel, bookingStatusText, personOfConversation, type ChatMessage, type Person } from "../store";
+import { ReviewSheet } from "./ReviewSheet";
 import { SafetyActions, ReportSheet, BlockSheet, SafetyTipsStrip, openSafetyTips, type ReportTarget } from "./SafetySheets";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
@@ -38,6 +39,12 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   const [safetyOpen, setSafetyOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
   const [blockTarget, setBlockTarget] = useState<Person | null>(null);
+  // reviews after the meal: the guest rates the host here; on the host's side, the host rates this guest
+  const [reviewStars, setReviewStars] = useState<number | null>(null);
+  const [rateGuestOpen, setRateGuestOpen] = useState(false);
+  const hostBooking = store.bookings.find((b) => b.conversationId === conversationId && !!b.guest && b.status === "confirmed" && b.live !== "requested");
+  const hostMeal = hostBooking ? store.mealById(hostBooking.mealId) : undefined;
+  const after = (m?: { startsAt?: string }) => !!m && (!store.live || (!!m.startsAt && Date.parse(m.startsAt) < Date.now()));
 
   useEffect(() => { store.markRead(conversationId); }, [conv?.messages.length]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [conv?.messages.length, typing]);
@@ -58,6 +65,14 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   const chatContext = conv.messages.filter((m) => m.sender === "them").slice(-6).map((m) => `${conv.name}: ${m.text}`).join("\n");
   const safety = (
     <>
+      {booking && meal && (
+        <ReviewSheet open={reviewStars !== null} onClose={() => setReviewStars(null)} about="host" name={conv.name} avatar={conv.avatar} mealTitle={tMaybe(meal.title)}
+          initialStars={reviewStars ?? 0} initialComment={booking.comment ?? ""} onSave={(s, c) => store.rateBooking(booking.id, s, c)} />
+      )}
+      {hostBooking && hostMeal && (
+        <ReviewSheet open={rateGuestOpen} onClose={() => setRateGuestOpen(false)} about="guest" name={hostBooking.guest!.name} avatar={hostBooking.guest!.avatar} mealTitle={tMaybe(hostMeal.title)}
+          initialStars={hostBooking.guestRating ?? 0} initialComment={hostBooking.guestComment ?? ""} onSave={(s, c) => store.rateGuest(hostBooking.id, s, c)} />
+      )}
       <SafetyActions open={safetyOpen} onClose={() => setSafetyOpen(false)} person={person} mealId={conv.mealId}
         onReport={(r) => setReportTarget({ ...r, context: r.about === "person" ? chatContext : undefined })} onBlock={setBlockTarget} />
       <ReportSheet target={reportTarget} onClose={() => setReportTarget(null)} />
@@ -114,10 +129,10 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
       </div>
       {booking.status === "confirmed" && !waiting && (!booking.live || (meal.startsAt && Date.parse(meal.startsAt) < Date.now())) && (
         <div className="px-4 py-2.5 flex items-center justify-between" style={{ background: "#ede8fb" }}>
-          <span style={{ fontSize: 12, color: "#6b21d9", fontWeight: 700 }}>{booking.rating ? t("Thanks for rating!") : t("Rate {name} after the meal", { name: conv.name.split(" ")[0] })}</span>
+          <span style={{ fontSize: 12, color: "#6b21d9", fontWeight: 700 }}>{booking.rating ? t("Thanks! Tap to edit your review") : t("Rate {name} after the meal", { name: conv.name.split(" ")[0] })}</span>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((i) => (
-              <motion.button key={i} aria-label={i > 1 ? t("{n} stars", { n: i }) : t("1 star")} onClick={() => store.rateBooking(booking.id, i)} whileTap={{ scale: 0.72 }} animate={{ scale: i <= (booking.rating ?? 0) ? 1.15 : 1 }}>
+              <motion.button key={i} aria-label={i > 1 ? t("{n} stars", { n: i }) : t("1 star")} onClick={() => setReviewStars(i)} whileTap={{ scale: 0.72 }} animate={{ scale: i <= (booking.rating ?? 0) ? 1.15 : 1 }}>
                 <Star size={16} fill={i <= (booking.rating ?? 0) ? "#f59e0b" : "none"} color={i <= (booking.rating ?? 0) ? "#f59e0b" : "#a99cc8"} />
               </motion.button>
             ))}
@@ -130,6 +145,13 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   const messages = (
     <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-3 [&>*]:flex-shrink-0" style={{ scrollbarWidth: "none" }}>
       {!isDesktop && confirmation}
+      {hostBooking && hostMeal && after(hostMeal) && (
+        <button type="button" className="rv-nudge" onClick={() => setRateGuestOpen(true)}>
+          <img src={hostBooking.guest!.avatar} alt="" />
+          <span><b>{hostBooking.guestRating ? t("You rated {name} {n}★", { name: hostBooking.guest!.name.split(" ")[0], n: hostBooking.guestRating }) : t("How was {name} at your table?", { name: hostBooking.guest!.name.split(" ")[0] })}</b>{tMaybe(hostMeal.title)}</span>
+          <span className="rv-nudge-cta">{hostBooking.guestRating ? t("Edit") : t("Rate")}</span>
+        </button>
+      )}
       {!isDesktop && <SafetyTipsStrip />}
       {conv.messages.length === 0 && (
         <p className="text-center py-8" style={{ fontSize: 13, color: "#7c6fa0" }}>{t("Say hello to {name} — ask about the menu, allergies or timing.", { name: conv.name.split(" ")[0] })}</p>

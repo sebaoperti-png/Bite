@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { EmptyPlate } from "../../shared/Restaurant";
 import { openSafetyTips } from "./SafetySheets";
+import { GetStartedCard, openTour } from "./GetStarted";
+import { ReviewNudge } from "./ReviewSheet";
 import { PlusMenu } from "./PlusMenu";
 import { MobileWeekMenu } from "./WeekMenu";
 import { LocationPicker, placeSummary } from "./LocationPicker";
@@ -62,6 +64,13 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
   const activeService: ServiceType = criteria.service === "all" ? "eat-together" : criteria.service;
 
   const set = (patch: Partial<SearchCriteria>) => setCriteria((c) => ({ ...c, ...patch }));
+  // live: "How was dinner?" after a meal, and the first steps for someone new
+  const firstSteps = store.live ? (
+    <>
+      <ReviewNudge />
+      <GetStartedCard onAccount={() => onNavigate("profile")} onBrowse={() => onSearch({ service: "all" })} onHost={onStartHosting} />
+    </>
+  ) : null;
 
   const searchFields = [
     { id: "area" as Picker,   icon: MapPin,   label: t("Location"), value: placeSummary(criteria, t(ANY_AREA)) },
@@ -87,6 +96,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
           <motion.div key="home-view" className="flex flex-col flex-1 min-h-0 overflow-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             {isDesktop ? (
               <DesktopHome
+                firstSteps={firstSteps}
                 name={store.profile.name}
                 activeTab={activeService}
                 setActiveTab={(s) => set({ service: s })}
@@ -212,6 +222,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
 
                   {/* This week's menu, by way of eating (same as the desktop menu) */}
                   <div className="px-5 pt-3 pb-24">
+                    {firstSteps && <div className="fs-wrap flex flex-col gap-3 mb-5">{firstSteps}</div>}
                     <div className="flex items-center justify-between mb-2.5">
                       <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{t("Cooking this week")}</p>
                       <button onClick={() => onSearch({ service: "all" })} className="flex items-center gap-0.5" style={{ fontSize: 12, fontWeight: 700, color: "#6b21d9" }}>{t("See all")}{" "}<ChevronRight size={14} />
@@ -320,7 +331,8 @@ function ServiceDoodle({ kind }: { kind: ServiceType }) {
   );
 }
 
-function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, openPicker, searching, resultCount, onSearchClick, onTag, meals, onSelectMeal, onSeeAll, onSeeService, onStartHosting }: {
+function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, openPicker, searching, resultCount, onSearchClick, onTag, meals, onSelectMeal, onSeeAll, onSeeService, onStartHosting, firstSteps }: {
+  firstSteps?: React.ReactNode;
   name: string;
   activeTab: ServiceType;
   setActiveTab: (t: ServiceType) => void;
@@ -415,11 +427,13 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
           </motion.section>
         </div>
 
+        {firstSteps && <div className="fs-wrap mt-8 grid gap-4 lg:grid-cols-[1fr_1fr] items-start">{firstSteps}</div>}
+
         <section className="mt-12">
           <div className="flex items-end justify-between mb-5">
             <div>
               <h2 style={{ fontSize: 26, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.02em" }}>{t("Cooking this week")}</h2>
-              <p style={{ fontSize: 14.5, color: "#7c6fa0", marginTop: 2 }}>{t("Home-cooked meals from verified neighbours across Germany")}</p>
+              <p style={{ fontSize: 14.5, color: "#7c6fa0", marginTop: 2 }}>{t("Home-cooked meals from neighbours across Germany")}</p>
             </div>
             <button onClick={onSeeAll} className="flex items-center gap-1 px-4 py-2 rounded-xl hover:bg-[#ede8fb] transition-colors">
               <span style={{ fontSize: 14, fontWeight: 700, color: "#6b21d9" }}>{t("See all")}</span>
@@ -526,6 +540,7 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
     { Icon: Leaf,       label: t("Dietary preferences"), sub: profile.dietary.length ? profile.dietary.map((d) => t(d)).join(" · ") : t("None set"), onClick: () => setSheet("dietary") },
     { Icon: CreditCard, label: t("Payment methods"),     sub: store.live ? t("For now you pay at the table") : t("Visa ···· 4242 (demo)"), onClick: () => setSheet("payment") },
     { Icon: UserPlus,   label: t("Invite friends"),      sub: t("Bring your neighbours to the table"), onClick: invite },
+    ...(store.live ? [{ Icon: Sparkles, label: t("How Bite works"), sub: t("The 30-second tour"), onClick: openTour }] : []),
     { Icon: ShieldCheck, label: t("Safety tips"),        sub: t("How to meet neighbours safely"), onClick: openSafetyTips },
     { Icon: Globe,      label: t("About Bite"),          sub: t("How it works, safety and hosting on bitetable.de"), onClick: () => { window.top!.location.href = "./?from=app"; } },
     { Icon: Settings,   label: t("Settings"),            sub: store.live ? t("Notifications, language, blocked people") : t("Notifications, language, Bite news, demo data"), onClick: () => setSheet("settings") },

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SafetyActions, ReportSheet, BlockSheet, openSafetyTips, type ReportTarget } from "./SafetySheets";
 import { personOfMeal, type Person } from "../store";
 import { LikeHeart } from "../../shared/Motion";
@@ -13,7 +13,9 @@ import { Sheet } from "./Sheet";
 import { SheetHeader } from "./HomeScreen";
 import { localPlace } from "../location";
 import { exactShare } from "../costing";
-import { t, tMaybe, dateLabel, dec } from "../../shared/i18n";
+import { t, tMaybe, dateLabel, dec, locale } from "../../shared/i18n";
+import { fetchHostReviews, fetchGuestRating, type HostReview } from "../liveData";
+import { ReviewSheet, Stars } from "./ReviewSheet";
 
 const SAMPLE_REVIEWS = [
   { name: "Julia R.",   stars: 5, text: "Absolutely beautiful meal. The host was warm and the food tasted just like home. Will definitely be back!" },
@@ -47,6 +49,26 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
   const guestBookings = meal.ownedByMe ? store.bookings.filter((b) => b.mealId === meal.id && b.guest && b.status === "confirmed") : [];
   const [activeImage, setActiveImage] = useState(0);
   const [showReviews, setShowReviews] = useState(isDesktop);
+  // live: the host's real reviews (first names only) and, on your own meal, the rating of guests asking to join
+  const [liveReviews, setLiveReviews] = useState<HostReview[] | null>(null);
+  useEffect(() => {
+    if (!store.live || !meal.hostId) return;
+    let alive = true;
+    fetchHostReviews(meal.hostId).then((r) => { if (alive) setLiveReviews(r); }).catch(() => { if (alive) setLiveReviews([]); });
+    return () => { alive = false; };
+  }, [store.live, meal.hostId, meal.reviews]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [guestRatings, setGuestRatings] = useState<Record<string, { rating: number; reviews: number } | null>>({});
+  const pendingIds = guestBookings.filter((b) => (store.pending ?? []).includes(b.id) && b.guest?.id).map((b) => b.guest!.id!).join(",");
+  useEffect(() => {
+    if (!store.live || !pendingIds) return;
+    pendingIds.split(",").forEach((id) => {
+      if (id in guestRatings) return;
+      fetchGuestRating(id).then((r) => setGuestRatings((g) => ({ ...g, [id]: r })));
+    });
+  }, [store.live, pendingIds]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [rateGuest, setRateGuest] = useState<string | null>(null);
+  const rateGuestBooking = guestBookings.find((b) => b.id === rateGuest);
+  const mealOver = !store.live || (!!meal.startsAt && Date.parse(meal.startsAt) < Date.now());
   const [showShare, setShowShare] = useState(false);
   const [safetyOpen, setSafetyOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
@@ -112,7 +134,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         {!isDesktop && (
           <div className="flex-shrink-0 text-right">
             <p style={{ fontSize: 22, fontWeight: 800, color: "#6b21d9" }}>{euro(meal.price)}</p>
-            <p style={{ fontSize: 10.5, color: "#7c6fa0" }}>{t("+ 12% service fee")}</p>
+            <p style={{ fontSize: 10.5, color: "#7c6fa0" }}>{store.live ? t("paid at the table") : t("+ 12% service fee")}</p>
           </div>
         )}
         {isDesktop && actionButtons}
@@ -168,6 +190,11 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         )}
       </div>
     </div>
+  );
+  // the host rates a guest after the dinner (from "Who's coming")
+  const rateSheet = rateGuestBooking && (
+    <ReviewSheet open onClose={() => setRateGuest(null)} about="guest" name={rateGuestBooking.guest!.name} avatar={rateGuestBooking.guest!.avatar} mealTitle={tMaybe(meal.title)}
+      initialStars={rateGuestBooking.guestRating ?? 0} initialComment={rateGuestBooking.guestComment ?? ""} onSave={(st, c) => store.rateGuest(rateGuestBooking.id, st, c)} />
   );
   const safety = !meal.ownedByMe && (
     <>
@@ -247,6 +274,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
                   <p style={{ fontSize: 12, color: "#7c6fa0" }}>{b.guests === 1 ? t("wants to join with 1 seat") : t("wants to join with {n} seats", { n: b.guests })}</p>
                 </div>
                 {!store.live && <span className="rq-chip"><ShieldCheck size={12} /> {t("Verified · ID checked")}</span>}
+                {store.live && b.guest?.id && (() => { const g = guestRatings[b.guest.id]; return <span className="rq-chip"><Star size={12} fill={g ? "#f59e0b" : "none"} color="#f59e0b" /> {g ? t("{r} from {n} hosts", { r: dec(g.rating), n: g.reviews }) : t("New on Bite")}</span>; })()}
               </div>
               {(() => { const hello = store.conversations.find((c) => c.id === b.conversationId)?.messages[0]?.text; return hello ? <p className="rq-msg">“{tMaybe(hello)}”</p> : null; })()}
               <div className="rq-actions">
@@ -261,6 +289,12 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
                 <p style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{b.guest!.name}</p>
                 <p style={{ fontSize: 12, color: "#7c6fa0" }}>{b.guests === 1 ? t("1 seat") : t("{n} seats", { n: b.guests })} · {b.live ? euro(b.total) : t("{price} paid in-app", { price: euro(b.total) })}</p>
               </div>
+              {mealOver && (
+                <motion.button onClick={() => setRateGuest(b.id)} className="flex items-center gap-1 px-3 py-2 rounded-xl" style={{ background: b.guestRating ? "#fff7e6" : "#160a2e" }} whileTap={{ scale: 0.92 }} aria-label={t("Rate {name}", { name: b.guest!.name.split(" ")[0] })}>
+                  <Star size={13} fill={b.guestRating ? "#f59e0b" : "none"} color={b.guestRating ? "#f59e0b" : "#fff"} />
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: b.guestRating ? "#7a5a12" : "#fff" }}>{b.guestRating ? b.guestRating : t("Rate")}</span>
+                </motion.button>
+              )}
               <motion.button onClick={() => onOpenChat(b.conversationId)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-[#e6dcfa]" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.92 }}>
                 <MessageCircle size={14} color="#6b21d9" />
                 <span style={{ fontSize: 12.5, fontWeight: 700, color: "#6b21d9" }}>{t("Message")}</span>
@@ -332,7 +366,21 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
     <AnimatePresence initial={false}>
       {showReviews && (
         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-          {section(t("Reviews"), meal.reviews === 0 ? (
+          {store.live ? section(t("Reviews"), !liveReviews ? (
+            <p style={{ fontSize: 14, color: "#7c6fa0" }}>{t("Loading reviews…")}</p>
+          ) : liveReviews.length === 0 ? (
+            <p style={{ fontSize: 14, color: "#7c6fa0" }}>{t("No reviews yet. Guests can review {name} after the dinner.", { name: meal.host.split(" ")[0] })}</p>
+          ) : (
+            <div className={`rv-list ${isDesktop ? "grid-cols-2" : ""}`} style={isDesktop ? { gridTemplateColumns: "1fr 1fr" } : undefined}>
+              {liveReviews.map((r, i) => (
+                <div key={i} className="rv-item">
+                  <div className="rv-item-head"><img src={r.photo} alt="" /><b>{r.author}</b><span className="ml-auto"><Stars value={r.rating} /></span></div>
+                  {r.comment && <p>{r.comment}</p>}
+                  <small>{tMaybe(r.meal)} · {new Date(r.at).toLocaleDateString(locale(), { month: "long", year: "numeric" })}</small>
+                </div>
+              ))}
+            </div>
+          )) : section(t("Reviews"), meal.reviews === 0 ? (
             <p style={{ fontSize: 14, color: "#7c6fa0" }}>{t("No reviews yet — be the first to eat here!")}</p>
           ) : (
             <div className={isDesktop ? "grid grid-cols-2 gap-3" : "flex flex-col gap-3"}>
@@ -357,7 +405,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
     </AnimatePresence>
   );
 
-  const ctaLabel = meal.ownedByMe ? (store.live ? t("Cancel this meal") : t("Unpublish listing")) : myBooking?.live === "requested" ? t("Request sent · Open chat") : myBooking ? t("You're booked · Open chat") : left === 0 ? t("Sold out") : `${t(svc.cta)} · ${euro(withFee(meal.price))}`;
+  const ctaLabel = meal.ownedByMe ? (store.live ? t("Cancel this meal") : t("Unpublish listing")) : myBooking?.live === "requested" ? t("Request sent · Open chat") : myBooking ? t("You're booked · Open chat") : left === 0 ? t("Sold out") : `${t(svc.cta)} · ${euro(store.live ? meal.price : withFee(meal.price))}`;
   const ctaAction = () => {
     if (meal.ownedByMe) { store.unpublish(meal.id); onUnpublished(); return; }
     if (myBooking) { if (myBooking.conversationId) onOpenChat(myBooking.conversationId); else onMessage(); return; }
@@ -423,7 +471,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
                   <span style={{ fontSize: 32, fontWeight: 900, color: "#160a2e" }}>{euro(meal.price)}</span>
                   <span style={{ fontSize: 15, color: "#7c6fa0" }}>{t("contribution")}</span>
                 </div>
-                <p style={{ fontSize: 13, color: "#7c6fa0" }}>{t("Shares the cost of the ingredients · + 12% Bite service fee")}</p>
+                <p style={{ fontSize: 13, color: "#7c6fa0" }}>{store.live ? t("Shares the cost of the ingredients · paid at the table, no Bite fee") : t("Shares the cost of the ingredients · + 12% Bite service fee")}</p>
                 <div className="my-4">{infoPills}</div>
                 {tableSeats && <div className="mb-4">{tableSeats}</div>}
                 {ctaButton}
@@ -435,7 +483,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
           </div>
         </div>
         {shareSheet}
-        {safety}
+        {safety}{rateSheet}
       </div>
     );
   }
@@ -477,7 +525,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
       </div>
 
       {shareSheet}
-      {safety}
+      {safety}{rateSheet}
     </div>
   );
 }

@@ -16,6 +16,7 @@ const VIEW_KEY = "bite_view";
 import { motion, AnimatePresence } from "motion/react";
 import { ANY_AREA, ANY_DAY, ANY_TIME, DEFAULT_CRITERIA, matchesCriteria, mealDistance, searchCenter, euro, type Meal, type ServiceType, type SearchCriteria } from "../data";
 import { BottomNav, SheetHeader } from "./HomeScreen";
+import { markBrowsed } from "./GetStarted";
 import type { NavTab } from "./DesktopTopBar";
 import { Sheet } from "./Sheet";
 import { useIsDesktop } from "../useIsDesktop";
@@ -64,9 +65,12 @@ interface ListingsScreenProps {
   onSelect: (m: Meal) => void;
   onNavigate: (tab: NavTab) => void;
   searchedAt?: number;
+  /** live, when nothing is here yet: "Host the first table" */
+  onStartHosting?: () => void;
 }
 
-export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavigate, searchedAt = 0 }: ListingsScreenProps) {
+export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavigate, searchedAt = 0, onStartHosting }: ListingsScreenProps) {
+  useEffect(() => { markBrowsed(); }, []);
   const isDesktop = useIsDesktop();
   const store = useStore();
   const [showFilters, setShowFilters]   = useState(false);
@@ -188,7 +192,18 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
     </div>
   );
 
-  const empty = (
+  // live and nothing here yet: Bite is just starting, so invite people to open the first table
+  const empty = store.live ? (
+    <div className="flex flex-col items-center justify-center py-14 px-6 gap-3 rounded-3xl text-center" style={{ background: isDesktop ? "#fff" : "transparent" }}>
+      <EmptyPlate size={96} />
+      <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "#160a2e" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
+      <p style={{ color: "#7c6fa0", fontSize: 14, maxWidth: 360, lineHeight: 1.5 }}>{t("Bite is just starting. Cook something you love and open the first table near you, or look a bit further.")}</p>
+      <div className="flex flex-wrap justify-center gap-2 mt-1">
+        {onStartHosting && <button onClick={onStartHosting} className="px-4 py-2.5 rounded-full" style={{ background: "#6b21d9", fontSize: 13.5, color: "#fff", fontWeight: 800 }}>{t("Host the first table")}</button>}
+        <button onClick={clearEverything} className="px-4 py-2.5 rounded-full" style={{ background: "#ede8fb", fontSize: 13.5, color: "#6b21d9", fontWeight: 700 }}>{t("Show all meals")}</button>
+      </div>
+    </div>
+  ) : (
     <div className="flex flex-col items-center justify-center py-16 gap-3 rounded-3xl" style={{ background: isDesktop ? "#fff" : "transparent" }}>
       <EmptyPlate size={96} />
       <p style={{ color: "#7c6fa0", fontWeight: 600, fontSize: 14.5, textAlign: "center" }}>{t("No meals match your search")}</p>

@@ -30,7 +30,8 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
   const [gate, setGate] = useState(false);
 
   const subtotal = meal.price * guests;
-  const fees = Math.round(feeFor(meal.price) * guests * 100) / 100;
+  // live: no fee while payments are not in the app (the database computes the same total)
+  const fees = store.live ? 0 : Math.round(feeFor(meal.price) * guests * 100) / 100;
   const total = Math.round((subtotal + fees) * 100) / 100;
   const unit = meal.serviceType === "pickup" ? "order" : meal.serviceType === "eat-together" ? "seat" : "spot";
 
@@ -70,10 +71,10 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
         <Line label={`${euro(meal.price)} × ${guests === 1 ? t(`1 ${unit}`) : t(`{n} ${unit}s`, { n: guests })}`} value={euro(subtotal)} />
         <div className="flex items-center justify-between py-1.5">
           <span className="flex items-center gap-1.5" style={{ fontSize: 13, color: "#7c6fa0" }}>
-            {t("Bite service fee (12%)")}
+            {store.live ? t("Bite service fee (free for now)") : t("Bite service fee (12%)")}
             <span className="tip-wrap" onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
               <button type="button" className="tip-btn" aria-label={t("What is the service fee for?")} aria-expanded={tip} onClick={() => setTip((v) => !v)} onBlur={() => setTip(false)}>?</button>
-              <span className={`tip ${tip ? "on" : ""}`} role="tooltip">{store.live ? t("Bite's fee for running the platform. In this early phase it is not charged: you only pay the host's share at the table.") : t("It keeps every dinner safe: in-app payments, host checks, insurance and support. Your host gets the full contribution for the groceries.")}</span>
+              <span className={`tip ${tip ? "on" : ""}`} role="tooltip">{store.live ? t("In this early phase Bite charges no fee: you only pay the host's share, at the table.") : t("It keeps every dinner safe: in-app payments, host checks, insurance and support. Your host gets the full contribution for the groceries.")}</span>
             </span>
           </span>
           <span style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{euro(fees)}</span>
