@@ -19,7 +19,7 @@ export function LegalPage() {
           </a>
         </div>
       </header>
-      <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "44px 24px 90px", display: "grid", gridTemplateColumns: "230px 1fr", gap: "48px", alignItems: "start" }}>
+      <div className="lg-wrap" style={{ maxWidth: "1080px", margin: "0 auto", padding: "44px 24px 90px", display: "grid", gridTemplateColumns: "230px 1fr", gap: "48px", alignItems: "start" }}>
         {/* TOC */}
         {" "}
         <nav className="lg-toc" style={{ position: "sticky", top: "100px" }}>
@@ -106,7 +106,7 @@ export function LegalPage() {
             </h3>
             {" "}
             <p>
-              Bite is an online marketplace operated by Bite GmbH ("Bite", "we", "us") that connects people who cook at home ("Hosts") with people who want to buy, share or learn to cook a meal ("Guests"). Bite provides the platform only.
+              Bite is an online marketplace operated by Sebastiano Operti, trading as Bite (no company is registered yet; "Bite", "we", "us") that connects people who cook at home ("Hosts") with people who want to buy, share or learn to cook a meal ("Guests"). Bite provides the platform only.
               {" "}
               <strong>
                 We are not the producer, seller, or supplier of any meal.
@@ -900,7 +900,7 @@ export function LegalPage() {
           </section>
           {" "}
           <p style={{ marginTop: "40px", paddingTop: "20px", borderTop: "1px solid rgba(107,33,217,0.1)", fontSize: "13px", color: "#8a7aa8" }}>
-            © 2026 Bite GmbH · Frankfurt am Main, Germany. These policies are provided in good faith and should be reviewed by legal counsel for your final launch jurisdiction.
+            © 2026 Bite · Sebastiano Operti, Germany. These policies are provided in good faith and should be reviewed by legal counsel for your final launch jurisdiction.
           </p>
         </main>
       </div>
