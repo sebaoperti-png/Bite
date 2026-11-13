@@ -52,7 +52,7 @@ export function LandingHero() {
                 <a className="lm" href="stand.html?ref=landing" style={{ color: "#160a2e" }}><Arrowed text={t("Tell us how you eat — 60-second survey →")} /></a>
               </div>
               {" "}
-              <div style={{ fontSize: "13px", color: "#7c6fa0" }}>{t("Verified home cooks · split the cost · less food waste")}</div>
+              <div style={{ fontSize: "13px", color: "#7c6fa0" }}>{t("Home cooks next door · split the cost · less food waste")}</div>
             </div>
           </div>
         </div>

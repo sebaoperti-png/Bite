@@ -7,32 +7,32 @@ import { t } from "../../shared/i18n";
 
 const TICKETS: { kind: string; title: string; text: React.ReactNode; foot: string; icon: React.ReactNode; dark?: boolean }[] = [
   {
-    kind: "Chat", title: "In-app chat", foot: "A real person replies",
-    text: "Talk to a real person from the Bite team, right inside the app.",
+    kind: "In the app", title: "Report or block", foot: "From any meal or chat",
+    text: "Something feels wrong? Report it or block the person in one tap. We read every report.",
     icon: <path d="M4 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4 4V5z" />,
   },
   {
-    kind: "Email", title: "Email us", foot: "Reply within 24h",
-    text: <><a href="mailto:hello@bitetable.de">hello<wbr />@bitetable.de</a> {t("— we answer within 24h.")}</>,
+    kind: "Email", title: "Email us", foot: "Usually within a day",
+    text: <><a href="mailto:hello@bitetable.de">hello<wbr />@bitetable.de</a> {t("— we usually answer within a day.")}</>,
     icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>,
   },
   {
-    kind: "Guides", title: "Help Center", foot: "Booking · hosting · refunds",
-    text: "Guides on booking, hosting, refunds & cost sharing.",
+    kind: "Guides", title: "Questions from the table", foot: "Booking · hosting · costs",
+    text: "Answers on booking, hosting and cost sharing, just below.",
     icon: <><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z" /><path d="M4 19a2 2 0 0 1 2-2h13" /></>,
   },
   {
-    kind: "Urgent", title: "Safety line", foot: "Always first in line", dark: true,
-    text: "Urgent concern during a meal? Reach our team instantly.",
+    kind: "Urgent", title: "In an emergency", foot: "Police 110 · Emergency 112", dark: true,
+    text: "Feel unsafe during a meal? Leave, call 110 or 112 first, then tell us and report the host in the app.",
     icon: <><path d="M4 17h16M5.5 17a6.5 6.5 0 0 1 13 0" /><path d="M12 8.5V7M10.5 7h3" /><path d="M3 20h18" /></>,
   },
 ];
 
 const FAQ = [
-  { q: "How do I get a refund if a meal is cancelled?", a: "If a host cancels, you're refunded in full automatically. If you cancel more than 24h ahead, you get a full refund; within 24h, the service fee may apply." },
-  { q: "How are hosts checked before they can cook?", a: "Every host completes ID verification, a video call, a sample-meal tasting and reference checks before their first listing goes live." },
+  { q: "What happens if a meal is cancelled?", a: "Right now nothing is paid in advance: you pay your share to the host at the table, so a cancellation costs you nothing. Please cancel as early as you can, so the host or the other guests can plan." },
+  { q: "How are hosts checked before they can cook?", a: "Today every host needs a real name and a profile photo and must accept Bite's house rules (hygiene, allergens, fair prices, respect). Hosts choose who joins, and anyone can be reported or blocked. ID checks and reviews are coming next." },
   { q: "I have a food allergy — is that handled?", a: "Every listing declares allergens and dietary tags, and you can filter by them. You can also message the host before booking to confirm." },
-  { q: "How does cost sharing work?", a: "The host sets a contribution per guest based on what the ingredients cost — an equal share, not a restaurant price. Guests pay it in-app plus a 12% Bite service fee; the host gets the full contribution back, and the host's own dinner gets cheaper too. No cash changes hands." },
+  { q: "How does cost sharing work?", a: "The host sets a contribution per guest based on what the ingredients cost — an equal share, not a restaurant price. A price cap makes sure nobody profits. For now you pay your share at the table and Bite charges no fee; payments in the app will come later." },
 ];
 
 export function LandingHelpCustomerService() {

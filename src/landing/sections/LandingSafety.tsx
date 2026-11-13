@@ -11,22 +11,39 @@ const LAYERS = [
   {
     title: "Personal safety",
     icon: <><path d="M12 3l7 2.5v5c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9v-5L12 3z" /><path d="M9 12l2 2 4-4" /></>,
-    points: ["Hosts verified: ID, video call, meal tasting & references", "Group dinners first — never anonymous 1-on-1", "Two-way reviews & ratings after every meal"],
+    points: [
+      { text: "A real name and a photo before anyone books or hosts" },
+      { text: "The host accepts each guest; the street is shared only after that" },
+      { text: "Report or block anyone in one tap" },
+      { text: "ID check for hosts and reviews after every meal", soon: true },
+    ],
   },
   {
     title: "Food safety & hygiene",
     icon: <><line x1="4" y1="18" x2="20" y2="18" /><path d="M5 18a7 7 0 0 1 14 0" /><line x1="12" y1="5" x2="12" y2="8" /><circle cx="12" cy="4" r="1" /></>,
-    points: ["Host hygiene & allergen guidelines", "Sample-meal tasting during onboarding", "Dedicated food-quality rating on every meal"],
+    points: [
+      { text: "Every host accepts the house rules: clean kitchen, fresh food, allergens listed" },
+      { text: "Allergens and dietary info on every meal" },
+      { text: "A food-quality rating after every meal", soon: true },
+    ],
   },
   {
     title: "Payments",
     icon: <><rect x="3" y="6" width="18" height="12" rx="2" /><line x1="3" y1="10" x2="21" y2="10" /><line x1="7" y1="14.5" x2="11" y2="14.5" /></>,
-    points: ["100% in-app secure payments via Stripe", "No off-platform cash — always a trail", "Event insurance in place on every booking"],
+    points: [
+      { text: "A price cap: guests share the real grocery cost, nobody makes a profit" },
+      { text: "The cost is receipt-backed, or clearly marked as estimated or stated by the host" },
+      { text: "Secure payments in the app, so no cash changes hands", soon: true },
+    ],
   },
   {
     title: "Data & privacy",
     icon: <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /><circle cx="12" cy="15.5" r="1" /></>,
-    points: ["GDPR-compliant by design", "Data minimization — only what's needed", "Consent-based & fully user-controlled"],
+    points: [
+      { text: "Stored in the EU (Frankfurt), handled under the GDPR" },
+      { text: "The map shows only the area, never your door" },
+      { text: "Only the data we need, never sold" },
+    ],
   },
 ];
 
@@ -40,10 +57,10 @@ const ART = [
 
 // What the safety receipt lists at the end
 const RECEIPT = [
-  { k: "Host verification", v: "4 steps" },
-  { k: "In-app payments", v: "100%" },
-  { k: "Data protection", v: "GDPR" },
-  { k: "Insurance", v: "every event" },
+  { k: "Name and photo", v: "required" },
+  { k: "Street address", v: "after you're accepted" },
+  { k: "Price", v: "capped, no profit" },
+  { k: "Your data", v: "EU · GDPR" },
 ];
 
 // where each layer's thing sits on the table (in the 600×600 drawing), for the tap targets
@@ -201,7 +218,7 @@ export function LandingSafety() {
               </g>
               <g className={`tb-item tb-card ${isOn(0) ? "on" : ""}`} onClick={() => place(0)}>
                 <path d="M200 128h196l6 40H194z" fill="#fffdf7" stroke="rgba(107,33,217,0.2)" strokeWidth="1.5" />
-                <text x="298" y="155" textAnchor="middle" fontFamily="'Instrument Serif', serif" fontStyle="italic" fontSize="22" fill="#3b1a78">{t("Your host · verified")}</text>
+                <text x="298" y="155" textAnchor="middle" fontFamily="'Instrument Serif', serif" fontStyle="italic" fontSize="22" fill="#3b1a78">{t("Your host · name & photo")}</text>
                 <circle cx="396" cy="128" r="11" fill="#0a9c62" /><path d="M391 128l3.5 3.5 6-7" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
               </g>
               {/* the cloche that comes down and lifts at the end */}
@@ -239,9 +256,9 @@ export function LandingSafety() {
                   ))}
                   <div className="sh-r-rule" />
                   <div className="sh-r-row sh-r-total"><span>{t("Trust violations tolerated")}</span><i /><b>0</b></div>
-                  <p className="sh-r-small">{t("One trust violation means immediate suspension.")}</p>
+                  <p className="sh-r-small">{t("Breaking the house rules means losing access to Bite.")}</p>
                   <div className="sh-r-barcode" aria-hidden />
-                  <span className="sh-stamp">{t("VERIFIED")}</span>
+                  <span className="sh-stamp">{t("TABLE SET")}</span>
                 </div>
               </div>
             ) : current ? (
@@ -250,7 +267,7 @@ export function LandingSafety() {
                 <div className="mc-top"><span>No. 0{shownIdx + 1}</span><i aria-hidden /><span>{t("House rule")}</span></div>
                 <svg className="mc-art" viewBox="0 0 96 64" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{ART[shownIdx]}</svg>
                 <h3>{t(current.title)}</h3>
-                <ul>{current.points.map((p) => <li key={p}>{t(p)}</li>)}</ul>
+                <ul>{current.points.map((p) => <li key={p.text} className={p.soon ? "soon" : ""}>{p.soon && <span className="mc-soon">{t("Coming")}</span>}{t(p.text)}</li>)}</ul>
                 <div className="mc-foot">{t("Served at every dinner")}</div>
                 {sealed ? (
                   <button type="button" className="mc-next" onClick={() => setPicked(null)}>{t("Back to the safety receipt")}</button>

@@ -41,13 +41,13 @@ export function LandingBecomeAHost() {
 
 // Each step drawn in chalk (every stroke has pathLength 1 so it can be redrawn when the step lights up)
 const STEPS: { title: string; text: string; art: React.ReactNode }[] = [
-  { title: "Get verified", text: "A quick ID check, a short video call and a sample meal — so guests know who's cooking.",
+  { title: "Show who's cooking", text: "Your name, a photo and Bite's house rules, so guests know who's at the stove.",
     art: <><path pathLength={1} d="M34 58c-13-1-15-19-3-22 0-13 19-17 27-6 8-11 27-7 27 6 12 3 10 21-3 22v16H34z" /><path pathLength={1} d="M34 64h48" /><circle pathLength={1} cx="90" cy="76" r="13" /><path pathLength={1} d="M84 76l4 4 8-9" /></> },
   { title: "List your meal", text: "Add your menu, date and seats in 2 minutes. Our assistant can write the description for you.",
     art: <><rect pathLength={1} x="30" y="14" width="48" height="66" rx="3" /><path pathLength={1} d="M40 28h28M44 38h20M40 50h28M40 58h22M40 66h26" /><path pathLength={1} d="M84 70l18-34 6 3-18 34-7 4z" /></> },
   { title: "Welcome guests", text: "Chat with guests before the day and confirm who joins — it's always your table, your rules.",
     art: <><path pathLength={1} d="M30 30h22l-3 20a8 8 0 0 1-16 0z" /><path pathLength={1} d="M41 58v18M33 78h16" /><path pathLength={1} d="M68 30h22l-3 20a8 8 0 0 1-16 0z" /><path pathLength={1} d="M79 58v18M71 78h16" /><path pathLength={1} d="M60 22v-8M52 24l-5-6M68 24l5-6" /></> },
-  { title: "Split the bill", text: "Scan your receipt and everyone pays an equal share in the app. No cash, no awkward maths.",
+  { title: "Split the bill", text: "Scan your receipt and everyone pays an equal share. Nobody profits, no awkward maths.",
     art: <><path pathLength={1} d="M36 14h48v60l-6 4-6-4-6 4-6-4-6 4-6-4-6 4-6-4z" /><path pathLength={1} d="M44 28h32M44 38h24M44 48h28" /><path pathLength={1} d="M30 60h60" strokeDasharray="4 5" /><path pathLength={1} d="M24 86l10-6M60 92v-10M96 86l-10-6" /></> },
 ];
 const NUMERALS = ["i", "ii", "iii", "iv"];
