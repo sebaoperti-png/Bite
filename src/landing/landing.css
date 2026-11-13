@@ -1269,3 +1269,55 @@ a.rs-go:hover { background: #160a2e; }
   .sd-label b { font-size: 25px; }
 }
 @media (prefers-reduced-motion: reduce) { .sd-cloche { display: none; } .sd-scene { opacity: 1; transform: none; transition: none; } .sd-line.on .sd-ring path { animation: none; stroke-dashoffset: 0; } .sd-label { animation: none; } }
+
+/* ── Safety, tap to set the table (2026-11-13): no scroll locking, the layout fits every width ── */
+.sh-section .sh-sticky { grid-template-columns: minmax(250px, 0.85fr) minmax(340px, 1.3fr) minmax(280px, 1fr); gap: 32px; align-items: center; }
+.sh-section .tb { max-width: 540px; }
+.tb-label { display: none; }
+/* things not yet on the table: a faint ghost of where they go */
+.tb-item { cursor: pointer; }
+.tb-item:not(.on) { opacity: .16; transform: none; filter: grayscale(1); transition: opacity .4s, filter .4s; }
+.tb-item:not(.on):hover { opacity: .32; }
+/* the tap targets */
+.tb-hot { position: absolute; z-index: 3; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; display: grid; place-items: center;
+  background: #6b21d9; color: #fff; box-shadow: 0 0 0 0 rgba(184,127,255,0.7), 0 8px 18px rgba(46,16,96,0.35); border: 2.5px solid #fff;
+  animation: tbHot 1.8s var(--d, 0s) ease-out infinite; transition: transform .25s cubic-bezier(.2,1.6,.4,1), background .3s, opacity .3s, width .3s, height .3s, margin .3s; }
+.tb-hot svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
+.tb-hot:hover, .tb-hot:focus-visible { transform: scale(1.12); outline: none; }
+.tb-hot:focus-visible { box-shadow: 0 0 0 4px #fff, 0 0 0 7px #b87fff; }
+@keyframes tbHot { 0% { box-shadow: 0 0 0 0 rgba(184,127,255,0.75), 0 8px 18px rgba(46,16,96,0.35); } 70%, 100% { box-shadow: 0 0 0 16px rgba(184,127,255,0), 0 8px 18px rgba(46,16,96,0.35); } }
+.tb-hot.on { animation: none; width: 28px; height: 28px; margin: -14px 0 0 -14px; background: #0a9c62; border-width: 2px; opacity: .92; }
+.tb-hot.on svg { width: 15px; height: 15px; }
+.tb-hot.picked { box-shadow: 0 0 0 4px rgba(255,255,255,0.9), 0 8px 18px rgba(46,16,96,0.35); }
+.tb-hot-label { position: absolute; top: calc(100% + 6px); left: 50%; translate: -50% 0; padding: 3px 9px; border-radius: 999px; background: rgba(22,10,46,0.88); color: #fff;
+  font-size: 12px; font-weight: 700; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .2s; }
+.tb-hot:not(.on):hover .tb-hot-label, .tb-hot:focus-visible .tb-hot-label { opacity: 1; }
+.tb.sealed .tb-hot { opacity: 0; pointer-events: none; }
+/* the slip's lines can be tapped too */
+.os-row button.os-name { padding: 0; margin: 0; border: 0; background: none; font: inherit; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.05; text-align: left; color: inherit; cursor: pointer; appearance: none; }
+.os-row button.os-name:hover { color: #6b21d9; }
+/* under the menu page */
+.mc-next { margin-top: 14px; padding: 10px 18px; border-radius: 999px; background: #6b21d9; color: #fff; font-size: 13.5px; font-weight: 800; transition: transform .2s, background .2s; }
+.mc-next:hover { background: #7c30e8; transform: translateY(-1px); }
+.mc-left { margin: 10px 0 0; font-size: 12.5px; color: #7c6aa3; }
+.sh-section .sh-right { min-width: 0; }
+.sh-section .sh-receipt-slot { margin-left: auto; margin-right: auto; max-width: 400px; }
+/* medium screens (small laptops, a browser with a side panel): two columns, the menu page under the table */
+@media (max-width: 1180px) and (min-width: 821px) {
+  .sh-section .sh-sticky { grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr); grid-template-areas: "left table" "left right"; gap: 20px 32px; align-items: start; }
+  .sh-section .sh-left { grid-area: left; position: sticky; top: 90px; }
+  .sh-section .tb { grid-area: table; max-width: 460px; }
+  .sh-section .sh-right { grid-area: right; width: 100%; max-width: 440px; margin: 0 auto; }
+  .sh-title, .sh-reveal { font-size: 46px; }
+}
+/* phones: title, table, menu page; the slip is left out (the menu page counts "2 of 4") */
+@media (max-width: 820px) {
+  .sh-section .sh-sticky { grid-template-columns: 1fr; gap: 22px; }
+  .sh-section .tb { order: 1; max-width: 340px; }
+  .sh-section .sh-right { order: 2; max-width: 420px; margin: 0 auto; width: 100%; }
+  .tb-hot { width: 42px; height: 42px; margin: -21px 0 0 -21px; }
+  .tb-hot-label { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .tb-hot { animation: none; } }
+.tb-hot.on { opacity: 0; }
+.tb-hot.on:hover, .tb-hot.on:focus-visible { opacity: .95; }
