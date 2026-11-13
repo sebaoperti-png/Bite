@@ -17,7 +17,7 @@ const FAQ: { test: (q: string) => boolean; reply: () => AssistantReply }[] = [
   {
     test: (q) => has(q, "safe", "sicher", "trust", "vertrau", "verif", "stranger", "fremd", "danger", "gefahr"),
     reply: () => ({
-      text: t("Safety comes first. Everyone needs a real name and a photo before booking or hosting, hosts accept Bite's house rules, and the host chooses who joins: the street is shared only after that. You can report or block anyone in one tap. ID checks and reviews are coming next."),
+      text: t("Safety comes first. Everyone needs a real name and a photo before booking or hosting, hosts accept Bite's house rules, and the host chooses who joins: the street is shared only after that. You can report or block anyone in one tap, and guests and hosts review each other after every dinner. ID checks are coming next."),
       chips: [t("How does cost sharing work?"), t("How do I become a host?")],
     }),
   },
