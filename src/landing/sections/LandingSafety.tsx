@@ -15,7 +15,8 @@ const LAYERS = [
       { text: "A real name and a photo before anyone books or hosts" },
       { text: "The host accepts each guest; the street is shared only after that" },
       { text: "Report or block anyone in one tap" },
-      { text: "ID check for hosts and reviews after every meal", soon: true },
+      { text: "Guests and hosts review each other after every dinner" },
+      { text: "ID check for hosts", soon: true },
     ],
   },
   {
@@ -24,7 +25,7 @@ const LAYERS = [
     points: [
       { text: "Every host accepts the house rules: clean kitchen, fresh food, allergens listed" },
       { text: "Allergens and dietary info on every meal" },
-      { text: "A food-quality rating after every meal", soon: true },
+      { text: "Guests rate every dinner, and the rating shows on the host's meals" },
     ],
   },
   {

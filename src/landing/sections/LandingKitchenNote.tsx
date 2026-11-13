@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { t } from "../../shared/i18n";
 
 const KEY = "bite_kitchen_note";
-const VERSION = "2026-11-13";
+const VERSION = "2026-11-14";
 
-const COOKING = ["ID checks for hosts", "Payments in the app", "Reviews after every meal"];
-const READY = ["Report or block anyone in one tap", "A price cap: nobody makes a profit", "Help by email: hello@bitetable.de"];
+const COOKING = ["ID checks for hosts", "Payments in the app"];
+const READY = ["Reviews after every dinner, both ways", "Report or block anyone in one tap", "A price cap: nobody makes a profit", "Help by email: hello@bitetable.de"];
 
 export function LandingKitchenNote({ ready }: { ready: boolean }) {
   const [open, setOpen] = useState(false);

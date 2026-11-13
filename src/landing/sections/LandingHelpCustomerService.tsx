@@ -30,7 +30,7 @@ const TICKETS: { kind: string; title: string; text: React.ReactNode; foot: strin
 
 const FAQ = [
   { q: "What happens if a meal is cancelled?", a: "Right now nothing is paid in advance: you pay your share to the host at the table, so a cancellation costs you nothing. Please cancel as early as you can, so the host or the other guests can plan." },
-  { q: "How are hosts checked before they can cook?", a: "Today every host needs a real name and a profile photo and must accept Bite's house rules (hygiene, allergens, fair prices, respect). Hosts choose who joins, and anyone can be reported or blocked. ID checks and reviews are coming next." },
+  { q: "How are hosts checked before they can cook?", a: "Today every host needs a real name and a profile photo and must accept Bite's house rules (hygiene, allergens, fair prices, respect). Hosts choose who joins, anyone can be reported or blocked, and guests and hosts review each other after every dinner. ID checks are coming next." },
   { q: "I have a food allergy — is that handled?", a: "Every listing declares allergens and dietary tags, and you can filter by them. You can also message the host before booking to confirm." },
   { q: "How does cost sharing work?", a: "The host sets a contribution per guest based on what the ingredients cost — an equal share, not a restaurant price. A price cap makes sure nobody profits. For now you pay your share at the table and Bite charges no fee; payments in the app will come later." },
 ];

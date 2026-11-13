@@ -96,7 +96,7 @@ export function LandingLaptop() {
               {/* a status bar, so the app starts below the camera island like on a real phone */}
               <span className="lp-status" aria-hidden><b>19:30</b><i /></span>
               {load && (
-                <iframe title={t("The Bite demo app")} src={`bite.html?lang=${getLang()}`} loading="lazy" tabIndex={live ? 0 : -1}
+                <iframe title={t("The Bite demo app")} src={`bite.html?preview&lang=${getLang()}`} loading="lazy" tabIndex={live ? 0 : -1}
                   style={{ width: PHONE_W, height: PHONE_H - Math.round(STATUS / scale), transform: `scale(${scale})`, top: STATUS }} />
               )}
             </div>
@@ -112,7 +112,7 @@ export function LandingLaptop() {
               {load && (
                 <iframe
                   title={t("The Bite demo app")}
-                  src={`bite.html?lang=${getLang()}`}
+                  src={`bite.html?preview&lang=${getLang()}`}
                   loading="lazy"
                   tabIndex={live ? 0 : -1}
                   style={{ width: APP_W, height: APP_H, transform: `scale(${scale})` }}
@@ -127,7 +127,8 @@ export function LandingLaptop() {
       )}
 
       <p className="lp-foot">
-        <a className="lm" href="bite.html"><Arrowed text={t("Open it full screen →")} /></a>
+        <span className="lp-demo-note">{t("Above: a demo with sample meals.")}</span>{" "}
+        <a className="lm" href="bite.html"><Arrowed text={t("Open the real app →")} /></a>
       </p>
     </section>
   );
