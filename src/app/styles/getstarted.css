@@ -36,3 +36,16 @@
 .gs-tour { margin: 8px 0 0 10px; font-size: 12.5px; font-weight: 800; color: #6b21d9; text-decoration: underline; text-underline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .wt-dots button { transition: none; } }
 .fs-wrap:empty { display: none; }
+
+/* hosting flow: the ingredients warning and the host's declaration */
+.hf-warn { display: flex; gap: 10px; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #fff4e5; border: 1px solid rgba(192,94,0,0.25); color: #c05e00; }
+.hf-warn svg { flex-shrink: 0; margin-top: 1px; }
+.hf-warn p { margin: 0; font-size: 12.5px; line-height: 1.5; color: #7a4a10; font-weight: 600; }
+.hf-decl { padding: 16px 16px 14px; border-radius: 18px; background: #fbf6ec; border: 1.5px solid rgba(107,33,217,0.18); }
+.hf-decl-title { margin: 0 0 8px; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; color: #160a2e; }
+.hf-decl ul { margin: 0 0 12px; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.45; color: #4a3a6e; }
+.hf-decl-check { position: relative; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; color: #160a2e; cursor: pointer; }
+.hf-decl-check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.hf-decl-box { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #6b21d9; display: grid; place-items: center; color: #fff; background: #fff; flex-shrink: 0; }
+.hf-decl-check input:checked + .hf-decl-box { background: #6b21d9; }
+.hf-decl-check input:focus-visible + .hf-decl-box { outline: 2px solid #6b21d9; outline-offset: 2px; }
