@@ -1,0 +1,37 @@
+/* Reviews (ReviewSheet.tsx), the review list on the meal page and the "rate your dinner" nudge */
+.rv { font-family: 'Inter', sans-serif; }
+.rv-who { display: flex; align-items: center; gap: 12px; }
+.rv-who img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 0 0 3px #f0e9fb; }
+.rv-q { margin: 0; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; line-height: 1.1; color: #160a2e; }
+.rv-meal { margin: 3px 0 0; font-size: 12.5px; color: #7c6fa0; }
+.rv-stars { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
+.rv-stars button { padding: 4px; border-radius: 12px; }
+.rv-stars button:focus-visible { outline: 2px solid #6b21d9; outline-offset: 2px; }
+.rv-label { margin: 4px 0 0; text-align: center; font-size: 13.5px; font-weight: 800; color: #6b21d9; min-height: 20px; }
+.rv-chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 14px; }
+.rv-chips button { padding: 6px 12px; border-radius: 999px; background: #f3effc; color: #4a3a6e; font-size: 12.5px; font-weight: 700; border: 1px solid rgba(107,33,217,0.12); }
+.rv-chips button:hover { background: #ede5fb; color: #6b21d9; }
+.rv-text { display: block; width: 100%; margin-top: 14px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid rgba(107,33,217,0.18); background: #fff; font: inherit; font-size: 14.5px; line-height: 1.5; color: #160a2e; resize: vertical; outline: none; }
+.rv-text:focus { border-color: #6b21d9; }
+.rv-count { margin: 4px 2px 0; text-align: right; font-size: 11px; color: #a99cc8; }
+.rv-note { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: #7c6fa0; }
+.rv-save { display: block; width: 100%; margin-top: 14px; padding: 14px; border-radius: 16px; background: #6b21d9; color: #fff; font-size: 15px; font-weight: 800; }
+.rv-save:disabled { opacity: .45; }
+.rv-mini { display: inline-flex; gap: 1px; vertical-align: -1px; }
+
+/* the list on the meal page */
+.rv-list { display: grid; gap: 12px; }
+.rv-item { padding: 14px 16px; border-radius: 18px; background: #fff; box-shadow: 0 2px 10px rgba(107,33,217,0.06); }
+.rv-item-head { display: flex; align-items: center; gap: 10px; }
+.rv-item-head img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.rv-item-head b { font-size: 13.5px; color: #160a2e; }
+.rv-item-head em { font-style: normal; font-size: 11.5px; color: #a99cc8; }
+.rv-item p { margin: 8px 0 0; font-size: 13.5px; line-height: 1.55; color: #4a3a6e; }
+.rv-item small { display: block; margin-top: 6px; font-size: 11.5px; color: #a99cc8; }
+
+/* "How was dinner?" on Home */
+.rv-nudge { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border-radius: 18px; background: linear-gradient(135deg, #fff7e6, #fdebc8); border: 1px solid rgba(245,158,11,0.35); text-align: left; }
+.rv-nudge img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.rv-nudge b { display: block; font-size: 14px; color: #160a2e; }
+.rv-nudge span { font-size: 12px; color: #7a5a12; }
+.rv-nudge .rv-nudge-cta { margin-left: auto; flex-shrink: 0; padding: 7px 12px; border-radius: 999px; background: #160a2e; color: #fff; font-size: 12.5px; font-weight: 800; }

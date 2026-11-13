@@ -1,0 +1,38 @@
+/* Welcome tour + "Your first steps" (GetStarted.tsx) */
+.wt-back { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; padding: 16px; background: rgba(13,6,32,0.55); backdrop-filter: blur(4px); font-family: 'Inter', sans-serif; }
+.wt { position: relative; width: min(420px, 100%); padding: 20px 22px 20px; border-radius: 26px; background: #fbf6ec; color: #2a1553; text-align: center; box-shadow: 0 40px 90px rgba(13,6,32,0.45); }
+.wt-top { display: flex; justify-content: space-between; align-items: center; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7c6aa3; }
+.wt-skip { font-family: 'Inter', sans-serif; font-size: 12.5px; letter-spacing: 0; text-transform: none; font-weight: 700; color: #7c6aa3; padding: 4px 8px; border-radius: 999px; }
+.wt-skip:hover { background: rgba(107,33,217,0.08); color: #6b21d9; }
+.wt-art { display: block; width: 120px; height: 110px; margin: 14px auto 6px; color: #6b21d9; }
+.wt-title { margin: 4px 0 8px; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 32px; line-height: 1.05; color: #160a2e; }
+.wt-text { margin: 0 auto; max-width: 330px; font-size: 14.5px; line-height: 1.55; color: #4a3a6e; min-height: 68px; }
+.wt-dots { display: flex; justify-content: center; gap: 7px; margin: 16px 0 14px; }
+.wt-dots button { width: 8px; height: 8px; border-radius: 999px; background: #d9cdee; transition: width .25s, background .25s; }
+.wt-dots button.on { width: 24px; background: #6b21d9; }
+.wt-actions { display: flex; gap: 10px; }
+.wt-next { flex: 1; padding: 14px; border-radius: 16px; background: #6b21d9; color: #fff; font-size: 15px; font-weight: 800; }
+.wt-next:hover { background: #7c30e8; }
+.wt-back-btn { padding: 14px 18px; border-radius: 16px; background: rgba(107,33,217,0.08); color: #6b21d9; font-size: 15px; font-weight: 800; }
+
+.gs { margin: 0; padding: 16px 16px 12px; border-radius: 22px; background: #fff; box-shadow: 0 4px 24px rgba(46,16,96,0.07); border: 1px solid rgba(107,33,217,0.08); font-family: 'Inter', sans-serif; }
+.gs-head { display: flex; align-items: center; gap: 12px; }
+.gs-ring { --p: 0; position: relative; width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%; background: conic-gradient(#6b21d9 calc(var(--p) * 360deg), #ece5f8 0); display: grid; place-items: center; }
+.gs-ring::before { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: #fff; }
+.gs-ring span { position: relative; font-size: 12px; font-weight: 900; color: #160a2e; }
+.gs-head-text { flex: 1; min-width: 0; }
+.gs-head-text h2 { margin: 0; font-size: 16px; font-weight: 900; color: #160a2e; letter-spacing: -.01em; }
+.gs-head-text p { margin: 2px 0 0; font-size: 12.5px; color: #7c6fa0; }
+.gs-x { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #9a8bb8; flex-shrink: 0; }
+.gs-x:hover { background: #f3effc; color: #6b21d9; }
+.gs-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.gs-step { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border-radius: 14px; text-align: left; transition: background .2s; }
+.gs-step:not(.done):hover { background: #f6f2fd; }
+.gs-check { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; font-size: 11.5px; font-weight: 800; color: #6b21d9; border: 2px solid #d9cdee; }
+.gs-step.done .gs-check { background: #0a9c62; border-color: #0a9c62; color: #fff; }
+.gs-label { flex: 1; font-size: 14px; font-weight: 600; color: #160a2e; }
+.gs-step.done .gs-label { color: #9a8bb8; text-decoration: line-through; text-decoration-color: rgba(154,139,184,0.6); }
+.gs-go { color: #6b21d9; flex-shrink: 0; }
+.gs-tour { margin: 8px 0 0 10px; font-size: 12.5px; font-weight: 800; color: #6b21d9; text-decoration: underline; text-underline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .wt-dots button { transition: none; } }
+.fs-wrap:empty { display: none; }
