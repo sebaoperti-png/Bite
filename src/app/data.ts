@@ -30,7 +30,7 @@ export interface Meal {
   /** Extra dish photos shown after the cover on the meal page */
   gallery?: string[];
   /** How the contribution was set: from the host's receipt or Bite's estimate */
-  costProof?: { kind: "receipt" | "estimate"; total: number; people: number };
+  costProof?: { kind: "receipt" | "declared" | "estimate"; total: number; people: number };
   /** Listings published from this browser through "Start hosting" */
   ownedByMe?: boolean;
   /* ── live mode only ── */
