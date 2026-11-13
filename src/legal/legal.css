@@ -14,3 +14,14 @@
   .lg-sec li { margin-bottom: 6px; }
   .lg-toc a { display: block; font-size: 14px; font-weight: 600; color: #6b5a87; padding: 7px 12px; border-radius: 9px; }
   .lg-toc a:hover { background: #f0e9fb; color: #6b21d9; }
+
+  /* phones: the contents list goes above the text as a row of chips, the text takes the full width */
+  main { min-width: 0; }
+  .lg-sec p, .lg-sec li { overflow-wrap: anywhere; }
+  @media (max-width: 820px) {
+    .lg-wrap { grid-template-columns: 1fr !important; gap: 20px !important; padding: 24px 16px 70px !important; }
+    .lg-toc { position: static !important; display: flex; flex-wrap: wrap; gap: 6px; }
+    .lg-toc > div { width: 100%; }
+    .lg-toc a { background: #f0e9fb; padding: 6px 11px; font-size: 13px; }
+    .lg-sec h2 { font-size: 25px; }
+  }
