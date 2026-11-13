@@ -56,7 +56,8 @@ async function logIn(page, email) {
 (async () => {
   await pool.query("delete from meals");
   await pool.query("delete from blocks; delete from reports; update profiles set photo_url = null, host_rules_at = null");
-  const browser = await chromium.launch();
+  // WebGL (software) so the map can be drawn in the headless browser
+  const browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"] });
   const anna = await personContext(browser, "Anna");
   const ben = await personContext(browser, "Ben");
 
@@ -105,6 +106,41 @@ async function logIn(page, email) {
   const browse = await ben.page.locator("body").innerText();
   await ben.page.screenshot({ path: "/tmp/flow_ben_browse.png" });
   check(browse.includes("Lamb tajine with apricots") && !browse.includes("Thai Green Curry"), "as a visitor Ben sees Anna's real meal and no demo meals");
+
+  // ---- where is it? Anna published in Aalen: it must be found near Aalen, by name and by postcode, and on the map
+  const spot = (await q("select lat, lng from meals"))[0];
+  check(spot && Math.abs(spot.lat - 48.84) < 0.05 && Math.abs(spot.lng - 10.09) < 0.05, `the meal is placed at Aalen (${spot && spot.lat}, ${spot && spot.lng}), rounded, not at the street`);
+  const searchPlace = async (typed, pickText) => {
+    await ben.page.goto(`${BASE}/bite.html?live&lang=en`);
+    await ben.page.waitForTimeout(2000);
+    await ben.page.getByText("All cities").first().click();
+    await ben.page.getByRole("combobox").fill(typed);
+    await ben.page.locator(".lp-suggest button", { hasText: pickText }).first().click({ timeout: 10000 });
+    await ben.page.waitForTimeout(500);
+    await ben.page.locator(".lp-done").click();
+    await ben.page.waitForTimeout(600);
+    await ben.page.getByRole("button", { name: /^Search/ }).first().click();
+    await ben.page.waitForTimeout(3000);
+    // only the results page counts (Home also shows "Cooking this week")
+    return (await ben.page.locator("body").innerText()).replace(/\s+/g, " ");
+  };
+  let found = await searchPlace("Aalen", "Aalen");
+  check(/1 meal available/.test(found) && found.includes("Lamb tajine with apricots") && /Aalen · \+10 km/.test(found) && /\d(,\d)? km/.test(found), "searching 'Aalen' (+10 km) finds the meal, with its distance");
+  found = await searchPlace("73430", "73430");
+  check(/1 meal available/.test(found) && found.includes("Lamb tajine with apricots"), "searching the postcode 73430 finds it too");
+  found = await searchPlace("Ellwangen", "Ellwangen");
+  check(/0 meals available/.test(found) && !found.includes("Lamb tajine with apricots"), "from Ellwangen (about 14 km away) with +10 km it is not shown: the radius is respected");
+  found = await searchPlace("Berlin", "Berlin");
+  check(/0 meals available/.test(found) && !found.includes("Lamb tajine with apricots"), "a search in Berlin does not show a meal in Aalen");
+  await searchPlace("Aalen", "Aalen");
+  await ben.page.getByRole("tab", { name: "Map" }).click();
+  await ben.page.locator(".mm-pin").first().waitFor({ timeout: 20000 });
+  check((await ben.page.locator(".mm-pin").count()) === 1, "on the map there is one pin, near Aalen");
+  await ben.page.locator(".mm-pin").first().click();
+  await ben.page.locator(".mm-card").waitFor({ timeout: 5000 });
+  check((await ben.page.locator(".mm-card").innerText()).includes("Lamb tajine with apricots"), "tapping the pin shows the meal card");
+  await ben.page.screenshot({ path: "/tmp/flow_map_aalen.png" });
+  await ben.page.getByRole("tab", { name: "List" }).click();
   await ben.page.goto(`${BASE}/bite.html?live&lang=en&meal=${meal.id}`);
   await ben.page.waitForTimeout(2000);
   const detail = await ben.page.locator("body").innerText();
