@@ -114,7 +114,9 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
     .filter((m) => matchesCriteria(m, criteria, store.seatsLeft(m)))
     .filter((m) => [...dietary, ...allergens].every((f) => m.tags.includes(f)))
     .slice()
-    .sort((a, b) => sort === "price" ? a.price - b.price : sort === "rating" ? b.rating - a.rating : sort === "distance" ? (mealDistance(a, criteria) ?? 1e9) - (mealDistance(b, criteria) ?? 1e9) : 0);
+    .sort((a, b) => sort === "price" ? a.price - b.price : sort === "rating" ? b.rating - a.rating : sort === "distance" ? (mealDistance(a, criteria) ?? 1e9) - (mealDistance(b, criteria) ?? 1e9)
+      // by default, tables of people you follow come first
+      : Number(store.isFollowing(b.hostId ?? b.host)) - Number(store.isFollowing(a.hostId ?? a.host)));
 
   const mapView = (
     <Suspense fallback={<div className="mm"><div className="mm-loading">{t("Unfolding the map…")}</div></div>}>
@@ -442,7 +444,7 @@ export function MealCard({ meal, onSelect, compact = false, distance = null }: {
           <img src={meal.hostAvatar} alt="" loading="lazy" className="w-9 h-9 rounded-full object-cover flex-shrink-0" style={{ border: "2px solid #ede8fb" }} />
           <div className="flex-1 min-w-0">
             <p style={{ fontSize: 15, fontWeight: 700, color: "#160a2e" }} className="truncate">{tMaybe(meal.title)}</p>
-            <p className="truncate" style={{ fontSize: 11.5, color: "#7c6fa0" }}>{t("with {name}", { name: meal.host })} · {meal.time}</p>
+            <p className="truncate" style={{ fontSize: 11.5, color: "#7c6fa0" }}>{t("with {name}", { name: meal.host })} · {meal.time}{store.isFollowing(meal.hostId ?? meal.host) && <span style={{ color: "#6b21d9", fontWeight: 800 }}> · {t("You follow")}</span>}</p>
           </div>
           <div className="flex items-center gap-0.5 flex-shrink-0">
             <Star size={11} fill="#f59e0b" color="#f59e0b" />

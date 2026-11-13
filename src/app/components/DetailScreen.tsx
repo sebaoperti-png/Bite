@@ -4,9 +4,9 @@ import { personOfMeal, type Person } from "../store";
 import { LikeHeart } from "../../shared/Motion";
 import { Cloche, TableSeats } from "../../shared/Restaurant";
 import { PrepChecklist } from "./PrepChecklist";
-import { ChevronLeft, Flag, Star, MapPin, Clock, Users, Heart, Share2, CheckCircle, ChevronDown, ShoppingBag, Utensils, ChefHat, Leaf, MessageCircle, Link2, Mail, Send, ExternalLink, Trash2, ShieldCheck, ConciergeBell } from "lucide-react";
+import { ChevronLeft, Flag, Star, MapPin, Clock, Users, Heart, Share2, CheckCircle, ChevronDown, ShoppingBag, Utensils, ChefHat, Leaf, MessageCircle, Link2, Mail, Send, ExternalLink, Trash2, ShieldCheck, ConciergeBell, UserPlus, UserCheck } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { withFee, euro, type Meal } from "../data";
+import { withFee, euro, allergenLabel, type Meal } from "../data";
 import { useStore, copyText } from "../store";
 import { useIsDesktop } from "../useIsDesktop";
 import { Sheet } from "./Sheet";
@@ -14,7 +14,7 @@ import { SheetHeader } from "./HomeScreen";
 import { localPlace } from "../location";
 import { exactShare } from "../costing";
 import { t, tMaybe, dateLabel, dec, locale } from "../../shared/i18n";
-import { fetchHostReviews, fetchGuestRating, type HostReview } from "../liveData";
+import { fetchHostReviews, fetchGuestRating, fetchFollowerCount, type HostReview } from "../liveData";
 import { ReviewSheet, Stars } from "./ReviewSheet";
 
 const SAMPLE_REVIEWS = [
@@ -32,6 +32,8 @@ const SVC_CONFIG = {
 const APP_URL = "https://bitetable.de/bite.html";
 
 interface DetailScreenProps {
+  /** live: ask a visitor to log in first, then run `then` */
+  withAccount?: (reason: string, then: (st: ReturnType<typeof useStore>) => void) => void;
   meal: Meal;
   onBack: () => void;
   onBook: () => void;
@@ -40,7 +42,7 @@ interface DetailScreenProps {
   onUnpublished: () => void;
 }
 
-export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUnpublished }: DetailScreenProps) {
+export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUnpublished, withAccount }: DetailScreenProps) {
   const isDesktop = useIsDesktop();
   const store = useStore();
   const liked = store.isLiked(meal.id);
@@ -67,6 +69,20 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
     });
   }, [store.live, pendingIds]); // eslint-disable-line react-hooks/exhaustive-deps
   const [rateGuest, setRateGuest] = useState<string | null>(null);
+  // follow the host: their new tables show up first; the count is public, the list is private
+  const hostPerson = personOfMeal(meal);
+  const following = store.isFollowing(hostPerson.id);
+  const [followers, setFollowers] = useState(0);
+  useEffect(() => {
+    if (!store.live || !meal.hostId) return;
+    let alive = true;
+    fetchFollowerCount(meal.hostId).then((n) => { if (alive) setFollowers(n); });
+    return () => { alive = false; };
+  }, [store.live, meal.hostId, following]); // eslint-disable-line react-hooks/exhaustive-deps
+  const toggleFollow = () => {
+    if (store.live && !store.account) { withAccount?.(t("Create a free account to follow {name}.", { name: hostPerson.name.split(" ")[0] }), (st) => st.follow(hostPerson)); return; }
+    if (following) store.unfollow(hostPerson.id); else store.follow(hostPerson);
+  };
   const rateGuestBooking = guestBookings.find((b) => b.id === rateGuest);
   const mealOver = !store.live || (!!meal.startsAt && Date.parse(meal.startsAt) < Date.now());
   const [showShare, setShowShare] = useState(false);
@@ -167,8 +183,16 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         </div>
         <div className="flex-1 min-w-0">
           <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{meal.host}{meal.ownedByMe && <span style={{ fontWeight: 600, color: "#0a7c4e" }}>{" "}{t("· you")}</span>}</p>
-          <p style={{ fontSize: 12.5, color: "#7c6fa0" }}>{meal.hostVerified === false ? t("New host on Bite") : t("Verified host · {n} meals shared", { n: meal.reviews })}</p>
+          <p style={{ fontSize: 12.5, color: "#7c6fa0" }}>{store.live
+            ? <>{meal.reviews ? t("{r}★ from {n} guests", { r: dec(meal.rating), n: meal.reviews }) : t("New host on Bite")}{followers > 0 && <> · {followers === 1 ? t("1 follower") : t("{n} followers", { n: followers })}</>}</>
+            : meal.hostVerified === false ? t("New host on Bite") : t("Verified host · {n} meals shared", { n: meal.reviews })}</p>
         </div>
+        {!meal.ownedByMe && (
+          <motion.button onClick={toggleFollow} aria-pressed={following} className="flex items-center gap-1.5 px-3 py-2 rounded-xl" style={{ background: following ? "#6b21d9" : "#fff", border: "1.5px solid #6b21d9" }} whileTap={{ scale: 0.92 }}>
+            {following ? <UserCheck size={15} color="#fff" strokeWidth={2.2} /> : <UserPlus size={15} color="#6b21d9" strokeWidth={2.2} />}
+            <span style={{ fontSize: 13, fontWeight: 700, color: following ? "#fff" : "#6b21d9" }}>{following ? t("Following") : t("Follow")}</span>
+          </motion.button>
+        )}
         {!meal.ownedByMe && (
           <motion.button onClick={onMessage} className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl hover:bg-[#e6dcfa]" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.92 }}>
             <MessageCircle size={15} color="#6b21d9" strokeWidth={2.2} />
@@ -345,6 +369,19 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
 
   const description = section(t("About this meal"), <p style={{ fontSize: isDesktop ? 16 : 14, color: "#160a2e", lineHeight: 1.7 }}>{tMaybe(meal.description)}</p>);
 
+  // what the host declared: every ingredient and which of the 14 EU allergens it contains
+  const whatsInIt = (meal.ingredientsText || (meal.allergens && meal.allergens.length > 0)) && section(t("What's in it"), (
+    <div className="rounded-2xl p-4" style={{ background: "#fff", boxShadow: "0 2px 12px rgba(107,33,217,0.07)" }}>
+      {meal.ingredientsText && <p style={{ fontSize: 14, color: "#160a2e", lineHeight: 1.6 }}>{meal.ingredientsText}</p>}
+      <div className="flex flex-wrap gap-1.5 mt-3">
+        {(meal.allergens ?? []).length === 0
+          ? <span className="px-2.5 py-1 rounded-full" style={{ fontSize: 12, fontWeight: 700, background: "#e5f7f0", color: "#0a7c4e" }}>{t("None of the 14 main allergens, says the host")}</span>
+          : (meal.allergens ?? []).map((a) => <span key={a} className="px-2.5 py-1 rounded-full" style={{ fontSize: 12, fontWeight: 700, background: "#fff4e5", color: "#c05e00" }}>{t("Contains")} {t(allergenLabel(a))}</span>)}
+      </div>
+      {meal.allergyNotes && <p style={{ fontSize: 12.5, color: "#7c6fa0", marginTop: 8, lineHeight: 1.5 }}>{meal.allergyNotes}</p>}
+      <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 10, lineHeight: 1.5 }}>{t("Cooked at home by {name}, not in a professional kitchen. Allergic? Ask in the chat before you book.", { name: meal.host.split(" ")[0] })}</p>
+    </div>
+  ));
   const ingredients = meal.serviceType === "cook-together" && meal.ingredients && meal.ingredients.length > 0 && (
     <div className="p-4 rounded-2xl" style={{ background: "#e5f7f0", border: "1px solid rgba(10,124,78,0.18)" }}>
       <div className="flex items-center gap-2 mb-3">
@@ -460,6 +497,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
                 {meal.ownedByMe && <PrepChecklist meal={meal} />}
               {hostCard}
               {description}
+              {whatsInIt}
               {costBox}
               {dietary}
               {ingredients}
@@ -510,6 +548,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         {location}
         {dietary}
         {description}
+        {whatsInIt}
         {costBox}
         {ingredients}
         {reviews}

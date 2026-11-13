@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { Pencil, Share2, ChefHat, ArrowRight, ChevronRight, Lock, Utensils, Star, Leaf, Globe2, Check, Camera } from "lucide-react";
 import { dayLabel, euro, type Meal } from "../data";
+import { useMyReviews } from "./ProfileExtras";
 import { useStore } from "../store";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
@@ -20,6 +21,7 @@ const STAMPS = [
   { c: "Japanese", e: "JP", col: "#d6336c" }, { c: "Korean", e: "KR", col: "#6b21d9" }, { c: "Moroccan", e: "MA", col: "#b5531d" },
   { c: "Lebanese", e: "LB", col: "#2f8f5b" }, { c: "Spanish", e: "ES", col: "#c2410c" }, { c: "Chinese", e: "CN", col: "#c81e1e" },
   { c: "Turkish", e: "TR", col: "#1d6fb5" }, { c: "French", e: "FR", col: "#3b5bdb" }, { c: "Mexican", e: "MX", col: "#a16207" },
+  { c: "Greek", e: "GR", col: "#1971c2" }, { c: "Vietnamese", e: "VN", col: "#d9480f" }, { c: "Mediterranean", e: "MED", col: "#0b7285" }, { c: "American", e: "US", col: "#5f3dc4" },
 ];
 // What the founder's demo account has already tried before the demo starts
 const TRIED_BEFORE = ["Italian", "Thai", "Indian", "Japanese", "Lebanese"];
@@ -178,12 +180,20 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
   const picker = usePhotoPicker();
 
   /* ── Demo numbers: a believable history + what happened in this demo ── */
-  const myBookings = store.bookings.filter((b) => !b.guest && b.status === "confirmed");
-  const guestsAtMyTables = store.bookings.filter((b) => b.guest && b.status === "confirmed");
+  // live: only dinners you really went to count (a request or a future dinner does not stamp the passport yet)
+  const attended = (b: { mealId: string; live?: string }) => {
+    if (!store.live) return true;
+    const m = store.mealById(b.mealId);
+    return b.live === "confirmed" && !!m?.startsAt && Date.parse(m.startsAt) < Date.now();
+  };
+  const myBookings = store.bookings.filter((b) => !b.guest && b.status === "confirmed" && attended(b));
+  const guestsAtMyTables = store.bookings.filter((b) => b.guest && b.status === "confirmed" && attended(b));
+  const hostedCount = store.live ? store.meals.filter((m) => m.ownedByMe && !m.cancelled).length : store.published.length;
+  const myReviews = useMyReviews(store.live);
   const bookedMeals = myBookings.map((b) => store.mealById(b.mealId)).filter(Boolean) as Meal[];
   // live mode starts from zero: only what really happened on this account
   const base = store.live ? { meals: 0, neighbours: 0, saved: 0, kg: 0 } : { meals: 12, neighbours: 31, saved: 148, kg: 9.7 };
-  const mealsShared = base.meals + myBookings.length + store.published.length;
+  const mealsShared = base.meals + myBookings.length + hostedCount;
   const neighbours = base.neighbours + myBookings.reduce((n, b) => n + 3 + b.guests, 0) + guestsAtMyTables.reduce((n, b) => n + b.guests, 0);
   const saved = base.saved + myBookings.reduce((n, b) => n + Math.max(0, 25 * b.guests - b.total), 0);
   const kgSaved = base.kg + myBookings.reduce((n, b) => n + 0.4 * b.guests, 0) + guestsAtMyTables.reduce((n, b) => n + 0.5 * b.guests, 0) + store.published.length * 0.6;
@@ -191,12 +201,14 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
   const tried = new Set(store.live ? [] : TRIED_BEFORE);
   bookedMeals.forEach((m) => m.tags.forEach((tag) => STAMPS.some((s) => s.c === tag) && tried.add(tag)));
   const stampsLeft = Math.max(0, GLOBETROTTER - tried.size);
+  // live: a number of your own, from your account id; demo: the founder's
+  const passportNo = store.live && store.myId ? `BT-${new Date().getFullYear()}-${parseInt(store.myId.replace(/-/g, "").slice(0, 6), 16) % 10000}`.replace(/-(\d{1,3})$/, (_, n) => `-${n.padStart(4, "0")}`) : "BT-2026-0001";
 
   const badges = [
     { id: "first", Icon: Utensils, tone: "gold", name: "First table", how: "Book your first meal", on: !store.live || myBookings.length > 0 },
-    { id: "guest", Icon: Star, tone: "rose", name: "Great guest", how: "Get a 5★ review from a host", on: !store.live },
+    { id: "guest", Icon: Star, tone: "rose", name: "Great guest", how: "Get a 5★ review from a host", on: !store.live || (myReviews.guest ?? []).some((r) => r.rating === 5) },
     { id: "waste", Icon: Leaf, tone: "mint", name: "Zero waste", how: "Save 10 kg of food", on: kgSaved >= 10 },
-    { id: "host", Icon: ChefHat, tone: "violet", name: "Super host", how: "Host your first table", on: store.published.length > 0 },
+    { id: "host", Icon: ChefHat, tone: "violet", name: "Super host", how: "Host your first table", on: hostedCount > 0 },
     { id: "globe", Icon: Globe2, tone: "sky", name: "Globetrotter", how: "Collect 8 passport stamps", on: tried.size >= GLOBETROTTER },
   ];
 
@@ -289,11 +301,11 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
                       <span><em>{t("Name")}</em><b>{profile.name}</b></span>
                       <span><em>{t("Lives in")}</em><b>{localPlace(profile.neighbourhood)}</b></span>
                       <span><em>{t("Member since")}</em><b>2026</b></span>
-                      <span><em>{t("Passport no.")}</em><b>BT-2026-0001</b></span>
+                      <span><em>{t("Passport no.")}</em><b>{passportNo}</b></span>
                     </span>
                   </span>
                   <span className="pp-sign">{profile.name.split(" ")[0]}</span>
-                  <span className="pp-mrz">P&lt;BITE&lt;{profile.name.toUpperCase().replace(/[^A-Z]+/g, "<")}&lt;&lt;&lt;&lt;&lt;&lt;<br />BT20260001&lt;{String(tried.size).padStart(2, "0")}STAMPS&lt;&lt;{mealsShared}TABLES&lt;&lt;&lt;</span>
+                  <span className="pp-mrz">P&lt;BITE&lt;{profile.name.toUpperCase().replace(/[^A-Z]+/g, "<")}&lt;&lt;&lt;&lt;&lt;&lt;<br />{passportNo.replace(/-/g, "")}&lt;{String(tried.size).padStart(2, "0")}STAMPS&lt;&lt;{mealsShared}TABLES&lt;&lt;&lt;</span>
                 </span>
               </button>
             </div>

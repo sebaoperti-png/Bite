@@ -1,9 +1,10 @@
+import "../styles/getstarted.css";
 import { useEffect, useRef, useState } from "react";
 import { HouseRulesSheet, ProfileGateSheet } from "./SafetySheets";
 import { ThinkingOrb } from "thinking-orbs";
 import { generate } from "../../lib/ui-generation.js";
 import { useStore } from "../store";
-import { labelForISO, euro, type Meal, type ServiceType } from "../data";
+import { labelForISO, euro, EU_ALLERGENS, freeFromTags, allergenLabel, type Meal, type ServiceType } from "../data";
 import { writeDescription, TONES, type Tone } from "../descriptionWriter";
 import { estimateGroceries, exactShare, suggestedPrice, priceCap, looksTooHigh, readReceipt, type CostSource } from "../costing";
 import { motion, AnimatePresence } from "motion/react";
@@ -48,6 +49,10 @@ interface FormData {
   dietary: Set<string>;
   allergens: Set<string>;
   allergyNotes: string;
+  /** every ingredient, in the host's words */
+  ingredientsText?: string;
+  /** the host confirmed the declaration on the last step */
+  declared?: boolean;
   // Step 3
   maxGuests: number;
   minGuests: number;
@@ -125,7 +130,10 @@ function stepError(step: number, f: FormData): string {
     if (!f.mealName.trim()) return t("Add the name of the meal");
     if (!f.cuisineType) return t("Pick a cuisine");
   }
-  if (step === 1 && !f.mainDishes.trim()) return t("Tell guests what the main dish is");
+  if (step === 1) {
+    if (!f.mainDishes.trim()) return t("Tell guests what the main dish is");
+    if ((f.ingredientsText ?? "").trim().length < 3) return t("List every ingredient, including oils, sauces and spices");
+  }
   if (step === 2 && f.minGuests > f.maxGuests) return t("Minimum guests can't be more than the maximum");
   if (step === 3) {
     if (!f.address.trim()) return t("Add your street address (shared only with booked guests)");
@@ -472,16 +480,8 @@ function Step2({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
     { id: "halal", label: "Halal", icon: CheckCircle },
     { id: "lactose-free", label: "Lactose-Free", icon: CheckCircle },
   ];
-  const ALLERGEN_OPTS = [
-    { id: "nuts", label: "Nuts", icon: Flame },
-    { id: "milk", label: "Milk" },
-    { id: "eggs", label: "Eggs", icon: Egg },
-    { id: "fish", label: "Fish", icon: Fish },
-    { id: "shellfish", label: "Shellfish", icon: Utensils },
-    { id: "soy", label: "Soy", icon: Bean },
-    { id: "gluten", label: "Gluten", icon: Wheat },
-    { id: "sesame", label: "Sesame" },
-  ];
+  const ALLERGEN_OPTS = EU_ALLERGENS.map((x) => ({ id: x.id, label: x.label }));
+
 
   return (
     <div className="flex flex-col gap-4">
@@ -511,6 +511,17 @@ function Step2({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       </Card>
 
       <Card>
+        <Label>{t("Ingredients")}</Label>
+        <textarea style={{ ...inputStyle, resize: "vertical" }} rows={4} maxLength={2000}
+          placeholder={t("e.g. tagliatelle (wheat, eggs), beef, tomatoes, onions, carrots, celery, olive oil, red wine, butter, parmesan, salt, pepper")}
+          value={form.ingredientsText ?? ""} onChange={e => set("ingredientsText", e.target.value)} aria-label={t("Ingredients")} />
+        <div className="hf-warn">
+          <AlertCircle size={16} strokeWidth={2.2} />
+          <p>{t("You are responsible for what you serve. List every ingredient, also oils, sauces, stocks and spices, and mark every allergen below. Guests with allergies rely on it.")}</p>
+        </div>
+      </Card>
+
+      <Card>
         <Label>{t("Dietary options available")}</Label>
         <ChipGrid
           options={DIETARY_OPTS as any}
@@ -524,7 +535,7 @@ function Step2({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       <Card>
         <div className="flex items-center gap-2 mb-3">
           <AlertCircle size={15} color="#c05e00" strokeWidth={2} />
-          <Label>{t("Allergens present")}</Label>
+          <Label>{t("Allergens in this meal (the 14 the EU names)")}</Label>
         </div>
         <ChipGrid
           options={ALLERGEN_OPTS as any}
@@ -1124,7 +1135,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   );
 }
 
-function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () => void; publishing: boolean }) {
+function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: keyof FormData, v: any) => void; onPublish: () => void; publishing: boolean }) {
   const store = useStore();
   const { profile } = store;
   const covered = form.pricePerGuest * form.maxGuests;
@@ -1246,6 +1257,29 @@ function Step8({ form, onPublish, publishing }: { form: FormData; onPublish: () 
         </div>
       </div>
 
+      {/* What's in it, as guests will see it */}
+      <Card>
+        <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", marginBottom: 4 }}>{t("What's in it")}</p>
+        <p style={{ fontSize: 13, color: "#4a3a6e", lineHeight: 1.5 }}>{form.ingredientsText?.trim() || "—"}</p>
+        <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700, marginTop: 6 }}>{form.allergens.size ? t("Contains: {list}", { list: [...form.allergens].map((a) => t(allergenLabel(a))).join(", ") }) : t("No allergens marked")}</p>
+      </Card>
+
+      {/* The host's declaration: required before publishing (live: stored with the meal, timed by the database) */}
+      <div className="hf-decl">
+        <p className="hf-decl-title">{t("Your promise as the host")}</p>
+        <ul>
+          <li>{t("The ingredients and allergens I listed are complete and correct.")}</li>
+          <li>{t("I cook in a clean kitchen and follow basic food hygiene.")}</li>
+          <li>{t("I'll be there at the time I set, or cancel as early as I can.")}</li>
+          <li>{t("I'm responsible for my food, my home and my guests' safety at my table. Bite only puts neighbours in touch.")}</li>
+        </ul>
+        <label className="hf-decl-check">
+          <input type="checkbox" checked={!!form.declared} onChange={(e) => set("declared", e.target.checked)} />
+          <span className="hf-decl-box" aria-hidden>{form.declared && <CheckCircle size={14} strokeWidth={3} />}</span>
+          {t("I confirm all of this")}
+        </label>
+      </div>
+
       {/* Publish button (inline duplicate for review step) */}
       <motion.button
         onClick={onPublish}
@@ -1337,6 +1371,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
     // before the first table: who is cooking (live: a name and a photo) and the house rules (the database checks both)
     if (store.live && !gatePassed.current.profile && !store.profileComplete) { setGate("profile"); return; }
     if (!gatePassed.current.rules && !store.hostRulesAccepted) { setGate("rules"); return; }
+    if (!form.declared) { store.showToast(t("Please confirm your promise as the host first")); document.querySelector(".hf-decl")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     setPublishing(true);
     const name = store.profile.name;
     const meal: Omit<Meal, "id"> = {
@@ -1351,7 +1386,11 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
       image: form.photos[form.coverIdx] ?? form.photos[0],
       gallery: form.photos.filter((_, i) => i !== form.coverIdx),
       costProof: form.freeEvent || !form.costSource ? undefined : { kind: proofKind(form)!, total: form.groceryCost, people: form.maxGuests + 1 },
-      tags: [form.cuisineType, ...[...form.dietary].map(d => DIET_TO_TAG[d]).filter(Boolean)],
+      tags: [...new Set([form.cuisineType, ...[...form.dietary].map(d => DIET_TO_TAG[d]).filter(Boolean), ...freeFromTags([...form.allergens])])],
+      ingredientsText: (form.ingredientsText ?? "").trim(),
+      allergens: [...form.allergens].filter((a) => EU_ALLERGENS.some((x) => x.id === a)),
+      allergyNotes: form.allergyNotes.trim(),
+      hostDeclared: true,
       location: `${form.address.trim()}, ${form.city.trim()}`,
       // live mode saves these separately (the street stays private until a guest is confirmed)
       street: form.address.trim(),
@@ -1463,7 +1502,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
             {step === 4 && <Step5 form={form} set={set} />}
             {step === 5 && <Step6 form={form} set={set} />}
             {step === 6 && <Step7 form={form} set={set} />}
-            {step === 7 && <Step8 form={form} onPublish={publish} publishing={publishing} />}
+            {step === 7 && <Step8 form={form} set={set} onPublish={publish} publishing={publishing} />}
           </motion.div>
         </AnimatePresence>
       </div>

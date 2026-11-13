@@ -3,6 +3,7 @@ import { EmptyPlate } from "../../shared/Restaurant";
 import { openSafetyTips } from "./SafetySheets";
 import { GetStartedCard, openTour } from "./GetStarted";
 import { ReviewNudge } from "./ReviewSheet";
+import { MyReviews, FollowingList, useMyReviews } from "./ProfileExtras";
 import { PlusMenu } from "./PlusMenu";
 import { MobileWeekMenu } from "./WeekMenu";
 import { LocationPicker, placeSummary } from "./LocationPicker";
@@ -42,7 +43,7 @@ const DIETARY_PREFS = ["Vegetarian", "Vegan", "Halal", "Pescatarian", "Gluten-fr
 const APP_URL = "https://bitetable.de/";
 
 type Picker = "area" | "date" | "time" | "guests";
-type ProfileSheet = "bookings" | "saved" | "listings" | "dietary" | "payment" | "settings" | "edit" | null;
+type ProfileSheet = "bookings" | "saved" | "listings" | "dietary" | "payment" | "settings" | "edit" | "reviews" | "following" | null;
 
 interface HomeScreenProps {
   tab: HomeTab;
@@ -533,10 +534,17 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
     window.prompt(t("Copy your invite link:"), APP_URL);
   };
 
+  const myReviews = useMyReviews(true);
+  const reviewSub = [
+    myReviews.host && myReviews.host.length ? t("{r}★ as host", { r: dec(myReviews.hostAvg) }) : null,
+    myReviews.guest && myReviews.guest.length ? t("{r}★ as guest", { r: dec(myReviews.guestAvg) }) : null,
+  ].filter(Boolean).join(" · ") || t("What guests and hosts said about you");
   const rows: { Icon: React.ElementType; label: string; sub: string; onClick: () => void }[] = [
     { Icon: BookOpen,   label: t("My bookings"),         sub: upcoming.length ? (upcoming.length > 1 ? t("{n} upcoming meals", { n: upcoming.length }) : t("1 upcoming meal")) : t("No upcoming meals"), onClick: () => setSheet("bookings") },
     { Icon: Heart,      label: t("Saved meals"),         sub: saved.length ? t("{n} saved", { n: saved.length }) : t("Tap ♥ on a meal to save it"), onClick: () => setSheet("saved") },
     { Icon: ChefHat,    label: t("My listings"),         sub: myListings.length ? t("{n} live", { n: myListings.length }) : t("Host your first meal"), onClick: () => setSheet("listings") },
+    { Icon: Star,       label: t("Your reviews"),        sub: reviewSub, onClick: () => setSheet("reviews") },
+    { Icon: Users,      label: t("People you follow"),   sub: store.following.length ? (store.following.length === 1 ? t("1 person") : t("{n} people", { n: store.following.length })) : t("Nobody yet"), onClick: () => setSheet("following") },
     { Icon: Leaf,       label: t("Dietary preferences"), sub: profile.dietary.length ? profile.dietary.map((d) => t(d)).join(" · ") : t("None set"), onClick: () => setSheet("dietary") },
     { Icon: CreditCard, label: t("Payment methods"),     sub: store.live ? t("For now you pay at the table") : t("Visa ···· 4242 (demo)"), onClick: () => setSheet("payment") },
     { Icon: UserPlus,   label: t("Invite friends"),      sub: t("Bring your neighbours to the table"), onClick: invite },
@@ -582,7 +590,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
 
   const titles: Record<Exclude<ProfileSheet, null>, string> = {
     bookings: "My bookings", saved: "Saved meals", listings: "My listings", dietary: "Dietary preferences",
-    payment: "Payment methods", settings: "Settings", edit: "Edit profile",
+    payment: "Payment methods", settings: "Settings", edit: "Edit profile", reviews: "Your reviews", following: "People you follow",
   };
 
   const go = (fn: () => void) => { close(); fn(); };
@@ -601,6 +609,8 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
           )
         )}
 
+        {sheet === "reviews" && <MyReviews />}
+        {sheet === "following" && <FollowingList onBrowse={() => go(onBrowse)} />}
         {sheet === "saved" && (
           saved.length === 0 ? <Empty icon={Heart} text="Nothing saved yet — tap ♥ on any meal" action="Browse meals" onAction={() => go(onBrowse)} /> : (
             <div className="flex flex-col gap-2">
