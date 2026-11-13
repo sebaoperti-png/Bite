@@ -8,7 +8,7 @@ export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnal
     <>
       {showCookies && (
         <>
-          <div style={{ position: "fixed", inset: "0", zIndex: "900", background: "rgba(9,3,15,0.5)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div style={{ position: "fixed", inset: "0", zIndex: "950", background: "rgba(9,3,15,0.5)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
             <div className="cc-card" style={{ width: "100%", maxWidth: "560px", margin: "18px", background: "#fffdf7", borderRadius: "22px", boxShadow: "0 30px 70px rgba(9,3,15,0.4)", overflow: "hidden" }}>
               <div style={{ padding: "26px 26px 20px" }}>
                 <div className="cc-head">
