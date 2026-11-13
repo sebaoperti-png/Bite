@@ -18,6 +18,7 @@ import { DEFAULT_CRITERIA, type Meal, type SearchCriteria } from "./data";
 import { useLang } from "../shared/i18n";
 import { t, locale } from "../shared/i18n";
 import { useSafetyTips } from "./components/SafetySheets";
+import { WelcomeTour } from "./components/GetStarted";
 
 export type { ServiceType, Meal } from "./data";
 export { MEALS, dayLabel } from "./data";
@@ -203,6 +204,7 @@ function AppInner() {
   return (
     <div className="bite-shell">
       {tips.sheet}
+      <WelcomeTour />
       {showTopBar && (
         <DesktopTopBar
           active={activeNav}
@@ -286,7 +288,7 @@ function AppInner() {
                 />
               )}
               {screen === "listings" && (
-                <ListingsScreen criteria={criteria} setCriteria={setCriteria} onBack={() => goBack("home")} onSelect={openDetail} onNavigate={onNav} searchedAt={searchedAt} />
+                <ListingsScreen criteria={criteria} setCriteria={setCriteria} onBack={() => goBack("home")} onSelect={openDetail} onNavigate={onNav} searchedAt={searchedAt} onStartHosting={() => withAccount(t("Create a free account to host your first table."), () => navigate("start-hosting"))} />
               )}
               {screen === "detail" && (meal ? (
                 <DetailScreen

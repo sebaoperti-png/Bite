@@ -22,8 +22,12 @@ export interface Conversation { id: string; name: string; avatar: string; mealId
 export interface Booking {
   id: string; mealId: string; guests: number; total: number; note: string; at: number;
   status: "confirmed" | "cancelled"; conversationId: string; rating?: number;
+  /** the words the guest wrote with their rating of the host */
+  comment?: string;
+  /** Your rating of this guest (when it is one of *your* listings), and your words */
+  guestRating?: number; guestComment?: string;
   /** Set when someone else booked one of *your* listings */
-  guest?: { name: string; avatar: string };
+  guest?: { name: string; avatar: string; id?: string };
   /** Live mode: the real state in the database ("requested" = waiting for the host) */
   live?: "requested" | "confirmed" | "declined" | "cancelled";
 }
@@ -179,7 +183,10 @@ interface Store extends Data {
   cancelBooking: (id: string) => void;
   /** Accept or decline a guest's request to join one of your listings */
   answerRequest: (bookingId: string, accept: boolean) => void;
-  rateBooking: (id: string, stars: number) => void;
+  /** guest → host, after the meal */
+  rateBooking: (id: string, stars: number, comment?: string) => void;
+  /** host → guest, after the meal */
+  rateGuest: (id: string, stars: number, comment?: string) => void;
   publish: (meal: Omit<Meal, "id">) => Meal;
   unpublish: (id: string) => void;
   openConversation: (meal: Meal) => Promise<string>;
@@ -403,9 +410,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setData((d) => ({ ...d, bookings: d.bookings.map((b) => b.id === id ? { ...b, status: "cancelled" } : b) }));
       showToast(t("Booking cancelled — full refund on its way"));
     },
-    rateBooking: (id, stars) => {
-      setData((d) => ({ ...d, bookings: d.bookings.map((b) => b.id === id ? { ...b, rating: stars } : b) }));
+    rateBooking: (id, stars, comment = "") => {
+      setData((d) => ({ ...d, bookings: d.bookings.map((b) => b.id === id ? { ...b, rating: stars, comment: comment || undefined } : b) }));
       showToast(t("Thanks! You rated this meal {n}★", { n: stars }));
+    },
+    rateGuest: (id, stars, comment = "") => {
+      setData((d) => ({ ...d, bookings: d.bookings.map((b) => b.id === id ? { ...b, guestRating: stars, guestComment: comment || undefined } : b) }));
+      showToast(t("Thanks! Your review helps other hosts"));
     },
     publish: (m) => {
       const meal: Meal = { ...m, id: `p-${uid()}` };
@@ -543,10 +554,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           refreshSoon();
         });
       },
-      rateBooking: (id: string, stars: number) => {
-        setLive((l) => ({ ...l, bookings: l.bookings.map((b) => (b.id === id ? { ...b, rating: stars } : b)) }));
-        void L.reviewBooking(id, stars).then(({ error }) => {
+      rateBooking: (id: string, stars: number, comment = "") => {
+        setLive((l) => ({ ...l, bookings: l.bookings.map((b) => (b.id === id ? { ...b, rating: stars, comment: comment || undefined } : b)) }));
+        void L.reviewBooking(id, stars, comment).then(({ error }) => {
           if (error) { fail(error); refreshSoon(); } else showToast(t("Thanks! You rated this meal {n}★", { n: stars }));
+        });
+      },
+      rateGuest: (id: string, stars: number, comment = "") => {
+        setLive((l) => ({ ...l, bookings: l.bookings.map((b) => (b.id === id ? { ...b, guestRating: stars, guestComment: comment || undefined } : b)) }));
+        void L.reviewGuest(id, stars, comment).then(({ error }) => {
+          if (error) { fail(error); refreshSoon(); } else showToast(t("Thanks! Your review helps other hosts"));
         });
       },
       publish: (m: Omit<Meal, "id">) => {

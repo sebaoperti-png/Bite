@@ -66,13 +66,23 @@ export function mealFromRow(r: MealRow, me: string | null, address?: string): Me
   };
 }
 
+/** a one-to-one relation comes back as an object or a one-item array, depending on the schema cache */
+const one = <T,>(x: T | T[] | null | undefined): T | undefined => (Array.isArray(x) ? x[0] : x ?? undefined);
+
+/** bookings with both reviews; if the database has not got the guest reviews yet (migration 0007), without them */
+async function fetchBookings() {
+  const full = await supabase.from("bookings").select("*, guest:profiles!bookings_guest_id_fkey(name,photo_url), review:reviews(rating,comment), guest_review:guest_reviews(rating,comment)").order("created_at", { ascending: false });
+  if (!full.error) return full;
+  return supabase.from("bookings").select("*, guest:profiles!bookings_guest_id_fkey(name,photo_url), review:reviews(rating,comment)").order("created_at", { ascending: false });
+}
+
 /** Everything the signed-in person needs, in one go */
 export async function fetchAll(me: string) {
   const since = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString();
   const [mealsRes, addrRes, bookingsRes, convRes, likesRes, blocksRes] = await Promise.all([
     supabase.from("meal_cards").select("*").gte("starts_at", since).order("starts_at"),
     supabase.from("meal_addresses").select("meal_id,address"),
-    supabase.from("bookings").select("*, guest:profiles!bookings_guest_id_fkey(name,photo_url), review:reviews(rating)").order("created_at", { ascending: false }),
+    fetchBookings(),
     supabase.from("conversations").select("*, host:profiles!conversations_host_id_fkey(name,photo_url), guest:profiles!conversations_guest_id_fkey(name,photo_url), messages(id,sender_id,body,created_at,read_at)").order("created_at", { ascending: false }),
     supabase.from("likes").select("meal_id"),
     supabase.from("blocks").select("blocked_id, person:profiles!blocks_blocked_id_fkey(name,photo_url)"),
@@ -120,8 +130,11 @@ export async function fetchAll(me: string) {
       status: b.status === "requested" || b.status === "confirmed" ? "confirmed" : "cancelled",
       live: b.status,
       conversationId: convFor(b.meal_id, b.guest_id),
-      rating: b.review?.rating ?? undefined,
-      guest: iAmHost ? { name: b.guest?.name || "Guest", avatar: b.guest?.photo_url || initialAvatar(b.guest?.name || "G") } : undefined,
+      rating: one(b.review)?.rating ?? undefined,
+      comment: one(b.review)?.comment || undefined,
+      guestRating: iAmHost ? one(b.guest_review)?.rating ?? undefined : undefined,
+      guestComment: iAmHost ? one(b.guest_review)?.comment || undefined : undefined,
+      guest: iAmHost ? { name: b.guest?.name || "Guest", avatar: b.guest?.photo_url || initialAvatar(b.guest?.name || "G"), id: b.guest_id } : undefined,
     } as Booking;
   });
 
@@ -184,7 +197,23 @@ export const cancelMeal = (id: string) => supabase.from("meals").update({ status
 export const requestBooking = (mealId: string, seats: number, note: string) => supabase.rpc("request_booking", { p_meal: mealId, p_seats: seats, p_note: note });
 export const answerBooking = (id: string, accept: boolean) => supabase.rpc("answer_booking", { p_booking: id, p_accept: accept });
 export const cancelBooking = (id: string) => supabase.rpc("cancel_booking", { p_booking: id });
-export const reviewBooking = (id: string, rating: number) => supabase.rpc("review_booking", { p_booking: id, p_rating: rating, p_comment: "" });
+export const reviewBooking = (id: string, rating: number, comment = "") => supabase.rpc("review_booking", { p_booking: id, p_rating: rating, p_comment: comment });
+export const reviewGuest = (id: string, rating: number, comment = "") => supabase.rpc("review_guest", { p_booking: id, p_rating: rating, p_comment: comment });
+
+export interface HostReview { rating: number; comment: string; at: number; author: string; photo: string; meal: string }
+/** the reviews on a host's page (public: first names only) */
+export async function fetchHostReviews(hostId: string): Promise<HostReview[]> {
+  const { data, error } = await supabase.rpc("host_review_list", { p_host: hostId });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({ rating: r.rating, comment: r.comment ?? "", at: Date.parse(r.created_at), author: r.author || "Guest", photo: r.author_photo || initialAvatar(r.author || "G"), meal: r.meal_title }));
+}
+/** what a host sees about a guest asking for a seat */
+export async function fetchGuestRating(guestId: string): Promise<{ rating: number; reviews: number } | null> {
+  const { data, error } = await supabase.rpc("guest_rating", { p_guest: guestId });
+  if (error) return null;
+  const r = Array.isArray(data) ? data[0] : data;
+  return r && r.reviews > 0 ? { rating: Number(r.rating), reviews: r.reviews } : null;
+}
 export const startConversation = (mealId: string) => supabase.rpc("start_conversation", { p_meal: mealId });
 export const sendMessage = (me: string, conversationId: string, body: string) => supabase.from("messages").insert({ conversation_id: conversationId, sender_id: me, body });
 export const markRead = (conversationId: string) => supabase.rpc("mark_read", { p_conversation: conversationId });
