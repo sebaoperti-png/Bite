@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:costing": "esbuild tests/costing.test.ts --bundle --platform=node --format=cjs --define:import.meta.env.DEV=false --define:import.meta.env.BASE_URL=\"\\\"/\\\"\" --loader:.jpg=empty --loader:.png=empty --outfile=/tmp/costing.test.cjs --log-level=error && node /tmp/costing.test.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
