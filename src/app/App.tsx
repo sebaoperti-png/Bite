@@ -1,3 +1,4 @@
+import { BugReportHost } from "../shared/BugReport";
 import { useState, useEffect, useRef } from "react";
 import { EmptyPlate } from "../shared/Restaurant";
 import { AnimatePresence, motion } from "motion/react";
@@ -57,6 +58,7 @@ export default function App() {
   return (
     <StoreProvider>
       <AppInner />
+      <BugReportHost where="app" />
     </StoreProvider>
   );
 }
@@ -187,7 +189,7 @@ function AppInner() {
     <div className="h-full flex flex-col items-center justify-center gap-3 px-6 text-center" style={{ fontFamily: "'Figtree Variable', sans-serif" }}>
       <EmptyPlate size={110} />
       <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 34, lineHeight: 1.05, color: "#160a2e" }}>{t("This dish is off the menu.")}</p>
-      <p style={{ fontSize: 14, color: "#7c6fa0", maxWidth: 300 }}>{t("This page is no longer available.")} {t("The kitchen has plenty of other tables tonight.")}</p>
+      <p style={{ fontSize: 14, color: "#695a8c", maxWidth: 300 }}>{t("This page is no longer available.")} {t("The kitchen has plenty of other tables tonight.")}</p>
       <button onClick={() => navigate("home", true)} className="px-4 py-2 rounded-xl" style={{ background: "#6b21d9", color: "#fff", fontWeight: 700, fontSize: 14 }}>{t("Back to home")}</button>
     </div>
   );
