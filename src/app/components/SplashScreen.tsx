@@ -38,7 +38,7 @@ export function SplashScreen({ onDone, fast = false }: SplashScreenProps) {
   }, [onDone, fast]);
 
   return (
-    <div className="flex flex-col h-full items-center justify-between overflow-hidden" style={{ background: "linear-gradient(160deg, #0d0620 0%, #1a0840 40%, #2d1068 100%)", fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex flex-col h-full items-center justify-between overflow-hidden" style={{ background: "linear-gradient(160deg, #0d0620 0%, #1a0840 40%, #2d1068 100%)", fontFamily: "'Figtree Variable', sans-serif" }}>
 
       {/* Background particles */}
       {Array.from({ length: 22 }).map((_, i) => (

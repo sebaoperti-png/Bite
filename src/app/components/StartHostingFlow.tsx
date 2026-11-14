@@ -179,7 +179,7 @@ function stepError(step: number, f: FormData): string {
 
 /** A round avatar with the host's initial, as an inline SVG */
 function initialAvatar(name: string) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b21d9"/><stop offset="1" stop-color="#9b4aff"/></linearGradient></defs><rect width="160" height="160" fill="url(#g)"/><text x="80" y="104" font-family="Inter,Arial,sans-serif" font-size="72" font-weight="800" fill="#fff" text-anchor="middle">${(name.charAt(0) || "B").toUpperCase()}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b21d9"/><stop offset="1" stop-color="#9b4aff"/></linearGradient></defs><rect width="160" height="160" fill="url(#g)"/><text x="80" y="104" font-family="Figtree Variable,Arial,sans-serif" font-size="72" font-weight="800" fill="#fff" text-anchor="middle">${(name.charAt(0) || "B").toUpperCase()}</text></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
@@ -1656,7 +1656,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
       <div className="md:hidden" style={{ height: "max(env(safe-area-inset-top), 14px)", background: "#fff", flexShrink: 0 }} />
 
       {/* Header */}

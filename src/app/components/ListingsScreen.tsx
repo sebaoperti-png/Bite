@@ -200,7 +200,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   const empty = store.live ? (
     <div className="flex flex-col items-center justify-center py-14 px-6 gap-3 rounded-3xl text-center" style={{ background: isDesktop ? "#fff" : "transparent" }}>
       <EmptyPlate size={96} />
-      <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "#160a2e" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
+      <p style={{ fontFamily: "'Fraunces Variable', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "#160a2e" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
       <p style={{ color: "#7c6fa0", fontSize: 14, maxWidth: 360, lineHeight: 1.5 }}>{t("Bite is just starting. Cook something you love and open the first table near you, or look a bit further.")}</p>
       <div className="flex flex-wrap justify-center gap-2 mt-1">
         {onStartHosting && <button onClick={onStartHosting} className="px-4 py-2.5 rounded-full" style={{ background: "#6b21d9", fontSize: 13.5, color: "#fff", fontWeight: 800 }}>{t("Host the first table")}</button>}
@@ -217,7 +217,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
 
   if (isDesktop) {
     return (
-      <div className="h-full overflow-y-auto" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+      <div className="h-full overflow-y-auto" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
         <div className="mx-auto w-full max-w-[1240px] px-8 pt-8 pb-16 grid gap-8 grid-cols-[260px_1fr] items-start">
           <aside className="sticky top-6 rounded-3xl p-5" style={{ background: "#fff", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
             <div className="flex items-center justify-between">
@@ -291,7 +291,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   }
 
   return (
-    <div className="relative flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="relative flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
       <div style={{ height: "max(env(safe-area-inset-top), 14px)", flexShrink: 0, background: "#fff" }} />
 
       {/* Header */}

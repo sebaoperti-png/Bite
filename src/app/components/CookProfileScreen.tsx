@@ -56,7 +56,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
       {/* Status bar space */}
       <div style={{ height: "max(env(safe-area-inset-top), 14px)", background: "#fff", flexShrink: 0 }} />
 

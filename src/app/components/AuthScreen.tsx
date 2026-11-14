@@ -96,7 +96,7 @@ export function AuthScreen({ initialMode, onBack, onDone, reason }: { initialMod
           <rect x="6" y="14" width="108" height="70" rx="6" fill="#fffdf7" stroke="rgba(107,33,217,0.35)" strokeWidth="2" />
           <path d="M8 18l52 38 52-38" fill="none" stroke="rgba(107,33,217,0.35)" strokeWidth="2" />
           <circle cx="60" cy="56" r="13" fill="#6b21d9" />
-          <text x="60" y="61.5" textAnchor="middle" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="15" fill="#fff">b</text>
+          <text x="60" y="61.5" textAnchor="middle" fontFamily="Figtree Variable, sans-serif" fontWeight="900" fontSize="15" fill="#fff">b</text>
         </svg>
         <h1 className="au-title">{t("Check your inbox")}</h1>
         <p className="au-lead">

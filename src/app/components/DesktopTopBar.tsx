@@ -26,7 +26,7 @@ export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting
   onStartHosting: () => void;
 }) {
   return (
-    <header className="flex-shrink-0" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(14px)", borderBottom: "1px solid rgba(107,33,217,0.08)", fontFamily: "'Inter', sans-serif", position: "relative", zIndex: 30 }}>
+    <header className="flex-shrink-0" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(14px)", borderBottom: "1px solid rgba(107,33,217,0.08)", fontFamily: "'Figtree Variable', sans-serif", position: "relative", zIndex: 30 }}>
       <div className="mx-auto flex items-center gap-8 px-8" style={{ maxWidth: 1240, height: 68 }}>
         <button onClick={() => onNavigate("home")} className="flex items-center gap-2.5" aria-label={t("Bite home")}>
           <img src={logoImg} alt="" style={{ width: 34, height: 34, borderRadius: 10, objectFit: "cover" }} />

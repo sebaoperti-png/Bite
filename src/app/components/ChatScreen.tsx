@@ -52,7 +52,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
 
   if (!conv) {
     return (
-      <div className="h-full flex flex-col items-center justify-center gap-3" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <div className="h-full flex flex-col items-center justify-center gap-3" style={{ fontFamily: "'Figtree Variable', sans-serif" }}>
         <p style={{ fontSize: 15, fontWeight: 700, color: "#160a2e" }}>{t("This conversation is no longer available.")}</p>
         <button onClick={onBack} className="px-4 py-2 rounded-xl" style={{ background: "#6b21d9", color: "#fff", fontWeight: 700 }}>{t("Go back")}</button>
       </div>
@@ -217,7 +217,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
 
   if (!isDesktop) {
     return (
-      <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+      <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
         <div style={{ height: "max(env(safe-area-inset-top), 14px)", background: "#fff", flexShrink: 0 }} />
         {header}
         {messages}
@@ -228,7 +228,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   }
 
   return (
-    <div className="h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
       <div className="mx-auto h-full w-full max-w-[1100px] px-8 py-8 grid gap-6" style={{ gridTemplateColumns: meal ? "360px 1fr" : "1fr" }}>
         {meal && (
           <aside className="flex flex-col gap-4 overflow-y-auto">

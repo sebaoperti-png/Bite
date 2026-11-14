@@ -1,6 +1,6 @@
 // The profile page, set like a restaurant table: a "Reserved for" place card with a trust sticker, the next
-// meal as a reservation ticket, the Bite Passport (cuisine stamps), badges, "Your tab so far" as a receipt
-// and the account options as a short menu. Demo numbers start from a believable history and grow with
+// meal as a reservation ticket, the Bite Passport (cuisine stamps), badges and the account options as a menu.
+// In live, "Your seat at the table" shows what makes a profile trustworthy, each missing piece as a button. Demo numbers start from a believable history and grow with
 // what the user does in the demo (booking a meal, publishing one, guests joining).
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
@@ -11,6 +11,7 @@ import { useStore } from "../store";
 import { useIsDesktop } from "../useIsDesktop";
 import { localPlace } from "../location";
 import { usePhotoPicker } from "./Avatar";
+import { HouseRulesSheet } from "./SafetySheets";
 import { t, tMaybe, dateLabel, dec, getLang } from "../../shared/i18n";
 
 export interface ProfileRow { Icon: React.ElementType; label: string; sub: string; onClick: () => void }
@@ -91,6 +92,45 @@ function Medal({ Icon, tone, on, delay }: { Icon: React.ElementType; tone: strin
 
 /** The trust sticker, like the certificate stuck on a restaurant window: ticks light up to the score
     while "verified neighbour" turns around the edge */
+/** "Your seat at the table": what makes a profile trustworthy, drawn as a place setting. Each missing piece is a
+ *  button that does the job right there (add a photo, write a few words, read the house rules), so nobody gets lost. */
+function SeatReady({ steps }: { steps: { key: string; label: string; done: boolean; cta: string; onClick?: () => void }[] }) {
+  const done = steps.filter((s) => s.done).length;
+  const all = done === steps.length;
+  const has = (k: string) => steps.find((s) => s.key === k)?.done;
+  return (
+    <div className={`sr ${all ? "all" : ""}`}>
+      <div className="sr-top">
+        <svg className="sr-set" viewBox="0 0 120 70" aria-hidden>
+          {/* placemat */}
+          <rect x="6" y="8" width="108" height="56" rx="10" className="sr-mat" />
+          {/* plate = photo and name */}
+          <g className={`sr-i ${has("photo") ? "on" : ""}`}><circle cx="60" cy="36" r="19" className="sr-plate" /><circle cx="60" cy="36" r="12" className="sr-plate-in" /></g>
+          {/* fork + knife = a few words about you */}
+          <g className={`sr-i ${has("bio") ? "on" : ""}`}><path d="M30 20v32M26 20v10a4 4 0 0 0 8 0V20" className="sr-line" /><path d="M90 20c4 4 4 14 0 16v16" className="sr-line" /></g>
+          {/* glass = email confirmed */}
+          <g className={`sr-i ${has("email") ? "on" : ""}`}><path d="M98 12h10l-1 9a4 4 0 0 1-8 0z M103 25v6 M99 31h8" className="sr-line" /></g>
+          {/* napkin = house rules */}
+          <g className={`sr-i ${has("rules") ? "on" : ""}`}><path d="M12 22l10-4 4 10-10 4z" className="sr-napkin" /></g>
+        </svg>
+        <div>
+          <b>{all ? t("Your seat is ready") : t("Set your seat at the table")}</b>
+          <span>{all ? t("Neighbours can see who they'll eat with.") : t("{n} of {total} done · takes about a minute", { n: done, total: steps.length })}</span>
+        </div>
+      </div>
+      <ul className="sr-steps">
+        {steps.map((s) => (
+          <li key={s.key} className={s.done ? "done" : ""}>
+            <span className="sr-check" aria-hidden>{s.done ? <Check size={12} strokeWidth={3.5} /> : null}</span>
+            <span className="sr-label">{s.label}</span>
+            {!s.done && s.onClick && <button type="button" onClick={s.onClick}>{s.cta} <ArrowRight size={13} /></button>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function TrustSticker({ score, checks, ring, label }: { score: number; checks: { label: string; on: boolean }[]; ring: string; label: string }) {
   const ticks = 48;
   const [lit, setLit] = useState(0);
@@ -218,6 +258,7 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
     .sort((a, b) => (a.d ?? 99) - (b.d ?? 99))[0];
 
   const [passOpen, setPassOpen] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(false);
   // demo: the founder's believable history. Live: how complete the profile really is (nothing invented)
   const liveChecks = [
     { label: t("Email confirmed"), on: !!store.account },
@@ -237,7 +278,7 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
         <div className="pd-pc-body">
           <span className="pd-pc-eyebrow">{t("Reserved for")}</span>
           <h1>{profile.name}</h1>
-          <p className="pd-pc-meta"><b>{t("Founder")}</b> · {t("{place} · member since 2026", { place: localPlace(profile.neighbourhood) })}</p>
+          <p className="pd-pc-meta"><b>{store.live ? (hostedCount > 0 ? t("Host") : t("Neighbour")) : t("Founder")}</b> · {t("{place} · member since 2026", { place: localPlace(profile.neighbourhood) })}</p>
           <p className="pd-pc-bio">{profile.bio ? tMaybe(profile.bio) : t("Tell neighbours a little about yourself.")}</p>
           <div className="pd-actions">
             <motion.button whileTap={{ scale: 0.95 }} onClick={onStartHosting} className="pd-btn primary"><ChefHat size={14} /> {t("Start hosting")}</motion.button>
@@ -245,7 +286,15 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
             <motion.button whileTap={{ scale: 0.95 }} onClick={onShare} className="pd-btn"><Share2 size={14} /> {t("Share profile")}</motion.button>
           </div>
         </div>
-        <TrustSticker score={trust} checks={trustChecks} ring={store.live ? t("YOUR PROFILE") : t("VERIFIED NEIGHBOUR")} label={store.live ? t("Profile complete") : t("Trust score")} />
+        {store.live
+          ? <SeatReady steps={[
+              { key: "email", label: t("Email confirmed"), done: !!store.account, cta: "" },
+              { key: "photo", label: t("A photo of you and your name"), done: store.profileComplete, cta: t("Add a photo"), onClick: picker.open },
+              { key: "bio", label: t("A few words about you"), done: profile.bio.trim().length >= 20, cta: t("Write them"), onClick: onEdit },
+              { key: "rules", label: t("Bite's house rules"), done: store.hostRulesAccepted, cta: t("Read them"), onClick: () => setRulesOpen(true) },
+            ]} />
+          : <TrustSticker score={trust} checks={trustChecks} ring={t("VERIFIED NEIGHBOUR")} label={t("Trust score")} />}
+        <HouseRulesSheet open={rulesOpen} onClose={() => setRulesOpen(false)} onAccepted={() => setRulesOpen(false)} />
       </section>
 
       <div className="pd-grid">
@@ -364,22 +413,11 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
         </div>
       </div>
 
-      {/* ── Your tab so far + the account options as a short menu ── */}
-      <div className="pd-grid pd-grid-bottom">
-        <section className="pd-tab">
-          <div className="pd-tab-head">
-            <b>BITE</b>
-            <span>{t("Your tab so far")}</span>
-          </div>
-          <TabLine i={0} value={Math.round(saved)} prefix={getLang() === "de" ? "" : "€"} suffix={getLang() === "de" ? " €" : ""} label={t("saved")} sub={t("vs. eating out")} />
-          <TabLine i={1} value={neighbours} label={t("neighbours met")} sub={t("at {n} shared tables", { n: mealsShared })} />
-          <TabLine i={2} value={mealsShared} label={t("meals shared")} sub={t("cooked at home, not in a factory")} />
-          <TabLine i={3} value={kgSaved} decimals={1} suffix=" kg" label={t("food saved")} sub={t("from going to waste")} />
-          <p className="pd-tab-foot"><i /> {t("Updates live as you book and host")}</p>
-        </section>
-
+      {/* ── The account options, with room to breathe ── */}
+      <div className="pd-account">
         <section className="pd-card pd-menu">
           <h2>{t("Account")}</h2>
+          <div className="pd-menu-grid">
           {rows.map(({ Icon, label, sub, onClick }) => (
             <button key={label} onClick={onClick} className="pd-menu-line">
               <Icon size={16} strokeWidth={2} />
@@ -387,6 +425,7 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
               <ChevronRight size={16} />
             </button>
           ))}
+          </div>
         </section>
       </div>
     </div>

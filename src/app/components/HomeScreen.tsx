@@ -89,7 +89,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
   const resultCount = store.meals.filter((m) => matchesCriteria(m, { ...criteria, service: activeService }, store.seatsLeft(m))).length;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
       {!isDesktop && <div style={{ height: "max(env(safe-area-inset-top), 14px)", flexShrink: 0 }} />}
 
       <AnimatePresence mode="wait">
@@ -680,7 +680,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
           <div className="flex flex-col gap-3">
             <div className="rounded-2xl p-5" style={{ background: "#fbf7ef", border: "1px dashed rgba(107,33,217,0.3)" }}>
               <p style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9a8bb8" }}>{t("How paying works for now")}</p>
-              <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 24, color: "#160a2e", margin: "4px 0 8px" }}>{t("You pay at the table.")}</p>
+              <p style={{ fontFamily: "'Fraunces Variable', serif", fontStyle: "italic", fontSize: 24, color: "#160a2e", margin: "4px 0 8px" }}>{t("You pay at the table.")}</p>
               <p style={{ fontSize: 13.5, color: "#4b3a6b", lineHeight: 1.55 }}>{t("Bite charges nothing in this early phase. Once the host confirms your seat, you hand them their share of the groceries, as shown on the meal.")}</p>
             </div>
             <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "#f7f4fd" }}>

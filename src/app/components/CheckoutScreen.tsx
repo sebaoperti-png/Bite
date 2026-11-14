@@ -194,7 +194,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
   );
 
   return (
-    <div className="flex flex-col h-full relative" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex flex-col h-full relative" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
       {booked && (
         <div className="bk-done" role="status">
           <SuccessCheck size={84} />

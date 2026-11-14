@@ -501,7 +501,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
 
   if (isDesktop) {
     return (
-      <div className="h-full overflow-y-auto" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+      <div className="h-full overflow-y-auto" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
         <div className="mx-auto w-full max-w-[1160px] px-8 pt-6 pb-16">
           <button onClick={onBack} className="flex items-center gap-1 mb-4 px-2 py-1.5 -ml-2 rounded-lg hover:bg-[#ede8fb]" style={{ fontSize: 15, fontWeight: 700, color: "#6b21d9" }}>
             <ChevronLeft size={17} strokeWidth={2.5} />{" "}{t("Back")}</button>
@@ -543,7 +543,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
   }
 
   return (
-    <div className="relative flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Inter', sans-serif" }}>
+    <div className="relative flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
       <div className="relative">
         {gallery(270, false)}
         <div className="absolute flex items-center justify-between px-4" style={{ top: "max(env(safe-area-inset-top), 14px)", marginTop: 8, left: 0, right: 0 }}>
