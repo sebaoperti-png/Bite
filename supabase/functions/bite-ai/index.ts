@@ -12,7 +12,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const ORIGINS = ["https://bitetable.de", "https://www.bitetable.de", "http://localhost:5173", "http://localhost:4173"];
 const DAILY_LIMIT = 30;
-const MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-flash-latest";
+const MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-flash-lite-latest";
 
 function cors(req: Request) {
   const origin = req.headers.get("origin") ?? "";
@@ -35,23 +35,35 @@ function serviceKey() {
 
 const clip = (v: unknown, n: number) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, n);
 
+// Google's free models are sometimes overloaded (503) or rate-limited (429): try the next model, then give up kindly
+const MODELS = [...new Set([MODEL, "gemini-flash-lite-latest", "gemini-flash-latest"])];
 async function gemini(prompt: string, schema?: unknown) {
   const key = Deno.env.get("GEMINI_API_KEY");
   if (!key) throw new Error("not_configured");
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-    body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { temperature: schema ? 0.2 : 0.7, maxOutputTokens: 900, ...(schema ? { responseMimeType: "application/json", responseSchema: schema } : {}) },
-    }),
-  });
-  if (res.status === 429) throw new Error("busy");
-  if (!res.ok) throw new Error(`gemini_${res.status}`);
-  const data = await res.json();
-  const text: string = data?.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "";
-  if (!text.trim()) throw new Error("empty");
-  return text.trim();
+  let last = "busy";
+  for (const model of MODELS) {
+    const t0 = Date.now();
+    let res: Response;
+    try {
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      signal: AbortSignal.timeout(15000),
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { temperature: schema ? 0.2 : 0.7, maxOutputTokens: 4096, ...(schema ? { responseMimeType: "application/json", responseSchema: schema } : {}) },
+      }),
+    });
+    } catch (e) { console.error("bite-ai", model, "timeout or network", String(e)); last = "busy"; continue; }
+    console.log("bite-ai", model, res.status, `${Date.now() - t0} ms`);
+    if (res.status === 429 || res.status === 500 || res.status === 503 || res.status === 404) { console.error("bite-ai", model, res.status); last = res.status === 404 ? last : "busy"; continue; }
+    if (!res.ok) throw new Error(`gemini_${res.status}`);
+    const data = await res.json();
+    const text: string = data?.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "";
+    if (text.trim()) return text.trim();
+    last = "empty";
+  }
+  throw new Error(last);
 }
 
 function polishPrompt(b: Record<string, unknown>) {
@@ -134,6 +146,7 @@ Deno.serve(async (req) => {
     if (body.task === "polish" && clip(body.text, 1200).length < 8) return json(req, { error: "too_short" }, 400);
     if (body.task === "estimate" && clip(body.ingredients, 1200).length < 3) return json(req, { error: "no_ingredients" }, 400);
 
+    console.log("bite-ai", body.task, "start");
     const { data: allowed, error } = await admin.rpc("ai_take", { p_user: uid, p_limit: DAILY_LIMIT });
     if (error) throw error;
     if (!allowed) return json(req, { error: "limit" }, 429);
