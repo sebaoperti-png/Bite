@@ -880,6 +880,8 @@ const DE_UI: Record<string, string> = {
   "That's much more than this menu usually costs ({price}). Only include the shopping for this dinner.": "Das ist viel mehr, als dieses Menü normalerweise kostet ({price}). Nimm nur den Einkauf für dieses Essen.",
   "{price} is too little to split between {n} people without someone paying more than their share. Make it free, or check the total.": "{price} ist zu wenig, um es auf {n} Personen aufzuteilen, ohne dass jemand mehr als seinen Anteil zahlt. Mach es kostenlos oder prüf den Betrag.",
   "Make it free": "Kostenlos machen",
+  "Two minutes: how easy was it?": "Zwei Minuten: Wie einfach war es?",
+  "Rate Bite": "Bite bewerten",
   "Appearance": "Darstellung",
   "Dark": "Dunkel",
   "Light": "Hell",
