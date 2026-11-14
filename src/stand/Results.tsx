@@ -88,7 +88,7 @@ export function Results() {
         <svg className="pz-word" viewBox="-2 0 664 300" role="img" aria-label="Bite">
           <defs><mask id="pz-m" maskUnits="userSpaceOnUse" x="0" y="0" width="549" height="549"><rect width="549" height="549" fill="#fff" /><path d="M190 405q72 62 144 0" fill="none" stroke="#000" strokeWidth="26" strokeLinecap="round" /><g fill="#000"><circle cx="405" cy="198" r="20" /><circle cx="434" cy="228" r="22" /><circle cx="456" cy="267" r="22" /><circle cx="469" cy="311" r="20" /></g></mask></defs>
           <g transform="translate(-60 -12) scale(0.6)"><g mask="url(#pz-m)" fill="#e9dcff"><rect x="107" y="30" width="83" height="330" rx="41.5" /><circle cx="285" cy="340" r="178" /></g></g>
-          <text x="226" y="296" fontSize="330" fontWeight="900" fill="#e9dcff" fontFamily="Inter, sans-serif" letterSpacing="-14">ite</text>
+          <text x="226" y="296" fontSize="330" fontWeight="900" fill="#e9dcff" fontFamily="Figtree Variable, sans-serif" letterSpacing="-14">ite</text>
         </svg>
         <h1 className="pz-title">{L.title}</h1>
         <div className="pz-live"><span className={`pz-dot ${live ? "on" : ""}`} />{live ? L.sourceLive : L.sourceLocal} · {time(updated)}</div>
@@ -131,7 +131,7 @@ export function Results() {
               <svg className="pz-pot" viewBox="0 0 240 170" aria-hidden>
                 <g className="pz-steam" fill="none" stroke="#e9dcff" strokeWidth="5" strokeLinecap="round"><path d="M90 52c-10-12 10-20 0-34" /><path d="M120 46c-10-12 10-20 0-34" /><path d="M150 52c-10-12 10-20 0-34" /></g>
                 <rect x="40" y="70" width="160" height="80" rx="18" fill="#6b21d9" /><rect x="30" y="62" width="180" height="16" rx="8" fill="#9b4aff" /><rect x="14" y="88" width="28" height="12" rx="6" fill="#9b4aff" /><rect x="198" y="88" width="28" height="12" rx="6" fill="#9b4aff" />
-                <text x="120" y="122" textAnchor="middle" fontSize="20" fontWeight="900" letterSpacing="5" fill="#e9dcff" fontFamily="Inter, sans-serif">BITE</text>
+                <text x="120" y="122" textAnchor="middle" fontSize="20" fontWeight="900" letterSpacing="5" fill="#e9dcff" fontFamily="Figtree Variable, sans-serif">BITE</text>
               </svg>
               <h2>{L.warm}</h2>
               <div className="pz-plates">

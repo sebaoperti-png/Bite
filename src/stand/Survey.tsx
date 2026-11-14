@@ -302,7 +302,7 @@ function KitchenTimer() {
       <circle className="st-timer-ring" cx="40" cy="46" r="32" fill="none" stroke="#9b4aff" strokeWidth="6" strokeLinecap="round" pathLength={1} transform="rotate(-90 40 46)" />
       <line className="st-timer-hand" x1="40" y1="46" x2="40" y2="24" stroke="#160a2e" strokeWidth="3.5" strokeLinecap="round" />
       <circle cx="40" cy="46" r="4" fill="#160a2e" />
-      <text x="40" y="68" textAnchor="middle" fontSize="10" fontWeight="900" fill="#6b21d9" fontFamily="Inter, sans-serif">60s</text>
+      <text x="40" y="68" textAnchor="middle" fontSize="10" fontWeight="900" fill="#6b21d9" fontFamily="Figtree Variable, sans-serif">60s</text>
     </svg>
   );
 }
