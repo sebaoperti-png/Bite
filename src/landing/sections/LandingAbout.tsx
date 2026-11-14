@@ -1,4 +1,4 @@
-// ABOUT US: the three founders as place cards around one round table, seen from above. Each card carries a name,
+// ABOUT US: the three founders as three snapshots taped to the page (like the ones in "Pull up a chair"). Each card carries a name,
 // a role and one line (shown once all three have one). Photos replace the initials as soon as they are in public/landing/team/ (FOUNDERS[].photo).
 import { asset } from "../asset";
 import { t } from "../../shared/i18n";
@@ -12,17 +12,17 @@ const FOUNDERS: Founder[] = [
   { name: "Chadha", role: "Co-founder", line: "" },
 ];
 
-function Seat({ f, i, lines }: { f: Founder; i: number; lines: boolean }) {
+const TONES = ["#efe6ff", "#ffe9dc", "#e3f4ea"];
+
+function Polaroid({ f, i, lines }: { f: Founder; i: number; lines: boolean }) {
   return (
-    <li className={`ab3-seat ab3-s${i}`}>
-      <span className="ab3-plate" aria-hidden>
-        {f.photo ? <img src={asset(f.photo)} alt="" /> : <i>{f.name.charAt(0)}</i>}
+    <li className={`ab3-pol ab3-p${i}`}>
+      <span className="ab3-photo" style={{ background: TONES[i % TONES.length] }}>
+        {f.photo ? <img src={asset(f.photo)} alt="" /> : <i aria-hidden>{f.name.charAt(0)}</i>}
       </span>
-      <span className="ab3-card">
-        <b>{f.name}</b>
-        <em>{t(f.role)}</em>
-        {lines && <span>{t(f.line)}</span>}
-      </span>
+      <b>{f.name}</b>
+      <em>{t(f.role)}</em>
+      {lines && <span>{t(f.line)}</span>}
     </li>
   );
 }
@@ -38,19 +38,9 @@ export function LandingAbout() {
           <p>{t("We are early and building in the open. If you have an idea, a worry or a recipe, write to us.")}</p>
           <a className="lm ab3-mail" href="mailto:hello@bitetable.de"><span className="lm-text">hello@bitetable.de</span></a>
         </div>
-        <div className="ab3-table-wrap">
-          <svg className="ab3-table" viewBox="0 0 300 300" aria-hidden>
-            <circle cx="150" cy="150" r="118" className="ab3-cloth" />
-            <circle cx="150" cy="150" r="118" className="ab3-cloth-edge" />
-            <circle cx="150" cy="160" r="30" className="ab3-bowl" />
-            <circle cx="150" cy="160" r="19" className="ab3-bowl-in" />
-            <circle cx="143" cy="156" r="4" className="ab3-food" /><circle cx="156" cy="163" r="3.5" className="ab3-food b" /><circle cx="152" cy="153" r="2.6" className="ab3-food c" />
-            <path d="M140 118c-3-5 3-7 0-12M150 116c-3-5 3-7 0-12M160 118c-3-5 3-7 0-12" className="ab3-steam" />
-          </svg>
-          <ol className="ab3-seats">
-            {FOUNDERS.map((f, i) => <Seat key={f.name} f={f} i={i} lines={FOUNDERS.every((x) => x.line)} />)}
-          </ol>
-        </div>
+        <ol className="ab3-pols">
+          {FOUNDERS.map((f, i) => <Polaroid key={f.name} f={f} i={i} lines={FOUNDERS.every((x) => x.line)} />)}
+        </ol>
       </div>
     </section>
   );
