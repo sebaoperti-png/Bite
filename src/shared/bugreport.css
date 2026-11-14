@@ -1,0 +1,27 @@
+/* "Report a bug" dialog (BugReport.tsx): a waiter's order pad on a dimmed page */
+.br { padding: 0; border: 0; background: transparent; max-width: min(520px, calc(100vw - 24px)); width: 100%; overflow: visible; }
+.br::backdrop { background: rgba(22,10,46,0.5); backdrop-filter: blur(3px); }
+.br-card { position: relative; padding: 30px 28px 24px; border-radius: 18px; background: #fffdf7; color: #160a2e; font-family: var(--font-sans);
+  background-image: repeating-linear-gradient(0deg, transparent 0 31px, rgba(107,33,217,0.05) 31px 32px); box-shadow: 0 40px 80px -30px rgba(22,10,46,0.6); }
+.br-x { position: absolute; right: 12px; top: 10px; width: 40px; height: 40px; border-radius: 50%; font-size: 26px; line-height: 1; color: #695a8c; background: none; border: 0; cursor: pointer; }
+.br-x:hover { background: rgba(107,33,217,0.08); }
+.br h2 { margin: 0; padding-right: 44px; font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 32px; line-height: 1.05; }
+.br-lead { margin: 8px 0 18px; font-size: 15px; line-height: 1.5; color: #4b3a6b; }
+.br-field { display: block; margin-top: 14px; }
+.br-field span { display: block; margin-bottom: 6px; font-size: 13.5px; font-weight: 700; color: #4b3a6b; }
+.br-field textarea, .br-field input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; border: 1.5px solid rgba(107,33,217,0.2); background: #fff; font: inherit; font-size: 16px; color: #160a2e; resize: vertical; }
+.br-field textarea:focus, .br-field input:focus { outline: none; border-color: #6b21d9; box-shadow: 0 0 0 3px rgba(107,33,217,0.15); }
+.br-check { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; font-size: 13.5px; line-height: 1.45; color: #4b3a6b; cursor: pointer; }
+.br-check input { width: 20px; height: 20px; margin: 0; accent-color: #6b21d9; flex-shrink: 0; }
+.br-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.br-err { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: #fff0f3; color: #a3123c; font-size: 14px; }
+.br-send { display: block; width: 100%; min-height: 50px; margin-top: 18px; border: 0; border-radius: 14px; background: #160a2e; color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+.br-send:hover { background: #2a1553; } .br-send:disabled { opacity: .6; cursor: wait; }
+.br-send:focus-visible, .br-x:focus-visible { outline: 2.5px solid #6b21d9; outline-offset: 2px; }
+.br-fine { margin: 12px 0 0; font-size: 12.5px; color: #695a8c; text-align: center; }
+.br-fine a { color: #6b21d9; }
+.br-done { text-align: center; padding: 10px 0 4px; }
+.br-done svg { width: 64px; height: 64px; fill: none; stroke: #0a8f5a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.br-done p { margin: 10px auto 0; max-width: 34ch; font-size: 15px; line-height: 1.5; color: #4b3a6b; }
+.ft-linkbtn { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; text-align: left; }
+.ft-linkbtn:hover { text-decoration: underline; }

@@ -14,7 +14,7 @@
 @keyframes blBite { 0%, 4% { transform: scale(0); } 12%, 78% { transform: scale(1); } 90%, 100% { transform: scale(0); } }
 .bl svg { animation: blPlate 2.4s ease-in-out infinite; }
 @keyframes blPlate { 0%, 100% { rotate: 0deg; } 10% { rotate: -4deg; } 20% { rotate: 3deg; } 30% { rotate: 0deg; } }
-.bl-label { font-size: 13px; font-weight: 700; color: #7c6fa0; }
+.bl-label { font-size: 13px; font-weight: 700; color: #695a8c; }
 .bl.dark .bl-label { color: rgba(255,255,255,0.75); }
 
 /* ── Cloche: the dome lifts to reveal what's under it ── */
@@ -66,7 +66,7 @@
 .tk { position: relative; margin-top: -2px; min-width: 210px; max-width: min(88vw, 360px); padding: 14px 16px 16px; background: #fffdf7; border-radius: 2px 2px 0 0; box-shadow: 0 14px 28px rgba(22,10,46,0.22); font-family: 'Figtree Variable', sans-serif; }
 .tk::after { content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 8px; background: linear-gradient(-45deg, transparent 6px, #fffdf7 0) 0 0 / 12px 12px, linear-gradient(45deg, transparent 6px, #fffdf7 0) 0 0 / 12px 12px; }
 .tk-clip { position: absolute; top: -6px; left: 50%; width: 26px; height: 12px; margin-left: -13px; border-radius: 3px; background: linear-gradient(180deg, #e8e3f2, #a99fbd); box-shadow: 0 1px 2px rgba(22,10,46,0.25); }
-.tk-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 6px; margin-bottom: 7px; border-bottom: 1.5px dashed rgba(107,33,217,0.22); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; color: #8b7bb5; letter-spacing: .08em; }
+.tk-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 6px; margin-bottom: 7px; border-bottom: 1.5px dashed rgba(107,33,217,0.22); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; color: #695a8c; letter-spacing: .08em; }
 .tk-head b { color: #6b21d9; letter-spacing: .25em; }
 .tk-msg { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; color: #160a2e; line-height: 1.35; }
 .tk-msg svg { flex-shrink: 0; }
@@ -98,7 +98,7 @@ h2:has(.rw.in) .chalk-line path, .chalk-line.in path { stroke-dashoffset: 0; }
 @keyframes kcIn { from { opacity: 0; transform: translateY(5px); } }
 @keyframes kcShimmer { to { background-position: -200% 0; } }
 @keyframes kcPulse { to { transform: scale(.5); opacity: .5; } }
-@media (prefers-reduced-motion: reduce) { .kc li, .kc li.now, .kc li i { animation: none; } .kc li.now { color: #7c6fa0; } }
+@media (prefers-reduced-motion: reduce) { .kc li, .kc li.now, .kc li i { animation: none; } .kc li.now { color: #695a8c; } }
 
 /* ── TableSeats: the table seen from above ── */
 .ts { margin: 0; padding: 14px 12px 12px; border-radius: 18px; background: #fff; box-shadow: 0 2px 12px rgba(107,33,217,0.07); }
@@ -161,7 +161,7 @@ button:hover > .bell, button:active > .bell { animation: bellRing .7s ease-in-ou
 .prep-item { position: relative; display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dotted rgba(107,33,217,0.18); font-size: 13.5px; font-weight: 600; color: #160a2e; cursor: pointer; }
 .prep-item:last-child { border-bottom: 0; }
 .prep-item .tick-input { left: 0; }
-.prep-item.on > span:last-child { color: #8b7bb5; text-decoration: line-through; text-decoration-color: rgba(107,33,217,0.35); }
+.prep-item.on > span:last-child { color: #695a8c; text-decoration: line-through; text-decoration-color: rgba(107,33,217,0.35); }
 .prep-item em { font-style: normal; font-size: 12px; color: #0a7c4e; text-decoration: none; }
 
 /* ── Empty plate (empty states) ── */

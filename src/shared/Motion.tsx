@@ -37,7 +37,7 @@ export function SpinningText({ text, cell = 26 }: { text: string; cell?: number 
   }, [text]);
   const chars = text.split("");
   return (
-    <span className="t-reel" style={{ ["--reel-cell" as string]: typeof cell === "number" ? `${cell}px` : cell }} aria-label={text}>
+    <span className="t-reel" role="img" style={{ ["--reel-cell" as string]: typeof cell === "number" ? `${cell}px` : cell }} aria-label={text}>
       {chars.map((c, i) => {
         const fromRight = chars.length - i;
         if (!/\d/.test(c)) return <span key={`s${fromRight}`} className="t-reel-static" aria-hidden>{c === " " ? "\u00a0" : c}</span>; // a lone space would collapse in the flex row
