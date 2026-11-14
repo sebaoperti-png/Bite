@@ -3,7 +3,8 @@
 // Run `npx vite preview --port 4173` first, or SITE=https://bitetable.de. LANG2=de for German.
 const { chromium } = require('playwright');
 (async()=>{ const b=await chromium.launch(); let fail=0;
-for (const vp of (process.env.VPS||'1009x630,1440x900,1280x720,900x700,390x844').split(',')) { const [W,H]=vp.split('x').map(Number);
+// Phones (≤640px) get LandingMobile, where safety is a story card, so the interactive table is tested from 641px up.
+for (const vp of (process.env.VPS||'1009x630,1440x900,1280x720,900x700').split(',')) { const [W,H]=vp.split('x').map(Number);
 const ctx=await b.newContext({viewport:{width:W,height:H}}); await ctx.addInitScript(()=>{try{localStorage.setItem('bite_cookie_consent',JSON.stringify({necessary:true,functional:false,analytics:false,marketing:false,ts:Date.now()}));sessionStorage.setItem('bite_intro_seen','1');localStorage.setItem('bite_kitchen_note','2026-11-14');}catch(e){}});
 const p=await ctx.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
 await p.goto((process.env.SITE||'http://localhost:4173')+'/?lang='+(process.env.LANG2||'en'),{waitUntil:'networkidle'}); await p.waitForTimeout(800);

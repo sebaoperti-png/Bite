@@ -22,7 +22,8 @@ const check = (c, m) => { if (c) { pass++; console.log("ok  ", m); } else { fail
       const over = await p.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
       check(errs.length === 0 && broken.length === 0 && over <= 1, `${label} ${path}: opens cleanly${errs.length ? " errors: " + errs.join(" | ") : ""}${broken.length ? " broken images: " + broken.join(", ") : ""}${over > 1 ? ` ${over}px too wide` : ""}`);
       if (path === "/") {
-        const ids = ["how", "services", "cooks", "sous-chef", "safety", "help", "waitlist"];
+        // phones get LandingMobile (no sous-chef demo; the other sections are story cards with the same ids)
+        const ids = label === "phone" ? ["how", "services", "cooks", "safety", "help", "waitlist"] : ["how", "services", "cooks", "sous-chef", "safety", "help", "waitlist"];
         const missing = await p.evaluate((ids) => ids.filter((id) => !document.getElementById(id)), ids);
         check(missing.length === 0, `${label} landing: all sections are there${missing.length ? " missing: " + missing.join(", ") : ""}`);
         const links = await p.evaluate(() => [...document.querySelectorAll("a[href]")].map((a) => a.getAttribute("href")));
