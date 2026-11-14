@@ -345,7 +345,7 @@ export function LegalPage() {
               {"1. What this covers"}
             </h3>
             <p>
-              {"This section covers the 60-second survey (stand.html, also used on a tablet at events such as the Aalener Industriemesse), the optional follow-up interview and the Bite newsletter, including the “Save me a seat” form on the home page. Bite is in an early, non-commercial feedback phase."}
+              {"This section covers the 60-second survey (stand.html, also used on a tablet at events such as the Aalener Industriemesse), the \"Rate Bite\" feedback card (feedback.html: stars, what you tried, ten usability statements, your comments and device type, stored without your name; the score is worked out from your answers), the optional follow-up interview and the Bite newsletter, including the “Save me a seat” form on the home page. Bite is in an early, non-commercial feedback phase."}
             </p>
             <h3>
               {"2. Who is responsible"}
@@ -397,7 +397,7 @@ export function LegalPage() {
               {"1. Worum es geht"}
             </h3>
             <p>
-              {"Dieser Abschnitt gilt für die 60-Sekunden-Umfrage (stand.html, auch auf einem Tablet bei Veranstaltungen wie der Aalener Industriemesse), das optionale Folge-Interview und den Bite-Newsletter, einschließlich des Formulars „Save me a seat“ auf der Startseite. Bite befindet sich in einer frühen, nicht kommerziellen Feedback-Phase."}
+              {"Dieser Abschnitt gilt für die 60-Sekunden-Umfrage (stand.html, auch auf einem Tablet bei Veranstaltungen wie der Aalener Industriemesse), die Bewertungskarte „Rate Bite“ (feedback.html: Sterne, was du ausprobiert hast, zehn Aussagen zur Bedienbarkeit, deine Kommentare und Gerätetyp, ohne Namen gespeichert), das optionale Folge-Interview und den Bite-Newsletter, einschließlich des Formulars „Save me a seat“ auf der Startseite. Bite befindet sich in einer frühen, nicht kommerziellen Feedback-Phase."}
             </p>
             <h3>
               {"2. Verantwortlicher"}
