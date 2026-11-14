@@ -1605,3 +1605,4 @@ body { background-color: #f3eefb;
 }
 .as-meal-noimg { width: 56px; height: 46px; border-radius: 10px; flex-shrink: 0; background: #efe6ff; }
 .as-foot a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 640px) { .nv-theme { display: none !important; } }
