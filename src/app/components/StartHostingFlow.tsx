@@ -196,7 +196,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p style={{ fontSize: 11, fontWeight: 700, color: "#7c6fa0", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>{children}</p>;
+  return <p style={{ fontSize: 11, fontWeight: 700, color: "#695a8c", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>{children}</p>;
 }
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
@@ -216,7 +216,7 @@ function Toggle({ value, onChange, label, desc }: { value: boolean; onChange: (v
     <div className="flex items-center justify-between gap-3" style={{ padding: "10px 0", borderBottom: "1px solid rgba(107,33,217,0.06)" }}>
       <div>
         <p style={{ fontSize: 13.5, fontWeight: 600, color: "#160a2e" }}>{t(label)}</p>
-        {desc && <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 1 }}>{t(desc)}</p>}
+        {desc && <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 1 }}>{t(desc)}</p>}
       </div>
       <motion.button
         onClick={() => onChange(!value)}
@@ -268,7 +268,7 @@ function Counter({ value, min, max, onChange, label, sublabel }: { value: number
     <div className="flex items-center justify-between" style={{ padding: "10px 0", borderBottom: "1px solid rgba(107,33,217,0.06)" }}>
       <div>
         <p style={{ fontSize: 13.5, fontWeight: 600, color: "#160a2e" }}>{t(label)}</p>
-        {sublabel && <p style={{ fontSize: 11.5, color: "#7c6fa0" }}>{t(sublabel)}</p>}
+        {sublabel && <p style={{ fontSize: 11.5, color: "#695a8c" }}>{t(sublabel)}</p>}
       </div>
       <div className="flex items-center gap-3">
         <motion.button
@@ -416,7 +416,7 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
         </div>
       )}
       <p style={{ fontSize: 11, color: "#c4b8de", textAlign: "right", marginTop: 4 }}>
-        {tone && !writing && <span style={{ float: "left", color: "#7c6fa0" }}>{t("Drafted by the Bite assistant — edit it as you like")}</span>}
+        {tone && !writing && <span style={{ float: "left", color: "#695a8c" }}>{t("Drafted by the Bite assistant — edit it as you like")}</span>}
         {form.description.length}/400
       </p>
     </>
@@ -428,12 +428,12 @@ function HostRating() {
   const { live } = useStore();
   const { host, hostAvg } = useMyReviews(live);
   if (live && !host) return null;
-  if (live && host!.length === 0) return <span style={{ fontSize: 12, fontWeight: 700, color: "#7c6fa0" }}>{t("No reviews yet")}</span>;
+  if (live && host!.length === 0) return <span style={{ fontSize: 12, fontWeight: 700, color: "#695a8c" }}>{t("No reviews yet")}</span>;
   return (
     <span className="flex items-center gap-1">
       <Star size={12} fill="#f59e0b" color="#f59e0b" />
       <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e" }}>{dec(live ? hostAvg : 4.9)}</span>
-      {live && <span style={{ fontSize: 11.5, color: "#7c6fa0" }}>({host!.length})</span>}
+      {live && <span style={{ fontSize: 11.5, color: "#695a8c" }}>({host!.length})</span>}
     </span>
   );
 }
@@ -461,7 +461,7 @@ function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
               <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{profile.name}</p>
               {!live && <BadgeCheck size={14} color="#0a7c4e" strokeWidth={2} />}
             </div>
-            <p style={{ fontSize: 12, color: "#7c6fa0" }}>{live ? localPlace(profile.neighbourhood) : t("{place} · Verified host", { place: localPlace(profile.neighbourhood) })}</p>
+            <p style={{ fontSize: 12, color: "#695a8c" }}>{live ? localPlace(profile.neighbourhood) : t("{place} · Verified host", { place: localPlace(profile.neighbourhood) })}</p>
           </div>
           <div className="ml-auto"><HostRating /></div>
         </div>
@@ -691,7 +691,7 @@ function Step3({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
             >
               <Icon size={22} color={form.privateEvent === id ? purple : "#7c6fa0"} strokeWidth={1.8} />
               <p style={{ fontSize: 13, fontWeight: 700, color: form.privateEvent === id ? purple : "#160a2e" }}>{t(label)}</p>
-              <p style={{ fontSize: 11, color: "#7c6fa0", textAlign: "center", lineHeight: 1.4 }}>{t(desc)}</p>
+              <p style={{ fontSize: 11, color: "#695a8c", textAlign: "center", lineHeight: 1.4 }}>{t(desc)}</p>
             </motion.button>
           ))}
         </div>
@@ -921,7 +921,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       >
         <span className="flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 12, background: on ? "#fff" : lightPurple, color: purple }}><Icon size={20} strokeWidth={2} /></span>
         <p style={{ fontSize: 14.5, fontWeight: 800, color: "#160a2e", marginTop: 6 }}>{t(title)}</p>
-        <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 2, lineHeight: 1.4 }}>{t(sub)}</p>
+        <p style={{ fontSize: 12, color: "#695a8c", marginTop: 2, lineHeight: 1.4 }}>{t(sub)}</p>
         {id === "receipt" && <span className="hf-pref">{t("Preferred")}</span>}
       </motion.button>
     );
@@ -969,7 +969,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                       <div style={{ height: 6, background: lightPurple, borderRadius: 6, marginTop: 10, overflow: "hidden" }}>
                         <motion.div style={{ height: "100%", background: `linear-gradient(90deg, ${purple}, #9b4aff)` }} animate={{ width: `${Math.max(8, reading * 100)}%` }} />
                       </div>
-                      <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 6 }}>{t("Looking for “SUMME” on the Kassenbon")}</p>
+                      <p style={{ fontSize: 12, color: "#695a8c", marginTop: 6 }}>{t("Looking for “SUMME” on the Kassenbon")}</p>
                     </>
                   ) : (
                     <>
@@ -988,20 +988,20 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                       {readError && <p style={{ fontSize: 13, color: "#c05e00", fontWeight: 700 }}>{readError}</p>}
                       <div className="flex gap-3 mt-3 flex-wrap">
                         <button onClick={() => fileRef.current?.click()} style={{ fontSize: 12.5, fontWeight: 800, color: purple }}>{form.receiptPreview ? t("Scan another") : t("Take a photo")}</button>
-                        {!store.live && <button onClick={() => scan("app/sample-receipt.jpg")} style={{ fontSize: 12.5, fontWeight: 700, color: "#7c6fa0" }}>{t("Try a sample receipt")}</button>}
+                        {!store.live && <button onClick={() => scan("app/sample-receipt.jpg")} style={{ fontSize: 12.5, fontWeight: 700, color: "#695a8c" }}>{t("Try a sample receipt")}</button>}
                       </div>
                     </>
                   )}
                 </div>
               </div>
-              <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 12, lineHeight: 1.5 }}>{t("Only the total is shared with guests. The photo stays on your device.")}</p>
+              <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 12, lineHeight: 1.5 }}>{t("Only the total is shared with guests. The photo stays on your device.")}</p>
             </Card>
           )}
 
           {form.costSource === "declared" && (
             <Card>
               <Label>{t("What you bought")}</Label>
-              <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: -4, marginBottom: 10, lineHeight: 1.5 }}>{t("Each item with what it cost. Guests see this list, so the price is fair and clear.")}</p>
+              <p style={{ fontSize: 12, color: "#695a8c", marginTop: -4, marginBottom: 10, lineHeight: 1.5 }}>{t("Each item with what it cost. Guests see this list, so the price is fair and clear.")}</p>
               <div className="hf-list">
                 {lines.map((l, i) => (
                   <div key={i} className="hf-list-row">
@@ -1020,7 +1020,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
               {form.groceryCost > 0 && looksTooHigh(form.groceryCost, estimate.total) && (
                 <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700, marginTop: 6 }}>{t("That's much more than this menu usually costs ({price}). Only include the shopping for this dinner.", { price: euro(estimate.total) })}</p>
               )}
-              <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 8, lineHeight: 1.5 }}>{t("Guests will see it as stated by you. Have the receipt? Scanning it is quicker and shows it's real.")}</p>
+              <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 8, lineHeight: 1.5 }}>{t("Guests will see it as stated by you. Have the receipt? Scanning it is quicker and shows it's real.")}</p>
             </Card>
           )}
 
@@ -1033,7 +1033,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                   <p className="hf-shimmer" style={{ fontSize: 13.5, fontWeight: 800 }}>{t("Pricing your ingredients at the supermarket…")}</p>
                 </div>
               )}
-              {aiNote && !aiBusy && <p style={{ fontSize: 12, color: "#7c6fa0", marginBottom: 8, lineHeight: 1.5 }}>{aiNote}</p>}
+              {aiNote && !aiBusy && <p style={{ fontSize: 12, color: "#695a8c", marginBottom: 8, lineHeight: 1.5 }}>{aiNote}</p>}
               {!aiBusy && form.aiLines?.length ? (
                 <div className="flex flex-col gap-1.5">
                   {form.aiLines.map((l, i) => (
@@ -1057,7 +1057,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                 </div>
               </div>
               )}
-              <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 10, lineHeight: 1.5 }}>{form.aiLines?.length ? t("Estimated by AI from your ingredient list and typical German supermarket prices, so it can be off. Got the receipt? Scan it for the exact amount.") : t("Based on typical German supermarket prices. Got the receipt? Scan it for the exact amount.")}</p>
+              <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 10, lineHeight: 1.5 }}>{form.aiLines?.length ? t("Estimated by AI from your ingredient list and typical German supermarket prices, so it can be off. Got the receipt? Scan it for the exact amount.") : t("Based on typical German supermarket prices. Got the receipt? Scan it for the exact amount.")}</p>
             </Card>
           )}
 
@@ -1077,7 +1077,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                   <span className="px-2.5 py-1 rounded-full" style={{ background: "#e5f7f0", fontSize: 12, fontWeight: 800, color: "#0a7c4e" }}>{t("Fair share {price}", { price: euro(share) })}</span>
                   <span className="px-2.5 py-1 rounded-full" style={{ background: "#fff0f3", fontSize: 12, fontWeight: 800, color: "#e9345a" }}>{t("Price cap {price}", { price: euro(cap) })}</span>
                 </div>
-                <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 8, lineHeight: 1.5 }}>{form.costSource === "estimate" ? t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +15% (it's an estimate), rounded to whole euros, and the guests together never pay more than the groceries.") : t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +5%, rounded to whole euros, and the guests together never pay more than the groceries.")}</p>
+                <p style={{ fontSize: 12, color: "#695a8c", marginTop: 8, lineHeight: 1.5 }}>{form.costSource === "estimate" ? t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +15% (it's an estimate), rounded to whole euros, and the guests together never pay more than the groceries.") : t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +5%, rounded to whole euros, and the guests together never pay more than the groceries.")}</p>
               </Card>
 
               <div style={{ background: "linear-gradient(135deg, #6b21d9, #9b4aff)", borderRadius: 20, padding: "18px 16px" }}>
@@ -1109,7 +1109,7 @@ function Step6({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   return (
     <div className="flex flex-col gap-4">
       <SectionTitle>{t("House rules")}</SectionTitle>
-      <p style={{ fontSize: 13, color: "#7c6fa0", marginTop: -8 }}>{t("Let guests know what to expect in your home")}</p>
+      <p style={{ fontSize: 13, color: "#695a8c", marginTop: -8 }}>{t("Let guests know what to expect in your home")}</p>
 
       <Card>
         <Toggle value={form.smokingAllowed} onChange={v => set("smokingAllowed", v)}
@@ -1125,7 +1125,7 @@ function Step6({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       {/* Visual rule icons */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { Icon: Cigarette, label: "Smoking", active: form.smokingAllowed, color: "#7c6fa0" },
+          { Icon: Cigarette, label: "Smoking", active: form.smokingAllowed, color: "#695a8c" },
           { Icon: Wine, label: "Alcohol", active: form.alcoholAllowed, color: "#7c3fa0" },
           { Icon: PawPrint, label: "Pets", active: form.petsPresent, color: "#c05e00" },
           { Icon: Footprints, label: "Shoes off", active: form.shoesOff, color: "#0a5fa0" },
@@ -1276,7 +1276,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         </div>
         <div style={{ textAlign: "center" }}>
           <p style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{uploading ? t("Adding photos…") : t("Drag & drop photos here")}</p>
-          <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 2 }}>{t("or click to upload from your device")}</p>
+          <p style={{ fontSize: 12, color: "#695a8c", marginTop: 2 }}>{t("or click to upload from your device")}</p>
         </div>
         <div className="flex gap-2">
           <span style={{ fontSize: 11, color: "#c4b8de" }}>{t("JPG · PNG · WEBP · Max 10MB")}</span>
@@ -1324,7 +1324,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         <div>
           <div className="flex items-center justify-between mb-2">
             <Label>{t("Your gallery (")}{photos.length})</Label>
-            <span style={{ fontSize: 11, color: "#7c6fa0" }}>{t("Tap star to set cover")}</span>
+            <span style={{ fontSize: 11, color: "#695a8c" }}>{t("Tap star to set cover")}</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {photos.map((url, i) => (
@@ -1394,7 +1394,7 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
 
   const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
     <div className="flex items-center justify-between py-2.5" style={{ borderBottom: "1px solid rgba(107,33,217,0.06)" }}>
-      <span style={{ fontSize: 12.5, color: "#7c6fa0" }}>{t(label)}</span>
+      <span style={{ fontSize: 12.5, color: "#695a8c" }}>{t(label)}</span>
       <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e", textAlign: "right", maxWidth: "60%" }}>{value}</span>
     </div>
   );
@@ -1414,7 +1414,7 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
           <div className="flex items-start justify-between gap-2">
             <div>
               <p style={{ fontSize: 16, fontWeight: 800, color: "#160a2e" }}>{form.eventTitle || t("Your Event")}</p>
-              <p style={{ fontSize: 13, color: "#7c6fa0", marginTop: 2 }}>{form.mealName || t("Your meal")} · {form.cuisineType ? t(form.cuisineType) : t("Cuisine TBD")}</p>
+              <p style={{ fontSize: 13, color: "#695a8c", marginTop: 2 }}>{form.mealName || t("Your meal")} · {form.cuisineType ? t(form.cuisineType) : t("Cuisine TBD")}</p>
             </div>
             <div style={{ background: purple, borderRadius: 10, padding: "4px 10px", flexShrink: 0 }}>
               <span style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{euro(form.freeEvent ? 0 : form.pricePerGuest)}</span>
@@ -1423,11 +1423,11 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
           <div className="flex items-center gap-3 mt-3">
             <div className="flex items-center gap-1">
               <MapPin size={11} color="#7c6fa0" strokeWidth={2} />
-              <span style={{ fontSize: 11, color: "#7c6fa0" }}>{form.city || t("City")}</span>
+              <span style={{ fontSize: 11, color: "#695a8c" }}>{form.city || t("City")}</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock size={11} color="#7c6fa0" strokeWidth={2} />
-              <span style={{ fontSize: 11, color: "#7c6fa0" }}>{form.date ? dateLabel(labelForISO(form.date)) : t("Date TBD")} · {form.startTime}</span>
+              <span style={{ fontSize: 11, color: "#695a8c" }}>{form.date ? dateLabel(labelForISO(form.date)) : t("Date TBD")} · {form.startTime}</span>
             </div>
           </div>
         </div>
@@ -1443,7 +1443,7 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
               <span style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{profile.name}</span>
               {!live && <BadgeCheck size={13} color="#0a7c4e" strokeWidth={2} />}
             </div>
-            <span style={{ fontSize: 11.5, color: "#7c6fa0" }}>{live ? localPlace(profile.neighbourhood) : t("Verified · {place}", { place: localPlace(profile.neighbourhood) })}</span>
+            <span style={{ fontSize: 11.5, color: "#695a8c" }}>{live ? localPlace(profile.neighbourhood) : t("Verified · {place}", { place: localPlace(profile.neighbourhood) })}</span>
           </div>
           <HostRating />
         </div>
@@ -1526,7 +1526,7 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
         {publishing && <ThinkingOrb state="shaping" size={20} theme="dark" />}
         <span style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{publishing ? t("Publishing…") : t("Publish event")}</span>
       </motion.button>
-      <p style={{ textAlign: "center", fontSize: 11, color: "#7c6fa0" }}>{t("You can edit or unpublish at any time after going live")}</p>
+      <p style={{ textAlign: "center", fontSize: 11, color: "#695a8c" }}>{t("You can edit or unpublish at any time after going live")}</p>
     </div>
   );
 }
@@ -1676,7 +1676,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
               <StepIcon size={13} color={purple} strokeWidth={2.5} />
               <p style={{ fontSize: 14, fontWeight: 800, color: "#160a2e" }}>{t(STEP_LABELS[step])}</p>
             </div>
-            <p style={{ fontSize: 11, color: "#7c6fa0", fontWeight: 500 }}>{t("Step {n} of {total}", { n: step + 1, total: TOTAL_STEPS })}</p>
+            <p style={{ fontSize: 11, color: "#695a8c", fontWeight: 500 }}>{t("Step {n} of {total}", { n: step + 1, total: TOTAL_STEPS })}</p>
           </div>
 
           <motion.button

@@ -1,3 +1,4 @@
+import { openBugReport } from "../../shared/BugReport";
 import { useState } from "react";
 import { EmptyPlate } from "../../shared/Restaurant";
 import { openSafetyTips } from "./SafetySheets";
@@ -11,6 +12,7 @@ import { Avatar, usePhotoPicker } from "./Avatar";
 import { SpinningText } from "../../shared/Motion";
 import { COUNTRIES, countryByName, postalError, placeLabel, localPlace } from "../location";
 import {
+  Bug,
   MapPin, Calendar, Clock, Users, Search, ChevronRight, ShoppingBag, Utensils, ChefHat, Home, MessageCircle, User, X, Check,
   Star, Bell, BadgeCheck, Globe, Shield, Ban, CheckCircle, Camera, Settings, CreditCard, UserPlus, BookOpen, Heart, LogOut,
   RotateCcw, FileText, LifeBuoy, Leaf, Plus, Minus, Trash2, Eye, Sparkles, ChevronDown, ShieldCheck,
@@ -155,7 +157,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                         <motion.button key={id} onClick={() => setOpenPicker(id)} className="flex items-center gap-2 px-3 py-2.5 rounded-2xl text-left min-w-0" style={{ background: "#ffffff", border: "1px solid rgba(107,33,217,0.14)" }} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.38 + i * 0.05 }} whileTap={{ scale: 0.97 }}>
                           <Icon size={13} color="#6b21d9" strokeWidth={1.8} className="flex-shrink-0" />
                           <div className="flex flex-col flex-1 min-w-0">
-                            <span style={{ fontSize: 10.5, color: "#8b7bb5", fontWeight: 600 }}>{label}</span>
+                            <span style={{ fontSize: 10.5, color: "#695a8c", fontWeight: 600 }}>{label}</span>
                             <span style={{ fontSize: 12, color: "#160a2e", fontWeight: 600, marginTop: 0.5 }} className="truncate">{value}</span>
                           </div>
                         </motion.button>
@@ -392,7 +394,7 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
           <div className="flex items-end justify-between mb-5">
             <div>
               <h2 style={{ fontSize: 26, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.02em" }}>{t("Cooking this week")}</h2>
-              <p style={{ fontSize: 14.5, color: "#7c6fa0", marginTop: 2 }}>{t("Home-cooked meals from neighbours across Germany")}</p>
+              <p style={{ fontSize: 14.5, color: "#695a8c", marginTop: 2 }}>{t("Home-cooked meals from neighbours across Germany")}</p>
             </div>
             <button onClick={onSeeAll} className="flex items-center gap-1 px-4 py-2 rounded-xl hover:bg-[#ede8fb] transition-colors">
               <span style={{ fontSize: 14, fontWeight: 700, color: "#6b21d9" }}>{t("See all")}</span>
@@ -435,7 +437,7 @@ function MessagesView({ onOpenChat, onBrowse }: { onOpenChat: (id: string) => vo
       {convs.length === 0 && (
         <div className="flex flex-col items-center gap-3 py-16" style={{ background: "#fff" }}>
           <MessageCircle size={34} color="#c4b8de" strokeWidth={1.4} />
-          <p style={{ fontSize: 14, color: "#7c6fa0", fontWeight: 600 }}>{t("No conversations yet")}</p>
+          <p style={{ fontSize: 14, color: "#695a8c", fontWeight: 600 }}>{t("No conversations yet")}</p>
           <button onClick={onBrowse} className="px-4 py-2 rounded-full" style={{ background: "#ede8fb", fontSize: 13, color: "#6b21d9", fontWeight: 700 }}>{t("Find a meal")}</button>
         </div>
       )}
@@ -455,7 +457,7 @@ function MessagesView({ onOpenChat, onBrowse }: { onOpenChat: (id: string) => vo
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
                 <p className="truncate" style={{ fontSize: 14, fontWeight: conv.unread ? 800 : 600, color: "#160a2e" }}>
-                  {conv.name}{meal && <span style={{ fontWeight: 500, color: "#7c6fa0" }}> · {tMaybe(meal.title)}</span>}
+                  {conv.name}{meal && <span style={{ fontWeight: 500, color: "#695a8c" }}> · {tMaybe(meal.title)}</span>}
                 </p>
                 <p className="flex-shrink-0" style={{ fontSize: 11, color: conv.unread ? "#6b21d9" : "#7c6fa0", fontWeight: conv.unread ? 700 : 400 }}>{last ? timeLabel(last.at) : ""}</p>
               </div>
@@ -513,6 +515,7 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
     ...(store.live ? [{ Icon: Sparkles, label: t("How Bite works"), sub: t("The 30-second tour"), onClick: openTour }] : []),
     { Icon: ShieldCheck, label: t("Safety tips"),        sub: t("How to meet neighbours safely"), onClick: openSafetyTips },
     { Icon: Globe,      label: t("About Bite"),          sub: t("How it works, safety and hosting on bitetable.de"), onClick: () => { window.top!.location.href = "./?from=app"; } },
+    { Icon: Bug,        label: t("Report a bug"),        sub: t("Something not working? Tell us, we fix it fast"), onClick: openBugReport },
     { Icon: Settings,   label: t("Settings"),            sub: store.live ? t("Notifications, language, blocked people") : t("Notifications, language, Bite news, demo data"), onClick: () => setSheet("settings") },
   ];
 
@@ -582,7 +585,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
                     <img src={m.image} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
                     <span className="min-w-0">
                       <span className="block truncate" style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{tMaybe(m.title)}</span>
-                      <span className="block" style={{ fontSize: 12, color: "#7c6fa0" }}>{m.host} · {dateLabel(m.date)} · {euro(m.price)}</span>
+                      <span className="block" style={{ fontSize: 12, color: "#695a8c" }}>{m.host} · {dateLabel(m.date)} · {euro(m.price)}</span>
                     </span>
                   </button>
                   <button onClick={() => store.toggleLike(m.id)} className="p-2" aria-label={t("Remove from saved")}><Heart size={16} fill="#e9345a" color="#e9345a" /></button>
@@ -603,7 +606,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
                     <img src={m.image} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="truncate" style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{tMaybe(m.title)}</p>
-                      <p style={{ fontSize: 12, color: "#7c6fa0" }}>{dateLabel(m.date)} · {m.time} · {euro(m.price)}</p>
+                      <p style={{ fontSize: 12, color: "#695a8c" }}>{dateLabel(m.date)} · {m.time} · {euro(m.price)}</p>
                       <p style={{ fontSize: 12, color: "#0a7c4e", fontWeight: 700 }}>{t("Live · {booked}/{seats} seats booked", { booked, seats: m.seats })}</p>
                     </div>
                   </div>
@@ -623,7 +626,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
 
         {sheet === "dietary" && (
           <>
-            <p style={{ fontSize: 13, color: "#7c6fa0", marginBottom: 12 }}>{t("We'll share these with your host every time you book.")}</p>
+            <p style={{ fontSize: 13, color: "#695a8c", marginBottom: 12 }}>{t("We'll share these with your host every time you book.")}</p>
             <div className="grid grid-cols-2 gap-2">
               {DIETARY_PREFS.map((d) => {
                 const on = store.profile.dietary.includes(d);
@@ -641,7 +644,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
         {sheet === "payment" && store.live && (
           <div className="flex flex-col gap-3">
             <div className="rounded-2xl p-5" style={{ background: "#fbf7ef", border: "1px dashed rgba(107,33,217,0.3)" }}>
-              <p style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9a8bb8" }}>{t("How paying works for now")}</p>
+              <p style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "#695a8c" }}>{t("How paying works for now")}</p>
               <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 24, color: "#160a2e", margin: "4px 0 8px" }}>{t("You pay at the table.")}</p>
               <p style={{ fontSize: 13.5, color: "#4b3a6b", lineHeight: 1.55 }}>{t("Bite charges nothing in this early phase. Once the host confirms your seat, you hand them their share of the groceries, as shown on the meal.")}</p>
             </div>
@@ -687,7 +690,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
             <div className="px-4 py-3 rounded-2xl" style={{ background: "#f7f4fd" }}>
               <span className="flex items-center gap-3"><Ban size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{t("Blocked people")}</span></span>
               {store.blocked.length === 0 ? (
-                <p style={{ fontSize: 12.5, color: "#7c6fa0", marginTop: 6, marginLeft: 28 }}>{t("Nobody. You can block someone from their meal or your chat with them.")}</p>
+                <p style={{ fontSize: 12.5, color: "#695a8c", marginTop: 6, marginLeft: 28 }}>{t("Nobody. You can block someone from their meal or your chat with them.")}</p>
               ) : (
                 <div className="flex flex-col gap-2 mt-3">
                   {store.blocked.map((p) => (
@@ -704,7 +707,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
             <SettingsLink Icon={LifeBuoy} label={t("Help & support")} onClick={() => window.open("./#help", "_blank", "noopener")} />
             {!store.live && <div className="mt-2 p-4 rounded-2xl" style={{ background: "#fff4f6", border: "1px solid rgba(233,52,90,0.15)" }}>
               <p style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{t("Demo data")}</p>
-              <p style={{ fontSize: 12.5, color: "#7c6fa0", marginTop: 2 }}>{t("Clear bookings, chats, saved meals and published listings made in this browser.")}</p>
+              <p style={{ fontSize: 12.5, color: "#695a8c", marginTop: 2 }}>{t("Clear bookings, chats, saved meals and published listings made in this browser.")}</p>
               {confirmReset ? (
                 <div className="flex gap-2 mt-3">
                   <button onClick={() => { store.reset(); setConfirmReset(false); close(); }} className="flex-1 py-2.5 rounded-xl" style={{ background: "#e9345a", color: "#fff", fontSize: 13, fontWeight: 800 }}>{t("Yes, reset")}</button>
@@ -745,7 +748,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
               <Avatar size={56} fontSize={22} />
               <div className="flex gap-2 flex-wrap">
                 <button type="button" onClick={photoPicker.open} className="px-3 py-2 rounded-xl" style={{ background: "#ede8fb", color: "#6b21d9", fontSize: 13, fontWeight: 800 }}>{store.profile.photo ? t("Change photo") : t("Add photo")}</button>
-                {store.profile.photo && <button type="button" onClick={() => { store.updateProfile({ photo: undefined }); store.showToast(t("Profile photo removed")); }} className="px-3 py-2 rounded-xl" style={{ background: "#fff", color: "#7c6fa0", fontSize: 13, fontWeight: 700, boxShadow: "inset 0 0 0 1.5px rgba(107,33,217,0.15)" }}>{t("Remove")}</button>}
+                {store.profile.photo && <button type="button" onClick={() => { store.updateProfile({ photo: undefined }); store.showToast(t("Profile photo removed")); }} className="px-3 py-2 rounded-xl" style={{ background: "#fff", color: "#695a8c", fontSize: 13, fontWeight: 700, boxShadow: "inset 0 0 0 1.5px rgba(107,33,217,0.15)" }}>{t("Remove")}</button>}
               </div>
               {photoPicker.input}
             </div>
@@ -791,7 +794,7 @@ function BookingRow({ b, confirmCancel, setConfirmCancel, onOpen, onChat }: { b:
         <img src={m.image} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
         <span className="flex-1 min-w-0">
           <span className="block truncate" style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{tMaybe(m.title)}</span>
-          <span className="block" style={{ fontSize: 12, color: "#7c6fa0" }}>{dateLabel(m.date)} · {m.time} · {b.guests === 1 ? t("1 guest") : t("{n} guests", { n: b.guests })}</span>
+          <span className="block" style={{ fontSize: 12, color: "#695a8c" }}>{dateLabel(m.date)} · {m.time} · {b.guests === 1 ? t("1 guest") : t("{n} guests", { n: b.guests })}</span>
           {(() => { const st = bookingStatusText(b, euro(b.total)); return <span className="block" style={{ fontSize: 12, fontWeight: 700, color: st.tone === "off" ? "#e9345a" : st.tone === "wait" ? "#b45309" : "#0a7c4e" }}>{st.text}</span>; })()}
         </span>
       </button>
@@ -819,7 +822,7 @@ const inputStyle: React.CSSProperties = {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span style={{ fontSize: 12, fontWeight: 700, color: "#7c6fa0", textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</span>
+      <span style={{ fontSize: 12, fontWeight: 700, color: "#695a8c", textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</span>
       {children}
     </label>
   );
@@ -829,7 +832,7 @@ function SettingsLink({ Icon, label, value, onClick }: { Icon: React.ElementType
   return (
     <button onClick={onClick} className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "#f7f4fd" }}>
       <span className="flex items-center gap-3"><Icon size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{label}</span></span>
-      <span className="flex items-center gap-1" style={{ fontSize: 13, color: "#7c6fa0" }}>{value}<ChevronRight size={14} color="#c4b8de" /></span>
+      <span className="flex items-center gap-1" style={{ fontSize: 13, color: "#695a8c" }}>{value}<ChevronRight size={14} color="#c4b8de" /></span>
     </button>
   );
 }
@@ -838,7 +841,7 @@ function Empty({ icon: Icon, text, action, onAction }: { icon: React.ElementType
   return (
     <div className="flex flex-col items-center gap-3 py-10">
       <EmptyPlate size={92} />
-      <p style={{ fontSize: 14, color: "#7c6fa0", fontWeight: 600, textAlign: "center" }}>{t(text)}</p>
+      <p style={{ fontSize: 14, color: "#695a8c", fontWeight: 600, textAlign: "center" }}>{t(text)}</p>
       {action && <button onClick={onAction} className="px-4 py-2 rounded-full" style={{ background: "#ede8fb", fontSize: 13, color: "#6b21d9", fontWeight: 700 }}>{t(action)}</button>}
     </div>
   );

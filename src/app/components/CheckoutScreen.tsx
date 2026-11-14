@@ -60,7 +60,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
         <img src={meal.image} alt="" className="w-20 h-20 rounded-2xl object-cover flex-shrink-0" />
         <div className="min-w-0">
           <p style={{ fontSize: 16, fontWeight: 800, color: "#160a2e", lineHeight: 1.25 }}>{tMaybe(meal.title)}</p>
-          <p style={{ fontSize: 12.5, color: "#7c6fa0", marginTop: 2 }}>{t("with {name}", { name: meal.host })}</p>
+          <p style={{ fontSize: 12.5, color: "#695a8c", marginTop: 2 }}>{t("with {name}", { name: meal.host })}</p>
           <div className="flex flex-col gap-0.5 mt-1.5" style={{ fontSize: 12, color: "#4a3a6e" }}>
             <span className="flex items-center gap-1.5"><Calendar size={12} color="#6b21d9" />{dateLabel(meal.date)} · {meal.time}</span>
             <span className="flex items-center gap-1.5 truncate"><MapPin size={12} color="#6b21d9" />{localPlace(meal.location.split(", ").slice(-2).join(", "))}</span>
@@ -70,7 +70,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
       <div className="px-4 pb-4 pt-1" style={{ borderTop: "1px solid rgba(107,33,217,0.07)" }}>
         <Line label={`${euro(meal.price)} × ${guests === 1 ? t(`1 ${unit}`) : t(`{n} ${unit}s`, { n: guests })}`} value={euro(subtotal)} />
         <div className="flex items-center justify-between py-1.5">
-          <span className="flex items-center gap-1.5" style={{ fontSize: 13, color: "#7c6fa0" }}>
+          <span className="flex items-center gap-1.5" style={{ fontSize: 13, color: "#695a8c" }}>
             {store.live ? t("Bite service fee (free for now)") : t("Bite service fee (12%)")}
             <span className="tip-wrap" onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
               <button type="button" className="tip-btn" aria-label={t("What is the service fee for?")} aria-expanded={tip} onClick={() => setTip((v) => !v)} onBlur={() => setTip(false)}>?</button>
@@ -95,7 +95,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
             <p><i className="dot fee" /><b>{euro(fees)}</b> {t("to Bite, to keep it safe")}</p>
           </div>
         </div>
-        <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 6 }}>{t("Your contribution covers the ingredients — not a restaurant bill. Free cancellation up to 24h before.")}</p>
+        <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 6 }}>{t("Your contribution covers the ingredients — not a restaurant bill. Free cancellation up to 24h before.")}</p>
       </div>
     </div>
   );
@@ -135,7 +135,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
         {store.live ? (
           <div className="p-3 rounded-2xl" style={{ background: "#f7f4fd", border: "1.5px dashed rgba(107,33,217,0.35)" }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{t("Nothing is charged now")}</p>
-            <p style={{ fontSize: 12, color: "#7c6fa0", lineHeight: 1.5, marginTop: 2 }}>{t("{name} first accepts your request. Paying in the app is coming soon; until then you settle the grocery share with the host.", { name: meal.host.split(" ")[0] })}</p>
+            <p style={{ fontSize: 12, color: "#695a8c", lineHeight: 1.5, marginTop: 2 }}>{t("{name} first accepts your request. Paying in the app is coming soon; until then you settle the grocery share with the host.", { name: meal.host.split(" ")[0] })}</p>
           </div>
         ) : null}
         {store.live ? (
@@ -147,7 +147,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
           </div>
           <div className="flex-1">
             <p style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{t("Visa ···· 4242")}</p>
-            <p style={{ fontSize: 11.5, color: "#7c6fa0" }}>{t("Demo card — you will not be charged")}</p>
+            <p style={{ fontSize: 11.5, color: "#695a8c" }}>{t("Demo card — you will not be charged")}</p>
           </div>
           <CheckCircle size={18} color="#6b21d9" />
         </div>
@@ -189,7 +189,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
   );
 
   const trust = (
-    <div className="flex items-center justify-center gap-1.5" style={{ fontSize: 11.5, color: "#7c6fa0" }}>
+    <div className="flex items-center justify-center gap-1.5" style={{ fontSize: 11.5, color: "#695a8c" }}>
       <Shield size={12} color="#0a7c4e" />{" "}{store.live ? t("The host chooses who joins · report a problem any time") : t("Secure payments · verified host · insured meal")}</div>
   );
 
@@ -211,7 +211,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
           </motion.button>
           <div>
             <p style={{ fontSize: isDesktop ? 28 : 16, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.01em" }}>{t("Confirm your booking")}</p>
-            {isDesktop && <p style={{ fontSize: 14, color: "#7c6fa0" }}>{store.live ? t("Nothing is charged now: you pay the host's share once your seat is confirmed") : t("You won't be charged in this demo")}</p>}
+            {isDesktop && <p style={{ fontSize: 14, color: "#695a8c" }}>{store.live ? t("Nothing is charged now: you pay the host's share once your seat is confirmed") : t("You won't be charged in this demo")}</p>}
           </div>
         </div>
       </div>
@@ -243,7 +243,7 @@ export function CheckoutScreen({ meal, onBack, onBooked }: { meal: Meal; onBack:
 function Line({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-1.5">
-      <span style={{ fontSize: 13, color: "#7c6fa0" }}>{label}</span>
+      <span style={{ fontSize: 13, color: "#695a8c" }}>{label}</span>
       <span style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{value}</span>
     </div>
   );

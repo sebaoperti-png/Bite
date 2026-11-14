@@ -135,7 +135,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
                     <span style={{ fontSize: 10, fontWeight: 800, color: "#0a7c4e" }}>{t("VERIFIED")}</span>
                   </span>
                 </div>
-                <p style={{ fontSize: 13, color: "#7c6fa0", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                <p style={{ fontSize: 13, color: "#695a8c", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
                   <MapPin size={12} color="#7c6fa0" strokeWidth={2} />
                   {localPlace(store.profile.neighbourhood)}
                 </p>
@@ -154,7 +154,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
               ].map(({ value, label, icon }) => (
                 <div key={label} className="flex-1 flex flex-col items-center py-3 rounded-2xl" style={{ background: "#f5f4f9" }}>
                   <div className="flex items-center gap-1 mb-0.5">{icon}<span style={{ fontSize: 17, fontWeight: 900, color: "#160a2e" }}>{value}</span></div>
-                  <span style={{ fontSize: 10, color: "#7c6fa0", fontWeight: 600 }}>{t(label)}</span>
+                  <span style={{ fontSize: 10, color: "#695a8c", fontWeight: 600 }}>{t(label)}</span>
                 </div>
               ))}
             </div>
@@ -204,7 +204,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
               <span key={c} className="px-3.5 py-1.5 rounded-full" style={{ background: "#ede8fb", fontSize: 12.5, fontWeight: 700, color: "#6b21d9" }}>{t(c)}</span>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: "#7c6fa0", fontWeight: 600, marginBottom: 10 }}>{t("Dietary options offered")}</p>
+          <p style={{ fontSize: 12, color: "#695a8c", fontWeight: 600, marginBottom: 10 }}>{t("Dietary options offered")}</p>
           <div className="flex flex-wrap gap-2">
             {DIETARY.map(d => (
               <span key={d} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "#e5f7f0", fontSize: 12, fontWeight: 700, color: "#0a7c4e" }}>
@@ -232,12 +232,12 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
                   <Star key={i} size={11} color="#f59e0b" fill="#f59e0b" />
                 ))}
               </div>
-              <span style={{ fontSize: 10, color: "#7c6fa0", marginTop: 3 }}>{t("out of 5")}</span>
+              <span style={{ fontSize: 10, color: "#695a8c", marginTop: 3 }}>{t("out of 5")}</span>
             </div>
             <div className="flex-1">
               {[5,4,3].map((stars, idx) => (
                 <div key={stars} className="flex items-center gap-2 mb-1">
-                  <span style={{ fontSize: 10, color: "#7c6fa0", width: 8 }}>{stars}</span>
+                  <span style={{ fontSize: 10, color: "#695a8c", width: 8 }}>{stars}</span>
                   <div className="flex-1 rounded-full overflow-hidden" style={{ height: 5, background: "#e0d8f5" }}>
                     <motion.div
                       className="h-full rounded-full"
@@ -267,7 +267,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e" }}>{r.name}</span>
-                        <span style={{ fontSize: 11, color: "#7c6fa0" }}>{t(r.date)}</span>
+                        <span style={{ fontSize: 11, color: "#695a8c" }}>{t(r.date)}</span>
                       </div>
                       <div className="flex gap-0.5 mt-0.5">
                         {Array.from({ length: r.rating }).map((_, j) => (
@@ -314,7 +314,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
           style={{ background: "transparent", border: "1.5px solid rgba(107,33,217,0.18)" }}
           whileTap={{ scale: 0.97 }}
         >
-          <span style={{ fontSize: 14, fontWeight: 700, color: "#7c6fa0" }}>{t("Maybe later")}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "#695a8c" }}>{t("Maybe later")}</span>
         </motion.button>
       </div>
     </div>
@@ -339,7 +339,7 @@ function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: strin
       <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "#f0ecfa" }}>
         {icon}
       </div>
-      <span style={{ fontSize: 12.5, color: "#7c6fa0", fontWeight: 500, minWidth: 120 }}>{label}</span>
+      <span style={{ fontSize: 12.5, color: "#695a8c", fontWeight: 500, minWidth: 120 }}>{label}</span>
       <span style={{ fontSize: 13, color: "#160a2e", fontWeight: 700, marginLeft: "auto", textAlign: "right" }}>{value}</span>
     </div>
   );

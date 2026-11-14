@@ -52,7 +52,7 @@ export function MyReviews() {
         ))}
       </div>
       {!list ? null : list.length === 0 ? (
-        <p style={{ fontSize: 14, color: "#7c6fa0", textAlign: "center", padding: "18px 8px" }}>
+        <p style={{ fontSize: 14, color: "#695a8c", textAlign: "center", padding: "18px 8px" }}>
           {tab === "host" ? t("No reviews as a host yet. They appear after your first dinner.") : t("No reviews as a guest yet. Hosts can rate you after the dinner.")}
         </p>
       ) : (
@@ -78,7 +78,7 @@ export function FollowingList({ onBrowse }: { onBrowse: () => void }) {
   if (store.following.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "18px 8px" }}>
-        <p style={{ fontSize: 14, color: "#7c6fa0", lineHeight: 1.5 }}>{t("Enjoyed a dinner? Tap “Follow” on the host's meal page and their new tables show up first for you.")}</p>
+        <p style={{ fontSize: 14, color: "#695a8c", lineHeight: 1.5 }}>{t("Enjoyed a dinner? Tap “Follow” on the host's meal page and their new tables show up first for you.")}</p>
         <button onClick={onBrowse} className="mt-3 px-4 py-2 rounded-full" style={{ background: "#ede8fb", color: "#6b21d9", fontWeight: 700, fontSize: 13.5 }}>{t("Find a table")}</button>
       </div>
     );

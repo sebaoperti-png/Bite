@@ -174,7 +174,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
           </button>
         );
       })}
-      <button onClick={clearEverything} className="px-2.5 py-1 rounded-full" style={{ background: "#fff", border: "1px solid rgba(107,33,217,0.15)", fontSize: 12, fontWeight: 700, color: "#7c6fa0" }}>{t("Clear all")}</button>
+      <button onClick={clearEverything} className="px-2.5 py-1 rounded-full" style={{ background: "#fff", border: "1px solid rgba(107,33,217,0.15)", fontSize: 12, fontWeight: 700, color: "#695a8c" }}>{t("Clear all")}</button>
     </div>
   );
 
@@ -201,7 +201,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
     <div className="flex flex-col items-center justify-center py-14 px-6 gap-3 rounded-3xl text-center" style={{ background: isDesktop ? "#fff" : "transparent" }}>
       <EmptyPlate size={96} />
       <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "#160a2e" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
-      <p style={{ color: "#7c6fa0", fontSize: 14, maxWidth: 360, lineHeight: 1.5 }}>{t("Bite is just starting. Cook something you love and open the first table near you, or look a bit further.")}</p>
+      <p style={{ color: "#695a8c", fontSize: 14, maxWidth: 360, lineHeight: 1.5 }}>{t("Bite is just starting. Cook something you love and open the first table near you, or look a bit further.")}</p>
       <div className="flex flex-wrap justify-center gap-2 mt-1">
         {onStartHosting && <button onClick={onStartHosting} className="px-4 py-2.5 rounded-full" style={{ background: "#6b21d9", fontSize: 13.5, color: "#fff", fontWeight: 800 }}>{t("Host the first table")}</button>}
         <button onClick={clearEverything} className="px-4 py-2.5 rounded-full" style={{ background: "#ede8fb", fontSize: 13.5, color: "#6b21d9", fontWeight: 700 }}>{t("Show all meals")}</button>
@@ -210,7 +210,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   ) : (
     <div className="flex flex-col items-center justify-center py-16 gap-3 rounded-3xl" style={{ background: isDesktop ? "#fff" : "transparent" }}>
       <EmptyPlate size={96} />
-      <p style={{ color: "#7c6fa0", fontWeight: 600, fontSize: 14.5, textAlign: "center" }}>{t("No meals match your search")}</p>
+      <p style={{ color: "#695a8c", fontWeight: 600, fontSize: 14.5, textAlign: "center" }}>{t("No meals match your search")}</p>
       <button onClick={clearEverything} className="px-4 py-2 rounded-full" style={{ background: "#ede8fb", fontSize: 13, color: "#6b21d9", fontWeight: 700 }}>{t("Show all meals")}</button>
     </div>
   );
@@ -243,7 +243,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
           <section className="flex flex-col gap-4">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p style={{ fontSize: 14, color: "#7c6fa0", fontWeight: 600 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
+                <p style={{ fontSize: 14, color: "#695a8c", fontWeight: 600 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
                 <h1 style={{ fontSize: 30, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.02em" }}>
                   {filtered.length === 1 ? t("1 meal available") : t("{n} meals available", { n: filtered.length })}</h1>
               </div>
@@ -301,7 +301,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
             <ChevronLeft size={18} color="#6b21d9" strokeWidth={2.5} />
           </motion.button>
           <div className="flex-1">
-            <p style={{ fontSize: 11, color: "#7c6fa0", fontWeight: 500 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
+            <p style={{ fontSize: 11, color: "#695a8c", fontWeight: 500 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
             <p style={{ fontSize: 16, fontWeight: 700, color: "#160a2e" }}>{filtered.length === 1 ? t("1 meal available") : t("{n} meals available", { n: filtered.length })}</p>
           </div>
           <div className="flex gap-2">
@@ -380,7 +380,7 @@ function FilterSection({ title, subtitle, options, selected, onToggle, columns =
   return (
     <div className="mt-5">
       <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", textTransform: "uppercase", letterSpacing: "0.05em" }}>{title}</p>
-      {subtitle && <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 2 }}>{subtitle}</p>}
+      {subtitle && <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 2 }}>{subtitle}</p>}
       <div className={`grid ${columns === 1 ? "grid-cols-1" : "grid-cols-2"} gap-2 mt-3`}>
         {options.map(({ id, label, Icon, color, bg }) => {
           const active = selected.has(id);
@@ -462,7 +462,7 @@ export function MealCard({ meal, onSelect, compact = false, distance = null }: {
           <img src={meal.hostAvatar} alt="" loading="lazy" className="w-9 h-9 rounded-full object-cover flex-shrink-0" style={{ border: "2px solid #ede8fb" }} />
           <div className="flex-1 min-w-0">
             <p style={{ fontSize: 15, fontWeight: 700, color: "#160a2e" }} className="truncate">{tMaybe(meal.title)}</p>
-            <p className="truncate" style={{ fontSize: 11.5, color: "#7c6fa0" }}>{t("with {name}", { name: meal.host })} · {meal.time}{store.isFollowing(meal.hostId ?? meal.host) && <span style={{ color: "#6b21d9", fontWeight: 800 }}> · {t("You follow")}</span>}</p>
+            <p className="truncate" style={{ fontSize: 11.5, color: "#695a8c" }}>{t("with {name}", { name: meal.host })} · {meal.time}{store.isFollowing(meal.hostId ?? meal.host) && <span style={{ color: "#6b21d9", fontWeight: 800 }}> · {t("You follow")}</span>}</p>
           </div>
           <div className="flex items-center gap-0.5 flex-shrink-0">
             {meal.reviews ? <>
@@ -483,7 +483,7 @@ export function MealCard({ meal, onSelect, compact = false, distance = null }: {
         <div className="flex items-center justify-between mt-2.5 pt-2.5" style={{ borderTop: "1px solid rgba(107,33,217,0.07)" }}>
           <div className="flex items-center gap-1 min-w-0">
             <MapPin size={10} color="#7c6fa0" strokeWidth={2} className="flex-shrink-0" />
-            <span className="truncate" style={{ fontSize: 11, color: "#7c6fa0" }}>{distance != null && <b style={{ color: "#6b21d9", fontWeight: 800 }}>{fmtKm(distance)} · </b>}{dateLabel(meal.date)}</span>
+            <span className="truncate" style={{ fontSize: 11, color: "#695a8c" }}>{distance != null && <b style={{ color: "#6b21d9", fontWeight: 800 }}>{fmtKm(distance)} · </b>}{dateLabel(meal.date)}</span>
           </div>
           <span className="flex-shrink-0" style={{ fontSize: 11, fontWeight: left <= 1 ? 800 : 500, color: left === 0 ? "#e9345a" : left <= 1 ? "#c05e00" : "#7c6fa0" }}>
             {left === 0 ? t("Sold out") : left === 1 ? t("1 seat left") : t("{n} seats left", { n: left })}

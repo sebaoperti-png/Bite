@@ -154,7 +154,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
       )}
       {!isDesktop && <SafetyTipsStrip />}
       {conv.messages.length === 0 && (
-        <p className="text-center py-8" style={{ fontSize: 13, color: "#7c6fa0" }}>{t("Say hello to {name} — ask about the menu, allergies or timing.", { name: conv.name.split(" ")[0] })}</p>
+        <p className="text-center py-8" style={{ fontSize: 13, color: "#695a8c" }}>{t("Say hello to {name} — ask about the menu, allergies or timing.", { name: conv.name.split(" ")[0] })}</p>
       )}
       <AnimatePresence initial={false}>
         {conv.messages.map((msg) => (
@@ -237,7 +237,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
                 <img src={meal.image} alt="" className="w-full h-40 object-cover" />
                 <div className="p-4">
                   <p style={{ fontSize: 16, fontWeight: 800, color: "#160a2e" }}>{tMaybe(meal.title)}</p>
-                  <p style={{ fontSize: 13, color: "#7c6fa0", marginTop: 2 }}>{dateLabel(meal.date)} · {meal.time} · {euro(meal.price)}</p>
+                  <p style={{ fontSize: 13, color: "#695a8c", marginTop: 2 }}>{dateLabel(meal.date)} · {meal.time} · {euro(meal.price)}</p>
                   <p className="flex items-center gap-1 mt-2" style={{ fontSize: 13, fontWeight: 700, color: "#6b21d9" }}>{t("View meal")}{" "}<ChevronRight size={14} /></p>
                 </div>
               </button>
@@ -282,7 +282,7 @@ function ChatBubble({ message, avatar, stream = false }: { message: ChatMessage;
         >
           <p style={{ fontSize: 14, color: isMe ? "#fff" : "#160a2e", lineHeight: 1.5, overflowWrap: "anywhere" }}><StreamText text={tMaybe(message.text)} play={stream} /></p>
         </div>
-        <p className={`mt-1 ${isMe ? "text-right" : "text-left"}`} style={{ fontSize: 10, color: "#7c6fa0" }}>
+        <p className={`mt-1 ${isMe ? "text-right" : "text-left"}`} style={{ fontSize: 10, color: "#695a8c" }}>
           {timeLabel(message.at)}{isMe && <span style={{ marginLeft: 4, color: "#9b4aff" }}>✓✓</span>}
         </p>
       </div>
