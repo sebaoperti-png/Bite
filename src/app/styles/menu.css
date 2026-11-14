@@ -42,7 +42,7 @@
 .wm-line b { font-size: 15px; font-weight: 800; color: #160a2e; max-width: 74%; line-height: 1.25; }
 .wm-line i { flex: 1; border-bottom: 2px dotted rgba(22,10,46,0.25); transform: translateY(-4px); min-width: 12px; }
 .wm-line em { font-style: normal; font-size: 15px; font-weight: 900; color: #6b21d9; }
-.wm-meta { display: block; margin-top: 2px; font-size: 12px; color: #7c6fa0; }
+.wm-meta { display: block; margin-top: 2px; font-size: 12px; color: #695a8c; }
 .wm-day, .wm-dish, .wm-all { opacity: 0; transform: translateY(8px); }
 .wm.open .wm-day, .wm.open .wm-dish, .wm.open .wm-all { opacity: 1; transform: none; transition: opacity .45s var(--d), transform .45s var(--d), background .2s; }
 .wm-pop { position: absolute; z-index: 10; right: 34px; bottom: calc(100% - 8px); width: 130px; height: 96px; object-fit: cover; border: 6px solid #fff; border-bottom-width: 18px; border-radius: 4px;
@@ -124,7 +124,7 @@ button:hover .dh-doodle { transform: rotate(-6deg); }
 .wm-head { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 4px 0 16px; padding-bottom: 14px; border-bottom: 1.5px dashed rgba(107,33,217,0.2); }
 .wm-head .wm-head-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #f0e9fb; color: #6b21d9; box-shadow: inset 0 0 0 1.5px rgba(107,33,217,0.15); }
 .wm-head b { margin-top: 2px; }
-.wm-head p { margin: 0; max-width: 230px; text-align: center; font-size: 12.5px; line-height: 1.4; color: #7c6fa0; }
+.wm-head p { margin: 0; max-width: 230px; text-align: center; font-size: 12.5px; line-height: 1.4; color: #695a8c; }
 .wm-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .wm-when { flex-shrink: 0; padding: 1px 7px; border-radius: 6px; background: #f0e9fb; color: #6b21d9; font-size: 11px; font-weight: 800; }
 .wm-none { margin: 10px 0; text-align: center; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 16px; color: #a08bc7; }
@@ -147,7 +147,7 @@ button:hover .dh-doodle { transform: rotate(-6deg); }
 .lp-err { margin: 0; font-size: 12.5px; font-weight: 700; color: #e9345a; }
 .lp-current { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; font-weight: 700; color: #160a2e; }
 .lp-current svg { color: #6b21d9; }
-.lp-label { margin: 6px 0 0; font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #8b7bb5; }
+.lp-label { margin: 6px 0 0; font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #695a8c; }
 .lp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .lp-chip { padding: 7px 12px; border-radius: 999px; background: #fff; color: #4b3a6b; font-size: 13px; font-weight: 700; box-shadow: inset 0 0 0 1.5px rgba(107,33,217,0.15); transition: background .2s, color .2s; }
 .lp-chip.on { background: #6b21d9; color: #fff; box-shadow: none; }
@@ -175,7 +175,7 @@ button:hover .dh-doodle { transform: rotate(-6deg); }
 .mwm-tabs button > span:last-child { position: relative; display: inline-flex; align-items: center; gap: 4px; }
 .mwm-tabs button.on { color: #fff; }
 .mwm-pill { position: absolute; inset: 0; border-radius: 9px; background: #6b21d9; }
-.mwm-what { margin: 10px 2px 4px; text-align: center; font-size: 12px; color: #7c6fa0; }
+.mwm-what { margin: 10px 2px 4px; text-align: center; font-size: 12px; color: #695a8c; }
 .mwm-dish { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 9px 2px; border-bottom: 1px dotted rgba(107,33,217,0.2); animation: mwmIn .35s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(var(--i) * 45ms); }
 .mwm-dish img { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
 .mwm-body { flex: 1; min-width: 0; }
@@ -192,12 +192,12 @@ button:hover .dh-doodle { transform: rotate(-6deg); }
 .lp-suggest button:hover, .lp-suggest button:focus-visible { background: #f6f1fe; outline: none; }
 .lp-suggest svg { margin-top: 2px; flex-shrink: 0; }
 .lp-suggest b { display: block; font-size: 14px; color: #160a2e; font-weight: 700; }
-.lp-suggest em { display: block; font-style: normal; font-size: 12px; color: #7c6fa0; }
+.lp-suggest em { display: block; font-style: normal; font-size: 12px; color: #695a8c; }
 
 /* ── Home as the entrance of a small restaurant (2026-11-14) ──
    The maître d's reservation book (cream page, ribbon), the people cooking tonight beside it,
    the kitchen's chalkboard further down. Titles in the menu's italic, everything else in Figtree. */
-.hm-greet { margin: 0; font-family: var(--font-serif); font-style: italic; font-size: 19px; line-height: 1.1; color: #9b4aff; }
+.hm-greet { margin: 0; font-family: var(--font-serif); font-style: italic; font-size: 19px; line-height: 1.1; color: #7c3aed; }
 .hm-title { margin: 4px 0 0; font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 36px; line-height: 0.98; letter-spacing: -0.01em; color: #160a2e; text-wrap: balance; }
 
 .hm-book { position: relative; padding: 40px 44px 34px; border-radius: 6px 22px 22px 6px; background: #fffdf6;
@@ -214,7 +214,7 @@ button:hover .dh-doodle { transform: rotate(-6deg); }
 .hm-side { display: flex; }
 .nc { width: 100%; }
 .nc-head h2 { margin: 0; font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 26px; line-height: 1.05; color: #160a2e; }
-.nc-head p { margin: 4px 0 0; font-size: 13px; line-height: 1.45; color: #7c6fa0; }
+.nc-head p { margin: 4px 0 0; font-size: 13px; line-height: 1.45; color: #695a8c; }
 .nc-list { list-style: none; margin: 0; padding: 0; }
 .nc-face { flex-shrink: 0; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(46,16,96,0.18); }
 .nc-initial { display: grid; place-items: center; font-family: var(--font-serif); font-style: italic; color: #fff; background: linear-gradient(135deg, #6b21d9, #b87fff); }

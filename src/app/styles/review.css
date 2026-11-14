@@ -3,7 +3,7 @@
 .rv-who { display: flex; align-items: center; gap: 12px; }
 .rv-who img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 0 0 3px #f0e9fb; }
 .rv-q { margin: 0; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; line-height: 1.1; color: #160a2e; }
-.rv-meal { margin: 3px 0 0; font-size: 12.5px; color: #7c6fa0; }
+.rv-meal { margin: 3px 0 0; font-size: 12.5px; color: #695a8c; }
 .rv-stars { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
 .rv-stars button { padding: 4px; border-radius: 12px; }
 .rv-stars button:focus-visible { outline: 2px solid #6b21d9; outline-offset: 2px; }
@@ -14,7 +14,7 @@
 .rv-text { display: block; width: 100%; margin-top: 14px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid rgba(107,33,217,0.18); background: #fff; font: inherit; font-size: 14.5px; line-height: 1.5; color: #160a2e; resize: vertical; outline: none; }
 .rv-text:focus { border-color: #6b21d9; }
 .rv-count { margin: 4px 2px 0; text-align: right; font-size: 11px; color: #a99cc8; }
-.rv-note { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: #7c6fa0; }
+.rv-note { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: #695a8c; }
 .rv-save { display: block; width: 100%; margin-top: 14px; padding: 14px; border-radius: 16px; background: #6b21d9; color: #fff; font-size: 15px; font-weight: 800; }
 .rv-save:disabled { opacity: .45; }
 .rv-mini { display: inline-flex; gap: 1px; vertical-align: -1px; }

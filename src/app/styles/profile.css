@@ -17,7 +17,7 @@
 .pd-desk .pd-card { border-radius: 24px; padding: 24px 26px; box-shadow: 0 6px 30px rgba(46,16,96,0.06); }
 .pd-card h2 { font-size: 18px; font-weight: 900; color: #160a2e; letter-spacing: -0.01em; }
 .pd-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-.pd-card-head p { font-size: 13px; color: #7c6fa0; margin-top: 3px; font-weight: 600; }
+.pd-card-head p { font-size: 13px; color: #695a8c; margin-top: 3px; font-weight: 600; }
 
 /* passport */
 .pd-passport { background: linear-gradient(180deg, #fffdf8, #fff); position: relative; }
@@ -39,8 +39,8 @@
 .pd-desk .pd-badge-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; overflow: visible; margin: 0; padding: 0; }
 .pd-badge { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 10px 4px; border-radius: 16px; background: #f7f5fb; }
 .pd-badge.on .pd-badge b { font-size: 11px; overflow-wrap: anywhere; hyphens: auto; font-weight: 800; color: #160a2e; line-height: 1.2; }
-.pd-badge em { font-style: normal; font-size: 10px; color: #8b7bb5; line-height: 1.25; }
-.pd-badge:not(.on) b { color: #8b7bb5; }
+.pd-badge em { font-style: normal; font-size: 10px; color: #695a8c; line-height: 1.25; }
+.pd-badge:not(.on) b { color: #695a8c; }
 
 /* ── Bite Passport booklet ── */
 .pp { --h: 410px; position: relative; height: var(--h); perspective: 2000px; margin: 6px 0 4px; }
@@ -146,7 +146,7 @@
 .pd-pc-eyebrow { display: inline-block; font-family: var(--font-serif); font-style: italic; font-size: 19px; color: #9b4aff; }
 .pd-placecard h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 44px; line-height: 1; letter-spacing: -0.01em; margin-top: 6px; }
 .pd-desk .pd-placecard h1 { font-size: 62px; }
-.pd-pc-meta { margin-top: 8px; font-size: 13px; color: #7c6fa0; font-weight: 600; }
+.pd-pc-meta { margin-top: 8px; font-size: 13px; color: #695a8c; font-weight: 600; }
 .pd-pc-meta b { color: #6b21d9; font-weight: 800; }
 .pd-pc-bio { margin-top: 12px; font-size: 14.5px; line-height: 1.6; color: #4a3a6e; max-width: 520px; }
 .pd-placecard .pd-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; justify-content: center; }
@@ -176,7 +176,7 @@ button.pd-ticket:hover { transform: translateY(-2px) rotate(-.4deg); box-shadow:
 .pd-ticket-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 12px 14px; }
 .pd-ticket-body small { font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; color: #9b4aff; }
 .pd-ticket-body b { font-size: 15px; color: #160a2e; }
-.pd-ticket-body > span { font-size: 12.5px; color: #7c6fa0; line-height: 1.45; }
+.pd-ticket-body > span { font-size: 12.5px; color: #695a8c; line-height: 1.45; }
 .pd-ticket-body button { align-self: flex-start; margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 10px; background: #6b21d9; color: #fff; font-size: 13px; font-weight: 800; }
 .pd-ticket-price { align-self: center; padding: 0 16px 0 4px; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; color: #6b21d9; }
 
@@ -230,7 +230,7 @@ button.pd-ticket:hover { transform: translateY(-2px) rotate(-.4deg); box-shadow:
 .sr-napkin-line { stroke: #c9a94f; stroke-width: 1.2; }
 .sr-head em { display: block; font-family: var(--font-serif); font-style: italic; font-size: 15px; color: #9b4aff; line-height: 1; }
 .sr-head h3 { margin: 3px 0 0; font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 25px; line-height: 1.02; color: #160a2e; }
-.sr-head p { margin: 5px 0 0; font-size: 12.5px; line-height: 1.4; color: #7c6fa0; }
+.sr-head p { margin: 5px 0 0; font-size: 12.5px; line-height: 1.4; color: #695a8c; }
 .sr-steps { list-style: none; margin: 12px 0 0; padding: 0; counter-reset: sr; }
 .sr-steps li > button, .sr-steps li > div { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 4px 4px; text-align: left; border-top: 1px dashed rgba(107,33,217,0.2); color: #160a2e; border-radius: 8px; }
 .sr-steps li > button { cursor: pointer; transition: background .2s; }
@@ -267,7 +267,7 @@ li.done .sr-name { color: #4b3a6b; }
 .carte-orn svg { width: 36px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
 .carte-head h2 { margin: 6px 0 0; font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 38px; line-height: 1; color: #160a2e; }
 .pd-desk .carte-head h2 { font-size: 48px; }
-.carte-head p { margin: 8px auto 0; max-width: 34ch; font-size: 13px; color: #7c6fa0; }
+.carte-head p { margin: 8px auto 0; max-width: 34ch; font-size: 13px; color: #695a8c; }
 .carte-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; margin-top: 24px; }
 .pd-desk .carte-cols { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; margin-top: 34px; }
 .carte-course h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 22px; color: #6b21d9; }
@@ -281,5 +281,5 @@ li.done .sr-name { color: #4b3a6b; }
 .ci-val { font-family: var(--font-serif); font-style: italic; font-size: 20px; line-height: 1; color: #6b21d9; }
 .ci-go { flex-shrink: 0; align-self: center; color: #b8a6dc; transition: transform .2s, color .2s; }
 .carte-item:hover .ci-go { transform: translateX(3px); color: #6b21d9; }
-.ci-desc { display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.4; color: #8b7bb5; font-style: italic; }
+.ci-desc { display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.4; color: #695a8c; font-style: italic; }
 .carte-foot { margin: 22px 0 0; text-align: center; font-family: var(--font-serif); font-style: italic; font-size: 15px; color: #a08bc7; }

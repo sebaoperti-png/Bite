@@ -15,7 +15,7 @@
 .lm-row img { width: 76px; height: 64px; border-radius: 12px; object-fit: cover; }
 .lm-row-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .lm-row-text b { font-size: 14px; font-weight: 800; color: #160a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lm-row-text em { font-style: normal; font-size: 12px; color: #7c6fa0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lm-row-text em { font-style: normal; font-size: 12px; color: #695a8c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lm-row-text span { font-size: 11.5px; color: #a99cc8; }
 .lm-row-price { padding: 4px 10px; border-radius: 999px; background: #6b21d9; color: #fff; font-size: 13px; font-weight: 900; }
 .lm-map { border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(46,16,96,0.08); }
