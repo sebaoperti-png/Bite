@@ -1325,6 +1325,14 @@ const DE_UI: Record<string, string> = {
   "Rome": "Rom", "Florence": "Florenz", "Naples": "Neapel", "Seville": "Sevilla", "The Hague": "Den Haag",
   "Brussels": "Brüssel", "Antwerp": "Antwerpen", "Ghent": "Gent", "Copenhagen": "Kopenhagen", "Warsaw": "Warschau",
   "Kraków": "Krakau", "Wrocław": "Breslau", "Gdańsk": "Danzig", "Prague": "Prag", "Lisbon": "Lissabon", "Gothenburg": "Göteborg",
+  // "No tables near you, yet" (NoTables.tsx)
+  "Tonight's tables": "Die Tische heute Abend",
+  "No tables near you, yet.": "Noch kein Tisch in deiner Nähe.",
+  "Bite has just opened its kitchen. We'll tell you when a neighbour sets the first table near you, or you set it yourself.": "Bite hat seine Küche gerade erst geöffnet. Wir sagen dir Bescheid, sobald jemand aus der Nachbarschaft den ersten Tisch in deiner Nähe deckt, oder du deckst ihn selbst.",
+  "Notify me": "Sag mir Bescheid",
+  "first table": "erster Tisch",
+  "We'll save you a seat.": "Wir halten dir einen Platz frei.",
+  "Leave your email and we'll write as soon as a neighbour opens a table near you. No spam, just the first invitation.": "Hinterlass deine E-Mail und wir schreiben dir, sobald jemand in deiner Nähe einen Tisch eröffnet. Kein Spam, nur die erste Einladung.",
 };
 
 // Words that are the same in German (listed so the dev check doesn't report them as missing)

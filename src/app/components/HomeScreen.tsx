@@ -33,6 +33,7 @@ import { ProfileDashboard, type ProfileRow } from "./ProfileDashboard";
 import { WeekMenu } from "./WeekMenu";
 import { AboutBiteCard } from "./AboutBiteCard";
 import { NeighbourCooks, HostChalkboard } from "./HomeParts";
+import { NoTables } from "./NoTables";
 
 export type HomeTab = Exclude<NavTab, "browse">;
 
@@ -91,6 +92,8 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
   };
 
   const nearby = store.meals.filter((m) => store.seatsLeft(m) > 0).slice(0, 12);
+  // live and nobody is cooking anywhere yet: a "No tables near you, yet" page instead of an empty menu
+  const noTables = store.live && !store.loading && !store.meals.some((m) => store.seatsLeft(m) > 0);
   const resultCount = store.meals.filter((m) => matchesCriteria(m, { ...criteria, service: activeService }, store.seatsLeft(m))).length;
 
   return (
@@ -118,6 +121,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                 onSeeAll={() => onSearch({ service: "all" })}
                 onSeeService={(s) => onSearch({ service: s })}
                 onStartHosting={onStartHosting}
+                noTables={noTables}
               />
             ) : (
               <>
@@ -192,7 +196,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
 
                   <div className="pt-4"><InstallBanner /></div>
 
-                  <div className="pt-5"><NeighbourCooks layout="row" meals={store.meals.filter((m) => store.seatsLeft(m) > 0 && !(store.myId && m.hostId === store.myId))} onSelectMeal={onSelectMeal} onHost={onStartHosting} /></div>
+                  {noTables ? <div className="px-4 pt-6"><NoTables compact onHost={onStartHosting} /></div> : <div className="pt-5"><NeighbourCooks layout="row" meals={store.meals.filter((m) => store.seatsLeft(m) > 0 && !(store.myId && m.hostId === store.myId))} onSelectMeal={onSelectMeal} onHost={onStartHosting} /></div>}
 
                   {/* Quick tags */}
                   <motion.div className="px-5 pt-3 pb-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.58 }}>
@@ -208,12 +212,14 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
 
                   {/* This week's menu, by way of eating (same as the desktop menu) */}
                   <div className="px-5 pt-3 pb-24">
+                    {!noTables && <>
                     <div className="flex items-center justify-between mb-2.5">
                       <p style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)" }}>{t("Cooking this week")}</p>
                       <button onClick={() => onSearch({ service: "all" })} className="tap-link flex items-center gap-0.5" style={{ fontSize: 12, fontWeight: 700, color: "var(--brand-ink)" }}>{t("See all")}{" "}<ChevronRight size={14} />
                       </button>
                     </div>
                     <MobileWeekMenu meals={store.meals.filter((m) => store.seatsLeft(m) > 0)} active={activeService} onSelectMeal={onSelectMeal} onSeeService={(s) => onSearch({ service: s })} />
+                    </>}
                     {firstSteps && <div className="fs-wrap flex flex-col gap-3 mt-6">{firstSteps}</div>}
                     <div style={{ marginTop: 24 }}><HostChalkboard compact onHost={onStartHosting} /></div>
                     <div style={{ marginTop: 22 }}><AboutBiteCard compact /></div>
@@ -318,8 +324,9 @@ function ServiceDoodle({ kind }: { kind: ServiceType }) {
   );
 }
 
-function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, openPicker, searching, resultCount, onSearchClick, onTag, meals, onSelectMeal, onSeeAll, onSeeService, onStartHosting, firstSteps }: {
+function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, openPicker, searching, resultCount, onSearchClick, onTag, meals, onSelectMeal, onSeeAll, onSeeService, onStartHosting, firstSteps, noTables }: {
   firstSteps?: React.ReactNode;
+  noTables?: boolean;
   name: string;
   activeTab: ServiceType;
   setActiveTab: (t: ServiceType) => void;
@@ -398,6 +405,7 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
           </motion.div>
         </div>
 
+        {noTables ? <section className="mt-12 mx-auto w-full max-w-[640px]"><NoTables onHost={onStartHosting} /></section> : (
         <section className="mt-12">
           <div className="flex items-end justify-between mb-5">
             <div>
@@ -411,6 +419,7 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
           </div>
           <WeekMenu meals={meals} active={activeTab} onSelectMeal={onSelectMeal} onSeeService={onSeeService} />
         </section>
+        )}
 
         {firstSteps && <div className="fs-wrap mt-10 grid gap-4 lg:grid-cols-[1fr_1fr] items-start">{firstSteps}</div>}
 

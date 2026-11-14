@@ -2,6 +2,7 @@ import "../styles/listings.css";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { placeSummary, fmtKm } from "./LocationPicker";
 import { BiteLoader, EmptyPlate } from "../../shared/Restaurant";
+import { NoTables } from "./NoTables";
 import { LikeHeart } from "../../shared/Motion";
 import {
   ChevronLeft, Star, SlidersHorizontal, Heart, MapPin, Search,
@@ -197,10 +198,12 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   );
 
   // live and nothing here yet: Bite is just starting, so invite people to open the first table
-  const empty = store.live ? (
+  const empty = store.live && !store.loading && !store.meals.some((m) => store.seatsLeft(m) > 0) ? (
+    <div className="py-6"><NoTables compact={!isDesktop} onHost={onStartHosting} /></div>
+  ) : store.live ? (
     <div className="flex flex-col items-center justify-center py-14 px-6 gap-3 rounded-3xl text-center" style={{ background: isDesktop ? "var(--surface)" : "transparent" }}>
       <EmptyPlate size={96} />
-      <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "var(--ink)" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
+      <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "var(--ink)" }}>{t("No table here yet")}</p>
       <p style={{ color: "var(--ink-2)", fontSize: 14, maxWidth: 360, lineHeight: 1.5 }}>{t("Bite is just starting. Cook something you love and open the first table near you, or look a bit further.")}</p>
       <div className="flex flex-wrap justify-center gap-2 mt-1">
         {onStartHosting && <button onClick={onStartHosting} className="px-4 py-2.5 rounded-full" style={{ background: "#6b21d9", fontSize: 13.5, color: "#fff", fontWeight: 800 }}>{t("Host the first table")}</button>}

@@ -1,0 +1,38 @@
+/* "No tables near you, yet" (NoTables.tsx): a menu card with an empty table set for four, live mode only */
+.nt { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 30px 26px 30px; border-radius: 26px;
+  background: #fffdf7; color: #160a2e;
+  box-shadow: 0 22px 50px rgba(46,16,96,0.12), 0 0 0 1px rgba(107,33,217,0.08), inset 0 0 0 9px #fffdf7, inset 0 0 0 10px rgba(107,33,217,0.14); }
+.nt-eyebrow { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 17px; color: #6b21d9; display: flex; align-items: center; gap: 10px; }
+.nt-eyebrow::before, .nt-eyebrow::after { content: ""; width: 26px; border-top: 1.5px solid rgba(107,33,217,0.3); }
+.nt-table { width: 230px; height: 230px; margin: 8px 0 4px; overflow: visible; }
+.nt-chair { fill: rgba(155,74,255,0.06); stroke: #a993d6; stroke-width: 2.5; stroke-dasharray: 5 5; animation: ntChair 3.6s ease-in-out infinite; }
+@keyframes ntChair { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.nt-shadow { fill: rgba(46,16,96,0.1); }
+.nt-cloth { fill: #fff; stroke: rgba(107,33,217,0.24); stroke-width: 1.5; }
+.nt-cloth-edge { fill: none; stroke: rgba(107,33,217,0.12); stroke-width: 1.5; stroke-dasharray: 2 6; stroke-linecap: round; }
+.nt-plate { fill: #fffdf7; stroke: #cbb9ea; stroke-width: 2; }
+.nt-rim { fill: none; stroke: #e6dcf7; stroke-width: 1.5; }
+.nt-cutlery { stroke: #a993d6; stroke-width: 2.4; stroke-linecap: round; }
+.nt-candle { fill: #f0e9fb; stroke: #d9c8f5; stroke-width: 2; }
+.nt-flame { fill: #ffb547; transform-origin: 110px 107px; animation: ntFlame 1.8s ease-in-out infinite; }
+@keyframes ntFlame { 0%, 100% { transform: scale(1) rotate(-3deg); } 50% { transform: scale(1.12, 0.92) rotate(3deg); } }
+.nt-title { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 38px; line-height: 1.02; letter-spacing: -0.01em; margin: 6px 0 10px; max-width: 420px; color: #160a2e; }
+.nt-sub { font-size: 14.5px; line-height: 1.55; color: #5c4a7c; max-width: 400px; margin: 0 0 20px; }
+.nt-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
+.nt-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 22px; border-radius: 14px; border: 0; cursor: pointer; font-size: 15px; font-weight: 800; text-decoration: none; transition: transform .2s cubic-bezier(.22,1,.36,1), background .2s, box-shadow .2s; }
+.nt-btn:active { transform: scale(.97); }
+.nt-notify { background: #160a2e; color: #fff; }
+.nt-notify:hover { background: #2a1553; }
+.nt-host { background: linear-gradient(135deg, #6b21d9, #9b4aff); color: #fff; box-shadow: 0 12px 26px rgba(107,33,217,0.32); }
+.nt-host:hover { box-shadow: 0 14px 30px rgba(107,33,217,0.42); }
+.nt-compact { padding: 24px 18px 24px; border-radius: 22px; }
+.nt-compact .nt-table { width: 170px; height: 170px; }
+.nt-compact .nt-title { font-size: 32px; }
+.nt-compact .nt-btn { flex: 1 1 100%; }
+
+/* the Notify me sheet: its own full-screen layer, with the reservation card's paper */
+.nt-layer { position: fixed; inset: 0; z-index: 80; }
+.nt-sheet { padding: 26px 24px 28px; background: #fffdf7 repeating-linear-gradient(180deg, transparent 0 31px, rgba(107,33,217,0.05) 31px 32px); color: #160a2e; min-height: 100%; }
+.nt-sheet .rs-form h2 { font-size: 38px; }
+
+@media (prefers-reduced-motion: reduce) { .nt-chair, .nt-flame { animation: none; } }

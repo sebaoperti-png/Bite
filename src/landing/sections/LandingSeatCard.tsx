@@ -1,26 +1,14 @@
 // HERO SIGN-UP — "Save me a seat": the stay-updated form as a restaurant reservation card, with a plate,
 // a coffee cup and a few ingredients floating around it. After sending, a "RESERVED" table sign pops up.
-// Same data flow as before: Google Apps Script endpoint if set (src/shared/forms.ts), otherwise kept in this browser.
+// The form itself is SeatForm (src/shared/SeatForm.tsx), shared with the app's "No tables near you, yet" page.
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { FORMS_ENDPOINT, postForm } from "../../shared/forms";
-import { getLang, t } from "../../shared/i18n";
-import { Tilt, Arrowed } from "../../shared/Motion";
-
-const ROLES = [
-  { id: "eat", label: "To eat" },
-  { id: "host", label: "To host" },
-  { id: "both", label: "Both" },
-] as const;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+import { t } from "../../shared/i18n";
+import { Tilt } from "../../shared/Motion";
+import { SeatForm } from "../../shared/SeatForm";
 
 export function LandingSeatCard() {
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"eat" | "host" | "both">("eat");
-  const [city, setCity] = useState("");
-  const [consent, setConsent] = useState(false);
-  const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
-  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
   // Which card is on top of the deck: the 60-second survey first, the reservation behind it
   const [front, setFront] = useState<"survey" | "seat">("survey");
   useEffect(() => {
@@ -29,30 +17,6 @@ export function LandingSeatCard() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!EMAIL_RE.test(email.trim())) { setError(t("Please enter a valid email address.")); return; }
-    if (!consent) { setError(t("Tick the box so we're allowed to email you.")); return; }
-    setError("");
-    setState("sending");
-    const entry = { email: email.trim().toLowerCase(), role, area: city.trim(), at: new Date().toISOString() };
-    try {
-      if (FORMS_ENDPOINT) {
-        const source = new URLSearchParams(window.location.search).get("ref") || "landing";
-        if (!(await postForm({ type: "waitlist", ...entry, source, newsletter: true, lang: getLang(), consentVersion: "waitlist-2026-10-20" }))) throw new Error("not saved");
-      } else {
-        try {
-          const list = JSON.parse(localStorage.getItem("bite_waitlist") || "[]");
-          localStorage.setItem("bite_waitlist", JSON.stringify([...list, entry]));
-        } catch { /* ignore */ }
-        await new Promise((r) => setTimeout(r, 700));
-      }
-      setState("done");
-    } catch {
-      setState("error");
-    }
-  };
 
   return (
     <div className="rs-wrap" id="waitlist">
@@ -115,58 +79,13 @@ export function LandingSeatCard() {
       </div>
 
       {/* Card 2: the reservation (stay-updated sign-up) */}
-      <div className={`rs-card rs-seat ${state === "done" ? "done" : ""} ${front === "seat" ? "front" : "back"}`} onClick={front === "seat" ? undefined : () => setFront("seat")}>
+      <div className={`rs-card rs-seat ${done ? "done" : ""} ${front === "seat" ? "front" : "back"}`} onClick={front === "seat" ? undefined : () => setFront("seat")}>
         <div className="rs-head">
           <span>{t("Reservation")}</span>
           <span className="rs-no">№ 0042</span>
         </div>
 
-        {state === "done" ? (
-          <div className="rs-done">
-            <div className="rs-tent" aria-hidden>
-              <span className="rs-tent-top" />
-              <span className="rs-tent-front"><b>{t("RESERVED")}</b><em>BITE</em></span>
-            </div>
-            <h3>{t("Your seat is saved.")}</h3>
-            <p>{t("Last step: we sent an email to")} <b>{email.trim()}</b>{t(". Click the link inside to confirm.")}</p>
-            <div className="rs-links">
-              <a className="lm" href="bite.html"><Arrowed text={t("Open the app")} /></a>
-              <a className="lm" href="feedback.html?ref=landing"><Arrowed text={t("Give us feedback")} /></a>
-            </div>
-          </div>
-        ) : (
-          <form className="rs-form" onSubmit={submit} noValidate>
-            <h2>{t("Save me a seat.")}</h2>
-            <p className="rs-sub">{t("Bite is still in the kitchen. Leave your email and we'll keep a seat for you, plus news on how to be part of it.")}</p>
-
-            <div className="rs-label">{t("I'm coming…")}</div>
-            <div className="rs-roles" role="radiogroup" aria-label={t("I'm interested as…")}>
-              {ROLES.map((r) => (
-                <button key={r.id} type="button" role="radio" aria-checked={role === r.id} className={`rs-role ${role === r.id ? "on" : ""}`} onClick={() => setRole(r.id)}>{t(r.label)}</button>
-              ))}
-            </div>
-
-            <label className="rs-line">
-              <span>{t("Email")}</span>
-              <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setError(""); }} placeholder={t("you@example.com")} autoComplete="email" maxLength={120} />
-            </label>
-            <label className="rs-line">
-              <span>{t("Your city")} <em>{t("(optional)")}</em></span>
-              <input value={city} onChange={(e) => setCity(e.target.value)} placeholder={t("e.g. Frankfurt, Fulda, Berlin…")} maxLength={60} />
-            </label>
-
-            <label className="rs-consent">
-              <input type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); setError(""); }} />
-              <span>{t("Yes, send me Bite news by email (at most once a month). I'll first get an email to confirm. I can withdraw my consent any time with the link in every email. I'm at least 16. Details in the")} <a href="legal.html#survey">{t("privacy policy")}</a>.</span>
-            </label>
-
-            {(error || state === "error") && <p className="rs-error" role="alert">{error || t("Something went wrong, please try again in a moment.")}</p>}
-
-            <button type="submit" className="rs-go" disabled={state === "sending"}>
-              {state === "sending" ? t("Saving…") : t("Save my seat")}
-            </button>
-          </form>
-        )}
+        <SeatForm source={new URLSearchParams(window.location.search).get("ref") || "landing"} onDone={() => setDone(true)} />
       </div>
       </div>
       </Tilt>

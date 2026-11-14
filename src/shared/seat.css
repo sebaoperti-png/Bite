@@ -1,0 +1,41 @@
+/* "Save me a seat": the stay-updated form as a reservation card (SeatForm.tsx). Shared by the landing's hero card
+   and the app's "No tables near you, yet" page; the card's paper and decorations stay in each page's own CSS. */
+.rs-head { display: flex; justify-content: space-between; align-items: center; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 16px; font-weight: 500; color: #6b21d9; margin-bottom: 8px; }
+.rs-no { font-family: 'Figtree Variable', sans-serif; font-style: normal; font-size: 12px; font-variant-numeric: tabular-nums; color: #a08bc7; }
+.rs-form h2, .rs-done h3 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 46px; line-height: 1; letter-spacing: -0.01em; color: #160a2e; margin: 4px 0 10px; }
+.rs-sub { font-size: 14.5px; line-height: 1.55; color: #5c4a7c; margin: 0 0 18px; }
+.rs-label, .rs-line > span { display: block; font-size: 10.5px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; color: #695a8c; margin-bottom: 7px; }
+.rs-line > span em { font-style: normal; font-weight: 600; letter-spacing: .04em; text-transform: none; }
+.rs-roles { display: flex; gap: 8px; margin-bottom: 18px; }
+.rs-role { flex: 1; padding: 10px 8px; border-radius: 12px; border: 1.5px dashed rgba(107,33,217,0.35); background: #fff; font-size: 13.5px; font-weight: 800; color: #4a3a6e; cursor: pointer; transition: all .2s; }
+.rs-role:hover { border-color: #9b4aff; color: #6b21d9; }
+.rs-role.on { border-style: solid; border-color: #6b21d9; background: #6b21d9; color: #fff; box-shadow: 0 8px 18px rgba(107,33,217,0.3); }
+.rs-line { display: block; margin-bottom: 16px; }
+.rs-line input { width: 100%; border: 0; border-bottom: 2px dotted rgba(107,33,217,0.35); background: transparent; padding: 4px 2px 6px; outline: none;
+  font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; color: #160a2e; transition: border-color .2s; }
+.rs-line input::placeholder { color: #c4b8de; }
+.rs-line input:focus { border-bottom-style: solid; border-bottom-color: #6b21d9; }
+.rs-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12px; line-height: 1.5; color: #695a8c; margin: 4px 0 14px; cursor: pointer; }
+.rs-consent input { margin-top: 2px; width: 16px; height: 16px; accent-color: #6b21d9; flex-shrink: 0; }
+.rs-consent a { color: #6b21d9; text-decoration: underline; }
+.rs-error { margin: 0 0 12px; font-size: 13px; font-weight: 700; color: #d81b60; }
+.rs-go { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 14px; border: 0; cursor: pointer; background: #160a2e; color: #fff; font-size: 16px; font-weight: 800; transition: background .2s, transform .2s; }
+.rs-go span { transition: transform .2s; }
+.rs-go:hover { background: #6b21d9; }
+.rs-go:hover span { transform: translateX(4px); }
+.rs-go:disabled { opacity: .7; cursor: wait; }
+
+/* after sending: a RESERVED table sign drops onto the card */
+.rs-done { text-align: center; padding: 6px 0 4px; }
+.rs-done p { font-size: 15px; color: #4a3a6e; line-height: 1.55; margin: 0 0 16px; overflow-wrap: anywhere; }
+.rs-tent { position: relative; width: 170px; height: 92px; margin: 6px auto 18px; perspective: 600px; animation: rsTent .9s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes rsTent { from { transform: translateY(-60px) rotateX(70deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.rs-tent-top { position: absolute; left: 6px; right: 6px; top: 0; height: 12px; border-radius: 6px 6px 0 0; background: #4a1fa0; }
+.rs-tent-front { position: absolute; inset: 8px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 6px; background: linear-gradient(160deg, #6b21d9, #3d0f8a); box-shadow: 0 16px 30px rgba(46,16,96,0.3); transform-origin: top; transform: perspective(400px) rotateX(12deg); }
+.rs-tent-front b { font-size: 20px; font-weight: 900; letter-spacing: .28em; padding-left: .28em; background: linear-gradient(100deg, #b8913f 0%, #f5e2a8 30%, #c9a24f 50%, #fff3c4 65%, #b8913f 85%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: rsGold 4s linear infinite; }
+.rs-tent-front em { font-style: normal; font-size: 10px; font-weight: 900; letter-spacing: .4em; padding-left: .4em; color: #e3c77a; }
+.rs-links { display: flex; flex-direction: column; gap: 8px; }
+.rs-links a { font-size: 14px; font-weight: 800; color: #6b21d9; }
+@keyframes rsGold { to { background-position: -250% 0; } }
+@media (max-width: 820px) { .rs-form h2, .rs-done h3 { font-size: 38px; } }
+@media (prefers-reduced-motion: reduce) { .rs-tent, .rs-tent-front b { animation: none !important; } }
