@@ -83,8 +83,9 @@ export function Ornament({ className = "", light = false }: { className?: string
 export function Course({ n, name, children, light = false, size = 22 }: { n: number; name: string; children?: React.ReactNode; light?: boolean; size?: number }) {
   return (
     <span className={`course ${light ? "light" : ""}`} style={{ fontSize: size }}>
-      <b>No. {n} · {name}</b>
-      {children && <><i />{children}</>}
+      <b aria-label={`${n}.`}>{n}</b>
+      <span className="course-name">{name}</span>
+      {children && <span className="course-topic">{children}</span>}
     </span>
   );
 }

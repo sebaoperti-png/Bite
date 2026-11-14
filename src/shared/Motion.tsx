@@ -172,8 +172,8 @@ export function RevealWords({ children, step = 45, delay = 0 }: { children: Reac
     Use on an <a className="lm">: <a className="lm"><Arrowed text={t("Read more →")} /></a> */
 export function Arrowed({ text }: { text: string }) {
   const m = text.match(/^(.*?)\s*→\s*$/);
-  if (!m) return <>{text}</>;
-  return <><span className="lm-text">{m[1]}</span> <span className="lm-arrow" aria-hidden>→</span></>;
+  // no trailing arrow glyph: the underline that grows on hover marks the link
+  return <span className="lm-text">{m ? m[1] : text}</span>;
 }
 
 /** Text that streams in word by word when `play` is true (transitions.dev 30 streaming text); static otherwise */
