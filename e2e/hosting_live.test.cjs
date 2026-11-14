@@ -106,13 +106,29 @@ const TOWNS = { "73430": ["Aalen"], "73457": ["Essingen", "Lauterburg"] };
   check(t2.includes("Main dish (Moroccan)") && t2.includes("isn't available"), "without the AI, Bite's standard estimate is used and it says why");
   aiOff = false;
 
+  // ---- photos: no photo of your own yet → a photo of the dish from Unsplash, credited
+  await ctx.route("https://images.unsplash.com/**", (route) => route.fulfill({ status: 200, contentType: "image/png", body: Buffer.from(PHOTO.split(",")[1], "base64") }));
+  await open(6, { ...FORM, city: "Aalen", postcode: "73430", photos: ["app/img/1504754524776-800x533.jpg"] });
+  await page.getByText("Find a photo of your dish").waitFor({ timeout: 8000 });
+  await page.waitForTimeout(1500);
+  const imgs = () => page.evaluate(() => [...document.querySelectorAll("img")].map((i) => i.getAttribute("src") || ""));
+  const cover = (await imgs()).filter((u) => u.includes("photo-test-1") && u.includes("w=1200"));
+  check(cover.length >= 1 && !(await imgs()).includes("app/img/1504754524776-800x533.jpg"), "with only the sample photo, the first photo of the dish becomes the cover");
+  check((await body()).includes("We put a photo of your dish as the cover for now") && (globalThis.__photoUsed || []).length === 1, "the host is told, and Unsplash is told the photo is used");
+  await page.getByRole("button", { name: "Add photo by Photographer 2" }).click();
+  await page.waitForTimeout(400);
+  check((await body()).includes("YOUR GALLERY (2)") || (await body()).includes("Your gallery (2)"), "a second photo can be added");
+
   // ---- publish with a shopping list: saved for guests, refused without it
   const listForm = { ...FORM, city: "Aalen", postcode: "73430", description: "Tajine like my nonna made.", costSource: "declared", groceryCost: 24, pricePerGuest: 5,
-    costLines: [{ item: "Lamb shoulder", price: 16 }, { item: "Apricots", price: 8 }] };
+    costLines: [{ item: "Lamb shoulder", price: 16 }, { item: "Apricots", price: 8 }],
+    photos: ["https://images.unsplash.com/photo-test-1?ixid=t&w=1200&h=800&fit=crop&auto=format&q=80"],
+    photoCredits: { "https://images.unsplash.com/photo-test-1?ixid=t&w=1200&h=800&fit=crop&auto=format&q=80": { name: "Photographer 1", username: "ph1", link: "https://unsplash.com/@ph1" } } };
   await open(7, listForm);
   await page.getByRole("button", { name: /Publish event/ }).click();
   await page.waitForTimeout(4500);
-  const rows = await q("select id, cost_proof, city, lat, lng from meals");
+  const rows = await q("select id, cost_proof, city, lat, lng, image_url, image_credit from meals");
+  check(rows.length === 1 && rows[0].image_url.startsWith("https://images.unsplash.com/") && rows[0].image_credit?.name === "Photographer 1", "an Unsplash cover is saved as a link with the photographer's credit (not re-uploaded)");
   check(rows.length === 1 && rows[0].cost_proof.kind === "declared" && rows[0].cost_proof.lines.length === 2 && rows[0].cost_proof.lines[0].item === "Lamb shoulder", "the shopping list is saved with the meal");
   check(rows.length === 1 && rows[0].city === "Aalen", "the town is saved");
   await page.goto(`${BASE}/bite.html?live&lang=en&meal=${rows[0]?.id}`);
@@ -120,6 +136,7 @@ const TOWNS = { "73430": ["Aalen"], "73457": ["Essingen", "Lauterburg"] };
   const det = page.getByText(/What the host bought \(2 items\)/);
   if (await det.count()) { await det.click(); await page.waitForTimeout(300); }
   check((await body()).includes("Apricots") && /€16\b/.test(await body()), "the meal page shows what the host bought");
+  check((await body()).includes("Sample photo by") && (await body()).includes("Photographer 1"), "the meal page credits the photographer");
   const c = await pool.connect();
   let sneaky = "allowed";
   try {

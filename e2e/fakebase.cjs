@@ -88,6 +88,8 @@ async function handle({ method, url, headers, body }) {
     // ---- the Edge Function "bite-ai" (Gemini is not called in tests: fixed answers, same shape)
     if (u.pathname === "/functions/v1/bite-ai") {
       if (!sub) return json(401, { error: "sign_in" });
+      if (body.task === "photos") return json(200, { photos: [1, 2, 3].map((i) => ({ id: `p${i}`, raw: `https://images.unsplash.com/photo-test-${i}?ixid=t`, alt: `${body.query} ${i}`, credit: { name: `Photographer ${i}`, username: `ph${i}`, link: `https://unsplash.com/@ph${i}` }, download: `https://api.unsplash.com/photos/p${i}/download` })) });
+      if (body.task === "photo_used") { (globalThis.__photoUsed ??= []).push(body.download); return json(200, { ok: true }); }
       if (body.task === "polish") return json(200, { text: `Polished: ${String(body.text).trim()}` });
       if (body.task === "estimate") {
         const items = String(body.ingredients).split(/[,\n]+/).map((x) => x.replace(/\(.*?\)/g, "").trim()).filter(Boolean);
