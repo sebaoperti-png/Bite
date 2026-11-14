@@ -10,6 +10,7 @@ import { LandingSafety } from "./sections/LandingSafety";
 import { LandingHelpCustomerService } from "./sections/LandingHelpCustomerService";
 import { LandingPeople } from "./sections/LandingPeople";
 import { LandingAbout } from "./sections/LandingAbout";
+import { FloatingLogos } from "./sections/FloatingLogos";
 import { LandingStayUpdated } from "./sections/LandingStayUpdated";
 import { LandingTestimonial } from "./sections/LandingTestimonial";
 import { LandingBecomeAHost } from "./sections/LandingBecomeAHost";
@@ -109,6 +110,7 @@ export function Landing() {
 
   return (
     <div className="lp" style={{ overflowX: "clip" }}>
+      <FloatingLogos />
       <LandingIntro />
       <LandingNav />
       <LandingHero />
