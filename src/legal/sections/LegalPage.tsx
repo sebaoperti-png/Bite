@@ -251,7 +251,7 @@ export function LegalPage() {
             </h3>
             <ul>
               <li><strong>{"Account & profile:"}</strong>{" name, email address, password (stored only as a hash), profile photo, city and country, language, notification and newsletter choices, and when you accepted the house rules."}</li>
-              <li><strong>{"Meals & bookings:"}</strong>{" what hosts publish (title, menu, ingredients, allergens, photos, date, seats, contribution and grocery cost, town and an approximate point on the map), the exact street (shown only to guests the host has accepted), seat requests and their status."}</li>
+              <li><strong>{"Meals & bookings:"}</strong>{" what hosts publish (title, menu, ingredients, allergens, photos and their credit, a shopping list if the host typed the grocery cost, date, seats, contribution and grocery cost, town and an approximate point on the map), the exact street (shown only to guests the host has accepted), seat requests and their status."}</li>
               <li><strong>{"Messages, reviews, reports & blocks:"}</strong>{" chats between guests and hosts; reviews after a dinner (a guest's first name, stars and words appear on the host's page; what a host writes about a guest is seen only by that guest, and other hosts see just the average); reports you send us and the people you block; the people you follow (only you see this list, others see just how many followers someone has)."}</li>
               <li><strong>{"Technical data:"}</strong>{" IP address and browser details that every website and service necessarily receives, and the choices saved in your browser (see Cookies)."}</li>
               <li><strong>{"Location:"}</strong>{" if you tap \"Use my location\", your browser's position is used only on your device to search nearby; it is not sent to us. If you type a place, that text is sent to the place search (see 4)."}</li>
@@ -279,6 +279,9 @@ export function LegalPage() {
               <li><strong>{"Google Apps Script & Google Sheets"}</strong>{" (Google Ireland Ltd.): the survey and the newsletter list (see the Survey section)."}</li>
               <li><strong>{"Photon by komoot"}</strong>{" (komoot GmbH, Germany): the place search in the app; receives the place or postcode you type and your IP address."}</li>
               <li><strong>OpenFreeMap</strong>{" (map tiles from OpenStreetMap data): draws the map in the app; receives your IP address and the map area shown."}</li>
+              <li><strong>OpenPLZ API</strong>{" (open data on German postcodes): when a host types a postcode, it finds the town; receives the postcode and your IP address."}</li>
+              <li><strong>Unsplash</strong>{" (Unsplash Inc., USA): when a host searches for a photo of their dish, the search words go to Unsplash, and photos picked from Unsplash are loaded from Unsplash's servers, which receive your IP address. Such photos are marked with the photographer's name on the meal page."}</li>
+              <li><strong>Google Gemini API</strong>{" (Google, USA): only if a host taps \"Improve my text with AI\" or lets Bite estimate the cost from the ingredients. Then the host's own text or ingredient list, the meal's name, cuisine and number of people are sent to Google through our server (not the host's name, email or address). On Google's free tier Google may use this text to improve its services, so don't put personal details in it. Transfers to the USA rely on the EU-US Data Privacy Framework."}</li>
               <li><strong>jsDelivr</strong>{" (public content delivery network): only when a host scans a receipt, the reading program and its German language data are downloaded from it; it receives the IP address."}</li>
             </ul>
             <p>{"Between users, guests and hosts see only the profile and booking information needed to arrange a meal. We do not sell personal data."}</p>
@@ -289,7 +292,7 @@ export function LegalPage() {
             <h3 lang="de">
               {"Kurz auf Deutsch: Empfänger"}
             </h3>
-            <p lang="de">{"Bite nutzt: Supabase (Datenbank, Login, Fotos; Server in Frankfurt am Main), Resend (E-Mails der App; Server in Irland), GitHub Pages (Website), Apple iCloud Mail (unser Postfach), Google Apps Script und Google Sheets (Umfrage und Newsletter), Photon von komoot (Ortssuche), OpenFreeMap (Karte) und jsDelivr (nur beim Scannen eines Kassenbons). Zahlungen und Ausweisdaten werden derzeit nicht verarbeitet. Wir verkaufen keine personenbezogenen Daten. Fragen: hello@bitetable.de."}</p>
+            <p lang="de">{"Bite nutzt: Supabase (Datenbank, Login, Fotos; Server in Frankfurt am Main), Resend (E-Mails der App; Server in Irland), GitHub Pages (Website), Apple iCloud Mail (unser Postfach), Google Apps Script und Google Sheets (Umfrage und Newsletter), Photon von komoot (Ortssuche), OpenFreeMap (Karte), jsDelivr (nur beim Scannen eines Kassenbons), OpenPLZ API (Postleitzahl zu Ort), Unsplash (Fotos von Gerichten, die Gastgeber auswählen) und die Google Gemini API (nur wenn ein Gastgeber die KI-Hilfe nutzt: dann gehen sein Text oder seine Zutatenliste ohne Namen oder Adresse an Google; im kostenlosen Tarif kann Google diese Texte zur Verbesserung seiner Dienste nutzen). Zahlungen und Ausweisdaten werden derzeit nicht verarbeitet. Wir verkaufen keine personenbezogenen Daten. Fragen: hello@bitetable.de."}</p>
             <h3>
               6. Retention
             </h3>
