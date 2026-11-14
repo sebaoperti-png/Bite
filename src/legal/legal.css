@@ -1,7 +1,7 @@
 
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; background: #faf8fc; color: #201636; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: #faf8fc; color: #201636; font-family: 'Figtree Variable', sans-serif; -webkit-font-smoothing: antialiased; }
   a { color: #6b21d9; }
   a:hover { color: #9b4aff; }
   .lg-sec { scroll-margin-top: 92px; }
