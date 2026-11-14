@@ -285,3 +285,38 @@ body:has(.st-page) { background: radial-gradient(ellipse 70% 45% at 50% 0%, rgba
 .st-attract-tap { margin-top: 30px; padding: 16px 30px; border-radius: 999px; background: #fff; color: #160a2e; font-size: 18px; font-weight: 900; animation: stTap 1.8s ease-in-out infinite; }
 @keyframes stTap { 50% { transform: scale(1.05); box-shadow: 0 0 0 14px rgba(255,255,255,0.08); } }
 @media (prefers-reduced-motion: reduce) { .st-attract, .st-attract-tap { animation: none; } }
+
+/* ── Feedback desk (stand.html?screen): same kitchen pass, for the "Rate Bite" answers ── */
+.fd-filters { display: flex; align-items: center; gap: 10px; margin-left: 2vw; }
+.fd-filters select { min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1.5px solid rgba(233,220,255,0.25); background: #1c1236; color: #fbf8ff; font: inherit; font-size: 14px; font-weight: 700; }
+.fd-switch { margin-left: 1vw; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(233,220,255,0.3); color: #e9dcff; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.fd-switch:hover { background: rgba(233,220,255,0.1); }
+.fd-score { gap: .6vh; }
+.fd-score-n { font-size: clamp(60px, 7vw, 130px); font-weight: 900; letter-spacing: -0.04em; line-height: 1; color: #6b21d9; font-variant-numeric: tabular-nums; }
+.fd-score-n small { font-size: .3em; font-weight: 800; color: #695a8c; letter-spacing: 0; }
+.fd-grade { padding: 4px 12px; border-radius: 999px; font-size: clamp(13px, 1vw, 17px); font-weight: 800; text-transform: capitalize; background: #ede8fb; color: #4b3a6b; }
+.fd-grade.g-excellent, .fd-grade.g-ausgezeichnet, .fd-grade.g-good, .fd-grade.g-gut { background: #e5f7f0; color: #0a7c4e; }
+.fd-grade.g-poor, .fd-grade.g-schwach { background: #fff0f3; color: #b4233f; }
+.fd-slip p { margin: .6vh 0 0; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.fd-slip em { font-style: normal; font-weight: 800; font-size: .85em; padding: 1px 6px; border-radius: 4px; }
+.fd-slip em.ok { background: #e5f7f0; color: #0a7c4e; }
+.fd-slip em.no { background: #fff0f3; color: #b4233f; }
+.fd-slip { width: clamp(200px, 16vw, 280px); }
+.fd-gate { align-items: center; justify-content: center; }
+.fd-keycard { width: min(420px, 92vw); padding: 30px; border-radius: 6px 6px 16px 16px; background: #fbf6ec; color: #160a2e; display: grid; gap: 14px; }
+.fd-keycard h1 { margin: 0; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 40px; }
+.fd-keycard p { margin: 0; color: #4a3a6e; }
+.fd-keycard label span { display: block; margin-bottom: 6px; font-weight: 800; font-size: 14px; }
+.fd-keycard input { width: 100%; min-height: 46px; padding: 0 12px; border-radius: 10px; border: 1.5px solid rgba(107,33,217,0.25); font: inherit; font-size: 16px; }
+.fd-keycard button { min-height: 48px; border: 0; border-radius: 12px; background: #160a2e; color: #fff; font: inherit; font-weight: 800; font-size: 16px; cursor: pointer; }
+.fd-keycard a { color: #6b21d9; font-weight: 700; font-size: 14px; }
+.fd-bad { color: #b4233f !important; font-weight: 700; }
+@media (max-width: 900px) {
+  .pz.fd { height: auto; overflow: visible; padding-bottom: 3vh; }
+  .fd .pz-head { flex-wrap: wrap; }
+  .fd-filters { margin-left: 0; flex-wrap: wrap; }
+  .fd .pz-main { grid-template-columns: 1fr; }
+  .fd .pz-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fd .pz-charts { grid-template-columns: 1fr; }
+  .fd .pz-slips { overflow-x: auto; }
+}

@@ -91,6 +91,7 @@ export function Results() {
           <text x="226" y="296" fontSize="330" fontWeight="900" fill="#e9dcff" fontFamily="Figtree Variable, sans-serif" letterSpacing="-14">ite</text>
         </svg>
         <h1 className="pz-title">{L.title}</h1>
+        <a className="fd-switch" href="stand.html?screen">{lang === "de" ? "Feedback-Pult" : "Feedback desk"}</a>
         <div className="pz-live"><span className={`pz-dot ${live ? "on" : ""}`} />{live ? L.sourceLive : L.sourceLocal} · {time(updated)}</div>
       </header>
 
