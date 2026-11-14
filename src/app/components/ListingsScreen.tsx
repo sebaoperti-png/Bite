@@ -1,3 +1,4 @@
+import "../styles/listings.css";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { placeSummary, fmtKm } from "./LocationPicker";
 import { BiteLoader, EmptyPlate } from "../../shared/Restaurant";
@@ -118,9 +119,10 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
       // by default, tables of people you follow come first
       : Number(store.isFollowing(b.hostId ?? b.host)) - Number(store.isFollowing(a.hostId ?? a.host)));
 
+  const [hi, setHi] = useState<string | null>(null);
   const mapView = (
     <Suspense fallback={<div className="mm"><div className="mm-loading">{t("Unfolding the map…")}</div></div>}>
-      <MealMap meals={filtered} criteria={criteria} onSelect={onSelect} onSearchArea={searchArea} />
+      <MealMap meals={filtered} criteria={criteria} onSelect={onSelect} onSearchArea={searchArea} highlight={hi} />
     </Suspense>
   );
 
@@ -256,7 +258,23 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
             {searchBox}
             {chips}
             {view === "map" ? (
-              <div className="rounded-3xl overflow-hidden" style={{ height: "calc(100vh - 290px)", minHeight: 520, boxShadow: "0 4px 24px rgba(46,16,96,0.08)" }}>{mapView}</div>
+              <div className="lm-split">
+                {/* the meals beside the map, like a menu; hovering one lights up its pin */}
+                <div className="lm-side" onMouseLeave={() => setHi(null)}>
+                  {filtered.length === 0 ? empty : filtered.map((meal) => (
+                    <button key={meal.id} type="button" className={`lm-row ${hi === meal.id ? "on" : ""}`} onMouseEnter={() => setHi(meal.id)} onFocus={() => setHi(meal.id)} onClick={() => onSelect(meal)}>
+                      <img src={meal.image} alt="" loading="lazy" />
+                      <span className="lm-row-text">
+                        <b>{tMaybe(meal.title)}</b>
+                        <em>{t("with {name}", { name: meal.host })} · {meal.time}</em>
+                        <span>{dateLabel(meal.date)}{mealDistance(meal, criteria) != null ? ` · ${fmtKm(mealDistance(meal, criteria)!)}` : ""}</span>
+                      </span>
+                      <span className="lm-row-price">{meal.price === 0 ? t("Free") : euro(meal.price)}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="lm-map">{mapView}</div>
+              </div>
             ) : checking ? kitchenCheck : filtered.length === 0 ? empty : (
               <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((meal, i) => (
@@ -447,8 +465,10 @@ export function MealCard({ meal, onSelect, compact = false, distance = null }: {
             <p className="truncate" style={{ fontSize: 11.5, color: "#7c6fa0" }}>{t("with {name}", { name: meal.host })} · {meal.time}{store.isFollowing(meal.hostId ?? meal.host) && <span style={{ color: "#6b21d9", fontWeight: 800 }}> · {t("You follow")}</span>}</p>
           </div>
           <div className="flex items-center gap-0.5 flex-shrink-0">
-            <Star size={11} fill="#f59e0b" color="#f59e0b" />
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#160a2e" }}>{meal.reviews ? dec(meal.rating) : t("New")}</span>
+            {meal.reviews ? <>
+              <Star size={11} fill="#f59e0b" color="#f59e0b" />
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#160a2e" }}>{dec(meal.rating)}</span>
+            </> : <span className="px-2 py-0.5 rounded-full" style={{ fontSize: 10.5, fontWeight: 800, color: "#6b21d9", background: "#f0ecfa" }}>{t("New host")}</span>}
           </div>
         </div>
 

@@ -5,15 +5,19 @@ import { ThinkingOrb } from "thinking-orbs";
 import { generate } from "../../lib/ui-generation.js";
 import { useStore } from "../store";
 import { labelForISO, euro, EU_ALLERGENS, freeFromTags, allergenLabel, type Meal, type ServiceType } from "../data";
+import { useMyReviews } from "./ProfileExtras";
 import { writeDescription, TONES, type Tone } from "../descriptionWriter";
-import { estimateGroceries, exactShare, suggestedPrice, priceCap, looksTooHigh, readReceipt, type CostSource } from "../costing";
+import { estimateGroceries, exactShare, suggestedPrice, priceCap, looksTooHigh, readReceipt, linesTotal, listProblem, linesFromIngredients, plausibleEstimate, type CostSource, type CostLine } from "../costing";
+import { aiEstimate, aiPolish, aiErrorText } from "../liveData";
+import { townsForPostcode, isPostcode } from "../postcode";
+import { searchPhotos, reportUse, unsplashReady, UNSPLASH_LINK, type PhotoCredit, type StockPhoto } from "../unsplash";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ChevronLeft, ChevronRight, ChefHat, MapPin, Clock, Users, Star,
   Utensils, Leaf, Wheat, Apple, Fish, Egg, CheckCircle, BadgeCheck,
   Cigarette, Wine, PawPrint, Footprints, Camera, ImageIcon, Plus, Minus,
   Home, Sun, Lock, Unlock, Bean,
-  DollarSign, AlertCircle, Flame, Globe, Save, Eye, ShieldCheck, Sparkles, Receipt,
+  DollarSign, AlertCircle, Flame, Globe, Save, Eye, ShieldCheck, Sparkles, Receipt, ListChecks, X, Wand2,
 } from "lucide-react";
 import { t, dateLabel, dec } from "../../shared/i18n";
 import { localPlace } from "../location";
@@ -64,6 +68,8 @@ interface FormData {
   // Step 4
   address: string;
   city: string;
+  /** five digits; it finds the town and puts the meal in the right part of town on the map */
+  postcode?: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -79,6 +85,12 @@ interface FormData {
   receiptRead?: number | null;
   /** the scan found a total but couldn't double-check it against the items or the card payment */
   receiptUnsure?: boolean;
+  /** "List it yourself": what the host bought and what each thing cost (the total is their sum) */
+  costLines?: CostLine[];
+  /** who took the photos picked from Unsplash, by photo URL (credited on the meal page) */
+  photoCredits?: Record<string, PhotoCredit>;
+  /** Bite's AI estimate from the ingredient list, item by item (live only) */
+  aiLines?: { item: string; amount?: string; price: number }[] | null;
   pricePerGuest: number;
   freeEvent: boolean;
   discountEnabled: boolean;
@@ -137,16 +149,23 @@ function stepError(step: number, f: FormData): string {
   if (step === 2 && f.minGuests > f.maxGuests) return t("Minimum guests can't be more than the maximum");
   if (step === 3) {
     if (!f.address.trim()) return t("Add your street address (shared only with booked guests)");
-    if (!f.city.trim()) return t("Add your city");
+    if (f.postcode != null && f.postcode.trim() && !isPostcode(f.postcode)) return t("A German postcode has 5 digits");
+    if (!f.city.trim()) return t("Add your town");
     if (!f.date) return t("Pick a date");
     if (f.date < todayISO()) return t("The date must be today or later");
     if (f.endTime <= f.startTime) return t("End time must be after the start time");
   }
   if (step === 4 && !f.freeEvent) {
-    if (!f.costSource) return t("Scan your receipt or let Bite estimate the grocery cost");
+    if (!f.costSource) return t("Scan your receipt, list what you bought, or let Bite estimate the grocery cost");
     if (f.groceryCost <= 0) return t("Enter what the groceries cost");
     if (f.groceryCost > 1000) return t("That's more than a home dinner costs. Check the total.");
     if (f.costSource === "receipt" && f.receiptUnsure) return t("Check the total from your receipt and tap \"That's right\"");
+    if (f.costSource === "receipt" && f.receiptRead == null) return t("Scan your receipt again, or list what you bought");
+    if (proofKind(f) === "declared") {
+      const problem = listProblem(f.costLines ?? []);
+      if (problem) return problem;
+      if (Math.abs(linesTotal(f.costLines ?? []) - f.groceryCost) >= 0.005) return t("The list must add up to the total");
+    }
     const cap = priceCap(f.groceryCost, f.maxGuests + 1, f.costSource);
     if (cap < 1) return t("The groceries are too little to split. Make it free (\"It's on me\") or check the total.");
     if (f.pricePerGuest < 1 || !Number.isInteger(f.pricePerGuest)) return t("Choose a contribution per guest");
@@ -283,8 +302,12 @@ function Counter({ value, min, max, onChange, label, sublabel }: { value: number
 
 /** Description with an assistant that drafts it from the title, dish and cuisine */
 function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
-  const { profile } = useStore();
+  const { profile, live } = useStore();
   const [tone, setTone] = useState<Tone | null>(null);
+  // "Improve with AI" (live): the host's own rough lines, rewritten by Gemini; "Undo" brings them back
+  const [polishing, setPolishing] = useState(false);
+  const [before, setBefore] = useState<string | null>(null);
+  const [aiMsg, setAiMsg] = useState("");
   const [writing, setWriting] = useState(false);
   // Before the words arrive the assistant "thinks" for a moment (0 reading the dish, 1 choosing words)
   const [thinking, setThinking] = useState<0 | 1 | null>(null);
@@ -293,6 +316,28 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
   const canWrite = !!(form.mealName.trim() || form.eventTitle.trim() || form.cuisineType);
 
   useEffect(() => () => { window.clearInterval(timer.current); pause.current.forEach((id) => window.clearTimeout(id)); }, []);
+
+  /** shows a text word by word, like it is being written */
+  const typeOut = (text: string) => {
+    const words = text.split(" ");
+    set("description", "");
+    let i = 0;
+    setWriting(true);
+    timer.current = window.setInterval(() => {
+      i += 1;
+      set("description", words.slice(0, i).join(" ").slice(0, 400));
+      if (i >= words.length) { window.clearInterval(timer.current); setWriting(false); }
+    }, 38);
+  };
+  const polish = async () => {
+    const own = form.description.trim();
+    setAiMsg(""); setPolishing(true); setThinking(0);
+    const res = await aiPolish({ text: own, mealName: form.mealName || form.eventTitle, cuisine: form.cuisineType, serviceType: form.serviceType, ingredients: form.ingredientsText });
+    setPolishing(false); setThinking(null);
+    if (!res.data?.text) { setAiMsg(aiErrorText(res.error, t)); return; }
+    setBefore(own);
+    typeOut(res.data.text);
+  };
 
   const write = (t: Tone) => {
     window.clearInterval(timer.current);
@@ -359,11 +404,37 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
         onChange={e => { window.clearInterval(timer.current); pause.current.forEach((id) => window.clearTimeout(id)); setThinking(null); setWriting(false); set("description", e.target.value); }}
       />
       </div>
+      {live && (
+        <div className="hf-polish">
+          <button type="button" onClick={polish} disabled={polishing || writing || form.description.trim().length < 15}
+            title={form.description.trim().length < 15 ? t("Write a few words of your own first") : undefined}>
+            {polishing ? <ThinkingOrb state="composing" size={20} theme="light" aria-label={t("Improving…")} /> : <Wand2 size={14} strokeWidth={2.2} />}
+            <span>{polishing ? t("Improving…") : t("Improve my text with AI")}</span>
+          </button>
+          {before !== null && !writing && <button type="button" className="hf-polish-undo" onClick={() => { set("description", before); setBefore(null); }}>{t("Undo")}</button>}
+          <p>{aiMsg || t("Write a few lines in your own words, the AI makes them read well. It keeps your facts and adds nothing.")}</p>
+        </div>
+      )}
       <p style={{ fontSize: 11, color: "#c4b8de", textAlign: "right", marginTop: 4 }}>
         {tone && !writing && <span style={{ float: "left", color: "#7c6fa0" }}>{t("Drafted by the Bite assistant — edit it as you like")}</span>}
         {form.description.length}/400
       </p>
     </>
+  );
+}
+
+/** the host's real rating as guests gave it (live), or "No reviews yet"; the demo keeps its sample 4.9 */
+function HostRating() {
+  const { live } = useStore();
+  const { host, hostAvg } = useMyReviews(live);
+  if (live && !host) return null;
+  if (live && host!.length === 0) return <span style={{ fontSize: 12, fontWeight: 700, color: "#7c6fa0" }}>{t("No reviews yet")}</span>;
+  return (
+    <span className="flex items-center gap-1">
+      <Star size={12} fill="#f59e0b" color="#f59e0b" />
+      <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e" }}>{dec(live ? hostAvg : 4.9)}</span>
+      {live && <span style={{ fontSize: 11.5, color: "#7c6fa0" }}>({host!.length})</span>}
+    </span>
   );
 }
 
@@ -388,14 +459,11 @@ function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           <div>
             <div className="flex items-center gap-1.5">
               <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{profile.name}</p>
-              <BadgeCheck size={14} color="#0a7c4e" strokeWidth={2} />
+              {!live && <BadgeCheck size={14} color="#0a7c4e" strokeWidth={2} />}
             </div>
             <p style={{ fontSize: 12, color: "#7c6fa0" }}>{live ? localPlace(profile.neighbourhood) : t("{place} · Verified host", { place: localPlace(profile.neighbourhood) })}</p>
           </div>
-          <div className="ml-auto flex items-center gap-1">
-            <Star size={12} fill="#f59e0b" color="#f59e0b" />
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e" }}>{dec(4.9)}</span>
-          </div>
+          <div className="ml-auto"><HostRating /></div>
         </div>
       </Card>
 
@@ -632,6 +700,49 @@ function Step3({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   );
 }
 
+/** Postcode first: it fills in the town (several villages can share one postcode: pick yours). The town stays editable. */
+function PostcodeTown({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
+  const [towns, setTowns] = useState<string[]>([]);
+  const [looking, setLooking] = useState(false);
+  const code = (form.postcode ?? "").trim();
+  useEffect(() => {
+    setTowns([]);
+    if (!isPostcode(code)) return;
+    const c = new AbortController();
+    setLooking(true);
+    townsForPostcode(code, c.signal).then((list) => {
+      setTowns(list);
+      if (list.length >= 1 && !list.includes(form.city.trim())) set("city", list[0]);
+    }).catch(() => {}).finally(() => setLooking(false));
+    return () => c.abort();
+  }, [code]); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <div className="pc">
+      <div className="pc-row">
+        <div className="pc-code">
+          <Label>{t("Postcode")}</Label>
+          <input style={inputStyle} aria-label={t("Postcode")} inputMode="numeric" autoComplete="postal-code" maxLength={5} placeholder="73430"
+            value={form.postcode ?? ""} onChange={e => set("postcode", e.target.value.replace(/\D/g, "").slice(0, 5))} aria-describedby="pc-hint" />
+        </div>
+        <div className="pc-town">
+          <Label>{t("Town")}</Label>
+          <div className="relative">
+            <input style={inputStyle} aria-label={t("Town")} autoComplete="address-level2" placeholder={looking ? t("Looking it up…") : t("e.g. Aalen")}
+              value={form.city} onChange={e => set("city", e.target.value)} />
+            {isPostcode(code) && !looking && towns.includes(form.city.trim()) && <CheckCircle size={16} color="#0a9c62" style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)" }} />}
+          </div>
+        </div>
+      </div>
+      {towns.length > 1 && (
+        <div className="pc-pick" role="group" aria-label={t("Towns with this postcode")}>
+          {towns.map((tw) => <button key={tw} type="button" className={form.city.trim() === tw ? "on" : ""} onClick={() => set("city", tw)}>{tw}</button>)}
+        </div>
+      )}
+      <p id="pc-hint" className="pc-hint">{isPostcode(code) && !looking && towns.length === 0 ? t("We couldn't look up this postcode. Type your town.") : t("Guests see only the town and roughly where on the map. The street is shared once you accept them.")}</p>
+    </div>
+  );
+}
+
 function Step4({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
   return (
     <div className="flex flex-col gap-4">
@@ -647,11 +758,7 @@ function Step4({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                 value={form.address} onChange={e => set("address", e.target.value)} />
             </div>
           </div>
-          <div>
-            <Label>{t("City")}</Label>
-            <input style={inputStyle} placeholder={t("e.g. Berlin")}
-              value={form.city} onChange={e => set("city", e.target.value)} />
-          </div>
+          <PostcodeTown form={form} set={set} />
         </div>
       </Card>
 
@@ -737,10 +844,34 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
     set("costSource", source);
     set("pricePerGuest", suggestedPrice(total, n, source));
   };
-  // a typed total stays "receipt" only if it is exactly what the scan found
-  const typeTotal = (v: number) => applyCost(v, form.receiptRead != null && Math.abs(v - form.receiptRead) < 0.005 ? "receipt" : "declared");
+  // "List it yourself": the total is always the sum of the list; it starts from the ingredient list
+  const lines = form.costLines ?? [];
+  const setLines = (next: CostLine[]) => { set("costLines", next); applyCost(linesTotal(next), "declared"); };
+  const startList = () => {
+    set("aiLines", null);
+    if (lines.length) { applyCost(linesTotal(lines), "declared"); return; }
+    const start = linesFromIngredients(form.ingredientsText ?? "");
+    setLines(start.length >= 2 ? start : [...start, { item: "", price: null }, { item: "", price: null }].slice(0, Math.max(2, start.length)));
+  };
+  // "Let Bite estimate": in live, from the ingredient list with the AI (item by item); otherwise, or if the AI is
+  // unavailable or far off, Bite's estimate from the menu
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiNote, setAiNote] = useState("");
+  const startEstimate = async () => {
+    set("aiLines", null); setAiNote("");
+    applyCost(estimate.total, "estimate");
+    if (!store.live || (form.ingredientsText ?? "").trim().length < 3) return;
+    setAiBusy(true);
+    const res = await aiEstimate({ ingredients: form.ingredientsText ?? "", people: n, mealName: form.mealName || form.eventTitle, cuisine: form.cuisineType });
+    setAiBusy(false);
+    if (!res.data) { setAiNote(aiErrorText(res.error, t)); return; }
+    const total = Math.round(res.data.lines.reduce((x, l) => x + l.price, 0) * 100) / 100;
+    if (!plausibleEstimate(total, estimate.total)) { setAiNote(t("The item-by-item estimate looked off, so Bite uses its standard estimate.")); return; }
+    set("aiLines", res.data.lines);
+    applyCost(total, "estimate");
+  };
   useEffect(() => {
-    if (form.costSource === "estimate" && estimate.total !== form.groceryCost) applyCost(estimate.total, "estimate");
+    if (form.costSource === "estimate" && !form.aiLines?.length && estimate.total !== form.groceryCost) applyCost(estimate.total, "estimate");
     if (form.costSource && form.pricePerGuest > cap) set("pricePerGuest", cap);
     if (form.costSource && cap >= 1 && form.pricePerGuest < 1) set("pricePerGuest", suggestedPrice(form.groceryCost, n, form.costSource));
   }, [estimate.total, form.maxGuests]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -755,11 +886,11 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       if (res.total) {
         const total = Math.round(res.total * 100) / 100;
         applyCost(total, "receipt"); set("receiptItems", res.items); set("receiptRead", total); set("receiptUnsure", !res.confident);
-      } else { set("receiptRead", null); set("receiptUnsure", false); set("costSource", "declared"); setReadError(t("We couldn't find the total — type it in below.")); }
+      } else { set("receiptRead", null); set("receiptUnsure", false); startList(); setReadError(t("We couldn't find the total on the photo. List what you bought instead, or scan it again.")); }
     } catch {
       set("receiptRead", null); set("receiptUnsure", false);
-      set("costSource", "declared");
-      setReadError(t("Couldn't read the receipt (no connection?). Type the total in below."));
+      startList();
+      setReadError(t("Couldn't read the receipt (no connection?). List what you bought instead, or try again."));
     } finally {
       setReading(null);
     }
@@ -780,10 +911,10 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   );
 
   const Option = ({ id, Icon, title, sub }: { id: CostSource; Icon: React.ElementType; title: string; sub: string }) => {
-    const on = id === "receipt" ? scanned : form.costSource === id;
+    const on = id === "receipt" ? form.costSource === "receipt" : form.costSource === id;
     return (
       <motion.button
-        onClick={() => (id === "estimate" ? applyCost(estimate.total, "estimate") : (form.receiptRead != null && Math.abs(form.groceryCost - form.receiptRead) < 0.005 ? applyCost(form.receiptRead, "receipt") : form.costSource !== "declared" && applyCost(0, "declared"), !form.receiptPreview && fileRef.current?.click()))}
+        onClick={() => (id === "estimate" ? void startEstimate() : id === "declared" ? (setReadError(""), startList()) : (set("aiLines", null), form.receiptRead != null ? applyCost(form.receiptRead, "receipt") : fileRef.current?.click()))}
         className="flex-1 text-left p-4 rounded-2xl"
         style={{ background: on ? lightPurple : "#fff", border: `2px solid ${on ? purple : "rgba(107,33,217,0.12)"}` }}
         whileTap={{ scale: 0.97 }}
@@ -791,6 +922,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         <span className="flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 12, background: on ? "#fff" : lightPurple, color: purple }}><Icon size={20} strokeWidth={2} /></span>
         <p style={{ fontSize: 14.5, fontWeight: 800, color: "#160a2e", marginTop: 6 }}>{t(title)}</p>
         <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 2, lineHeight: 1.4 }}>{t(sub)}</p>
+        {id === "receipt" && <span className="hf-pref">{t("Preferred")}</span>}
       </motion.button>
     );
   };
@@ -809,14 +941,15 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         <>
           <div>
             <Label>{t("How should guests see the cost?")}</Label>
-            <div className="flex gap-3">
-              <Option id="receipt" Icon={Receipt} title={t("Scan your receipt")} sub="Most transparent — guests see “receipt-backed”" />
-              <Option id="estimate" Icon={Sparkles} title={t("Let Bite estimate")} sub="From your menu and the number of people" />
+            <div className="hf-cost-opts">
+              <Option id="receipt" Icon={Receipt} title={t("Scan your receipt")} sub="Most transparent: guests see “receipt-backed”" />
+              <Option id="declared" Icon={ListChecks} title={t("List what you bought")} sub="Each item with its price; guests see the list" />
+              <Option id="estimate" Icon={Sparkles} title={t("Let Bite estimate")} sub={store.live ? "From your ingredients, item by item" : "From your menu and the number of people"} />
             </div>
           </div>
           <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={e => { const f = e.target.files?.[0]; if (f) scan(f); e.target.value = ""; }} />
 
-          {scanned && (
+          {(form.costSource === "receipt" || (form.costSource === "declared" && (!!form.receiptPreview || !!readError || reading !== null))) && (
             <Card>
               <div className="flex items-start gap-3">
                 {form.receiptPreview ? (
@@ -846,23 +979,13 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                       {form.costSource === "receipt" && form.receiptUnsure && !readError && (
                         <div style={{ marginTop: 4 }}>
                           <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700 }}>{t("Please check it: the photo was hard to read.")}</p>
-                          <button onClick={() => set("receiptUnsure", false)} className="mt-1.5 px-3 py-1.5 rounded-full" style={{ fontSize: 12.5, fontWeight: 800, color: "#fff", background: purple }}>{t("That's right")}</button>
+                          <div className="flex gap-2 flex-wrap mt-1.5">
+                            <button onClick={() => set("receiptUnsure", false)} className="px-3 py-1.5 rounded-full" style={{ fontSize: 12.5, fontWeight: 800, color: "#fff", background: purple }}>{t("That's right")}</button>
+                            <button onClick={startList} className="px-3 py-1.5 rounded-full" style={{ fontSize: 12.5, fontWeight: 800, color: purple, background: lightPurple }}>{t("Not right? List it")}</button>
+                          </div>
                         </div>
-                      )}
-                      {form.costSource === "declared" && form.groceryCost > 0 && !readError && (
-                        <p style={{ fontSize: 12.5, color: "#7c6fa0", fontWeight: 700 }}>{form.receiptRead != null ? t("You changed the total, so guests will see it as stated by you.") : t("Typed by you: guests will see it as stated by you, not receipt-backed.")}</p>
-                      )}
-                      {form.groceryCost > 0 && looksTooHigh(form.groceryCost, estimate.total) && (
-                        <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700, marginTop: 4 }}>{t("That's much more than this menu usually costs ({price}). Only include the shopping for this dinner.", { price: euro(estimate.total) })}</p>
                       )}
                       {readError && <p style={{ fontSize: 13, color: "#c05e00", fontWeight: 700 }}>{readError}</p>}
-                      <label className="block mt-2">
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "#7c6fa0" }}>{t("Total paid (check it matches)")}</span>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span style={{ fontSize: 18, fontWeight: 900, color: purple }}>€</span>
-                          <input type="number" inputMode="decimal" min={1} max={500} step="0.01" value={form.groceryCost || ""} onChange={e => { const v = Math.round(Number(e.target.value) * 100) / 100; if (v >= 0 && v <= 5000) typeTotal(v); }} style={{ ...inputStyle, width: 120, padding: "8px 12px", fontSize: 16, fontWeight: 800 }} />
-                        </div>
-                      </label>
                       <div className="flex gap-3 mt-3 flex-wrap">
                         <button onClick={() => fileRef.current?.click()} style={{ fontSize: 12.5, fontWeight: 800, color: purple }}>{form.receiptPreview ? t("Scan another") : t("Take a photo")}</button>
                         {!store.live && <button onClick={() => scan("app/sample-receipt.jpg")} style={{ fontSize: 12.5, fontWeight: 700, color: "#7c6fa0" }}>{t("Try a sample receipt")}</button>}
@@ -875,9 +998,54 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
             </Card>
           )}
 
+          {form.costSource === "declared" && (
+            <Card>
+              <Label>{t("What you bought")}</Label>
+              <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: -4, marginBottom: 10, lineHeight: 1.5 }}>{t("Each item with what it cost. Guests see this list, so the price is fair and clear.")}</p>
+              <div className="hf-list">
+                {lines.map((l, i) => (
+                  <div key={i} className="hf-list-row">
+                    <input aria-label={t("Item {n}", { n: i + 1 })} placeholder={t("e.g. Lamb shoulder")} value={l.item} maxLength={60}
+                      onChange={(e) => setLines(lines.map((x, j) => (j === i ? { ...x, item: e.target.value } : x)))} />
+                    <span className="hf-list-eur">€</span>
+                    <input aria-label={t("Price of item {n}", { n: i + 1 })} type="number" inputMode="decimal" min={0} max={500} step="0.01" placeholder="0,00" value={l.price ?? ""}
+                      onChange={(e) => { const v = e.target.value === "" ? null : Math.round(Number(e.target.value) * 100) / 100; if (v == null || (v >= 0 && v <= 500)) setLines(lines.map((x, j) => (j === i ? { ...x, price: v } : x))); }} />
+                    <button type="button" aria-label={t("Remove item {n}", { n: i + 1 })} onClick={() => setLines(lines.filter((_, j) => j !== i))} disabled={lines.length <= 2}><X size={14} /></button>
+                  </div>
+                ))}
+              </div>
+              {lines.length < 40 && <button type="button" onClick={() => setLines([...lines, { item: "", price: null }])} className="hf-list-add"><Plus size={14} /> {t("Add an item")}</button>}
+              <div className="hf-list-total"><span>{t("Total")}</span><b>{euro(linesTotal(lines))}</b></div>
+              {listProblem(lines) && <p style={{ fontSize: 12, color: "#c05e00", fontWeight: 700, marginTop: 6 }}>{listProblem(lines)}</p>}
+              {form.groceryCost > 0 && looksTooHigh(form.groceryCost, estimate.total) && (
+                <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700, marginTop: 6 }}>{t("That's much more than this menu usually costs ({price}). Only include the shopping for this dinner.", { price: euro(estimate.total) })}</p>
+              )}
+              <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 8, lineHeight: 1.5 }}>{t("Guests will see it as stated by you. Have the receipt? Scanning it is quicker and shows it's real.")}</p>
+            </Card>
+          )}
+
           {form.costSource === "estimate" && (
             <Card>
               <Label>{t("Bite's estimate for")}{" "}{n}{" "}{t("people")}</Label>
+              {aiBusy && (
+                <div className="flex items-center gap-3 py-2">
+                  <ThinkingOrb state="searching" size={32} theme="light" />
+                  <p className="hf-shimmer" style={{ fontSize: 13.5, fontWeight: 800 }}>{t("Pricing your ingredients at the supermarket…")}</p>
+                </div>
+              )}
+              {aiNote && !aiBusy && <p style={{ fontSize: 12, color: "#7c6fa0", marginBottom: 8, lineHeight: 1.5 }}>{aiNote}</p>}
+              {!aiBusy && form.aiLines?.length ? (
+                <div className="flex flex-col gap-1.5">
+                  {form.aiLines.map((l, i) => (
+                    <div key={i} className="flex justify-between gap-3" style={{ fontSize: 13, color: "#4a3a6e" }}>
+                      <span>{l.item}{l.amount ? <span style={{ color: "#a99cc8" }}> · {l.amount}</span> : null}</span><b style={{ whiteSpace: "nowrap" }}>{euro(l.price)}</b>
+                    </div>
+                  ))}
+                  <div className="flex justify-between pt-2 mt-1" style={{ borderTop: "1px dashed rgba(107,33,217,0.2)", fontSize: 14.5, fontWeight: 900, color: "#160a2e" }}>
+                    <span>{t("Estimated groceries")}</span><span>{euro(form.groceryCost)}</span>
+                  </div>
+                </div>
+              ) : !aiBusy && (
               <div className="flex flex-col gap-1.5">
                 {estimate.lines.map(l => (
                   <div key={l.label} className="flex justify-between" style={{ fontSize: 13, color: "#4a3a6e" }}>
@@ -888,7 +1056,8 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                   <span>{t("Estimated groceries")}</span><span>€{estimate.total}</span>
                 </div>
               </div>
-              <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 10, lineHeight: 1.5 }}>{t("Based on typical German supermarket prices. Got the receipt? Scan it for the exact amount.")}</p>
+              )}
+              <p style={{ fontSize: 11.5, color: "#7c6fa0", marginTop: 10, lineHeight: 1.5 }}>{form.aiLines?.length ? t("Estimated by AI from your ingredient list and typical German supermarket prices, so it can be off. Got the receipt? Scan it for the exact amount.") : t("Based on typical German supermarket prices. Got the receipt? Scan it for the exact amount.")}</p>
             </Card>
           )}
 
@@ -984,6 +1153,65 @@ function Step6({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   );
 }
 
+/** "Find a photo of your dish": searches Unsplash for the meal and adds the picked photo with its credit.
+ *  While the host still has only the sample photo, the first result becomes the cover by itself. */
+function StockPicker({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
+  const [query, setQuery] = useState(form.mealName.trim() || form.eventTitle.trim() || form.cuisineType || "");
+  const [results, setResults] = useState<StockPhoto[] | null>(null);
+  const [error, setError] = useState(false);
+  const [auto, setAuto] = useState(false);
+  const formRef = useRef(form);
+  formRef.current = form;
+  const untouched = (f: FormData) => f.photos.length === 1 && f.photos[0] === MOCK_PHOTOS[0];
+
+  const use = (p: StockPhoto, asCover: boolean) => {
+    const f = formRef.current;
+    set("photoCredits", { ...(f.photoCredits ?? {}), [p.url]: p.credit });
+    if (untouched(f)) { reportUse(p); set("photos", [p.url]); set("coverIdx", 0); return; }
+    if (f.photos.includes(p.url)) { set("photos", f.photos.filter((x) => x !== p.url)); if (f.coverIdx >= f.photos.length - 1) set("coverIdx", 0); return; }
+    reportUse(p);
+    set("photos", [...f.photos, p.url]);
+    if (asCover) set("coverIdx", f.photos.length);
+  };
+  const search = async (q: string, signal?: AbortSignal) => {
+    setError(false); setResults(null);
+    try {
+      const list = await searchPhotos(q, signal);
+      setResults(list);
+      if (list[0] && untouched(formRef.current)) { use(list[0], true); setAuto(true); }
+    } catch (e) { if ((e as Error).name !== "AbortError") { setError(true); setResults([]); } }
+  };
+  useEffect(() => { const c = new AbortController(); if (query.trim()) void search(query, c.signal); else setResults([]); return () => c.abort(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div className="sp">
+      <Label>{t("Find a photo of your dish")}</Label>
+      <form className="sp-search" onSubmit={(e) => { e.preventDefault(); void search(query); }}>
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("e.g. Lasagne")} aria-label={t("Search photos")} maxLength={60} />
+        <button type="submit" disabled={!query.trim()}>{t("Search")}</button>
+      </form>
+      {auto && <p className="sp-note">{t("We put a photo of your dish as the cover for now. A photo of your own food is always better.")}</p>}
+      {results === null ? <div className="sp-grid">{Array.from({ length: 6 }, (_, i) => <span key={i} className="sp-ph" />)}</div>
+        : results.length === 0 ? <p className="sp-note">{error ? t("Photo search isn't available right now. Upload your own photo above.") : t("No photos found. Try another word, like the main ingredient.")}</p>
+        : (
+          <div className="sp-grid">
+            {results.map((p) => {
+              const on = form.photos.includes(p.url);
+              return (
+                <button key={p.id} type="button" className={`sp-item ${on ? "on" : ""}`} onClick={() => use(p, form.photos.length === 0)} aria-pressed={on} aria-label={on ? t("Remove photo by {name}", { name: p.credit.name }) : t("Add photo by {name}", { name: p.credit.name })}>
+                  <img src={p.thumb} alt={p.alt} loading="lazy" />
+                  {on && <span className="sp-check"><CheckCircle size={20} color="#fff" strokeWidth={2.5} /></span>}
+                  <span className="sp-by">{p.credit.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      <p className="sp-credit">{t("Photos from")} <a href={UNSPLASH_LINK} target="_blank" rel="noreferrer">Unsplash</a>{t(", credited on your meal page.")}</p>
+    </div>
+  );
+}
+
 function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
   const { photos, coverIdx } = form;
   const setPhotos = (fn: (p: string[]) => string[]) => set("photos", fn(photos));
@@ -1054,7 +1282,8 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         </div>
       </motion.div>
 
-      {/* Sample photos to add */}
+      {/* No photo of your own yet? A photo of the dish from Unsplash (credited), or the sample photos without it */}
+      {unsplashReady() ? <StockPicker form={form} set={set} /> : (
       <div>
         <Label>{t("Add from suggestions")}</Label>
         <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
@@ -1086,6 +1315,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           })}
         </div>
       </div>
+      )}
 
       {/* Photo gallery */}
       {photos.length > 0 && (
@@ -1137,7 +1367,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
 
 function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: keyof FormData, v: any) => void; onPublish: () => void; publishing: boolean }) {
   const store = useStore();
-  const { profile } = store;
+  const { profile, live } = store;
   const covered = form.pricePerGuest * form.maxGuests;
   // The preview card draws itself like the assistant is assembling the listing, once, when the step opens
   const cardRef = useRef<HTMLDivElement>(null);
@@ -1209,14 +1439,11 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
           <div className="flex-1">
             <div className="flex items-center gap-1.5">
               <span style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{profile.name}</span>
-              <BadgeCheck size={13} color="#0a7c4e" strokeWidth={2} />
+              {!live && <BadgeCheck size={13} color="#0a7c4e" strokeWidth={2} />}
             </div>
-            <span style={{ fontSize: 11.5, color: "#7c6fa0" }}>{t("Verified · {place}", { place: localPlace(profile.neighbourhood) })}</span>
+            <span style={{ fontSize: 11.5, color: "#7c6fa0" }}>{live ? localPlace(profile.neighbourhood) : t("Verified · {place}", { place: localPlace(profile.neighbourhood) })}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Star size={12} fill="#f59e0b" color="#f59e0b" />
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e" }}>{dec(4.9)}</span>
-          </div>
+          <HostRating />
         </div>
       </Card>
 
@@ -1384,8 +1611,14 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
       seats: form.maxGuests,
       serviceType: form.serviceType,
       image: form.photos[form.coverIdx] ?? form.photos[0],
+      imageCredit: form.photoCredits?.[form.photos[form.coverIdx] ?? form.photos[0]],
       gallery: form.photos.filter((_, i) => i !== form.coverIdx),
-      costProof: form.freeEvent || !form.costSource ? undefined : { kind: proofKind(form)!, total: form.groceryCost, people: form.maxGuests + 1 },
+      costProof: form.freeEvent || !form.costSource ? undefined : {
+        kind: proofKind(form)!, total: form.groceryCost, people: form.maxGuests + 1,
+        // guests see what a typed total is made of, and the AI estimate item by item
+        ...(proofKind(form) === "declared" ? { lines: (form.costLines ?? []).filter((l) => l.item.trim() && l.price).map((l) => ({ item: l.item.trim().slice(0, 60), price: l.price! })) }
+          : form.costSource === "estimate" && form.aiLines?.length ? { lines: form.aiLines } : {}),
+      },
       tags: [...new Set([form.cuisineType, ...[...form.dietary].map(d => DIET_TO_TAG[d]).filter(Boolean), ...freeFromTags([...form.allergens])])],
       ingredientsText: (form.ingredientsText ?? "").trim(),
       allergens: [...form.allergens].filter((a) => EU_ALLERGENS.some((x) => x.id === a)),
@@ -1395,6 +1628,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
       // live mode saves these separately (the street stays private until a guest is confirmed)
       street: form.address.trim(),
       city: form.city.trim(),
+      postcode: (form.postcode ?? "").trim(),
       dateISO: form.date,
       time: form.startTime,
       date: labelForISO(form.date),

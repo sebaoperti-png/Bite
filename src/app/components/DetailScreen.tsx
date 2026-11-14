@@ -1,3 +1,4 @@
+import { creditLink, UNSPLASH_LINK } from "../unsplash";
 import { useEffect, useState } from "react";
 import { SafetyActions, ReportSheet, BlockSheet, openSafetyTips, type ReportTarget } from "./SafetySheets";
 import { personOfMeal, type Person } from "../store";
@@ -129,6 +130,11 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
       </AnimatePresence>
       </Cloche>
       <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(22,10,46,0.3) 0%, transparent 40%, rgba(22,10,46,0.55) 100%)" }} />
+      {activeImage === 0 && meal.imageCredit && (
+        <p className="photo-credit">
+          {t("Sample photo by")} <a href={creditLink(meal.imageCredit)} target="_blank" rel="noreferrer">{meal.imageCredit.name}</a> {t("on")} <a href={UNSPLASH_LINK} target="_blank" rel="noreferrer">Unsplash</a>
+        </p>
+      )}
       {images.length > 1 && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
           {images.map((_, i) => (
@@ -161,8 +167,10 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
             <Star key={i} size={13} fill={i <= Math.round(meal.rating) ? "#f59e0b" : "#e5e7eb"} color={i <= Math.round(meal.rating) ? "#f59e0b" : "#e5e7eb"} />
           ))}
         </div>
-        <span style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{meal.reviews ? dec(meal.rating) : t("New")}</span>
-        <span style={{ fontSize: 13.5, color: "#7c6fa0" }}>({meal.reviews === 1 ? t("1 review") : t("{n} reviews", { n: meal.reviews })})</span>
+        {meal.reviews ? <>
+          <span style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{dec(meal.rating)}</span>
+          <span style={{ fontSize: 13.5, color: "#7c6fa0" }}>({meal.reviews === 1 ? t("1 review") : t("{n} reviews", { n: meal.reviews })})</span>
+        </> : <span style={{ fontSize: 13.5, fontWeight: 700, color: "#7c6fa0" }}>{t("No reviews yet")}</span>}
         <motion.div animate={{ rotate: showReviews ? 180 : 0 }}>
           <ChevronDown size={14} color="#7c6fa0" strokeWidth={2} />
         </motion.div>
@@ -351,7 +359,7 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
         <span className="px-2.5 py-1 rounded-full" style={{ fontSize: 12, fontWeight: 800, background: proof.kind === "receipt" ? "#e5f7f0" : "#ede8fb", color: proof.kind === "receipt" ? "#0a7c4e" : "#6b21d9" }}>
           {proof.kind === "receipt" ? t("Receipt-backed") : proof.kind === "declared" ? t("Stated by the host") : t("Estimated by Bite")}
         </span>
-        <span style={{ fontSize: 12, color: "#7c6fa0" }}>{proof.kind === "receipt" ? t("Host scanned the grocery receipt") : proof.kind === "declared" ? t("Typed in by the host, without a scanned receipt") : t("Based on the menu and table size")}</span>
+        <span style={{ fontSize: 12, color: "#7c6fa0" }}>{proof.kind === "receipt" ? t("Host scanned the grocery receipt") : proof.kind === "declared" ? t("Listed by the host, without a scanned receipt") : proof.lines?.length ? t("Estimated from the ingredients, item by item") : t("Based on the menu and table size")}</span>
       </div>
       <div className="flex items-center justify-between gap-2 flex-wrap" style={{ fontSize: isDesktop ? 15 : 13.5, color: "#160a2e" }}>
         <span>{t("Groceries")}{" "}<b>{euro(proof.total)}</b></span>
@@ -362,6 +370,14 @@ export function DetailScreen({ meal, onBack, onBook, onMessage, onOpenChat, onUn
       </div>
       {Math.abs(exactShare(proof.total, proof.people) - meal.price) >= 0.005 && (
         <p style={{ fontSize: 13, color: "#160a2e", marginTop: 10, lineHeight: 1.5 }}>{t("The host asks {price} per guest: the fair share rounded to whole euros.", { price: euro(meal.price) })}</p>
+      )}
+      {proof.lines && proof.lines.length > 0 && (
+        <details className="cost-lines">
+          <summary>{proof.kind === "declared" ? t("What the host bought ({n} items)", { n: proof.lines.length }) : t("How Bite estimated it ({n} items)", { n: proof.lines.length })}</summary>
+          <ul>
+            {proof.lines.map((l, i) => <li key={i}><span>{l.item}{l.amount ? <em> · {l.amount}</em> : null}</span><b>{euro(l.price)}</b></li>)}
+          </ul>
+        </details>
       )}
       <p style={{ fontSize: 12, color: "#7c6fa0", marginTop: 10, lineHeight: 1.5 }}>{t("Price cap: hosts can't charge more than the real cost per person — nobody makes a profit, everyone eats for less.")}</p>
     </div>

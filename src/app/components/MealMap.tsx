@@ -39,13 +39,15 @@ function circle([lat, lng]: [number, number], km: number) {
 
 interface Point { meal: Meal; lngLat: [number, number] }
 
-export default function MealMap({ meals, criteria, onSelect, onSearchArea, compact = false }: {
+export default function MealMap({ meals, criteria, onSelect, onSearchArea, compact = false, highlight = null }: {
   meals: Meal[];
   criteria: SearchCriteria;
   onSelect?: (m: Meal) => void;
   onSearchArea?: (place: Place, radiusKm: number) => void;
   /** a small preview (the "Where?" picker): no controls, pins only show where meals are */
   compact?: boolean;
+  /** a meal hovered in the list beside the map (desktop): its pin lights up */
+  highlight?: string | null;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
@@ -154,7 +156,7 @@ export default function MealMap({ meals, criteria, onSelect, onSearchArea, compa
         el.type = "button";
         if (g.pts.length === 1) {
           const meal = g.pts[0].meal;
-          el.className = `mm-pin ${selected === meal.id ? "on" : ""}`;
+          el.className = `mm-pin ${selected === meal.id ? "on" : ""} ${highlight === meal.id ? "hl" : ""}`;
           el.textContent = meal.price === 0 ? t("Free") : euro(meal.price);
           el.setAttribute("aria-label", `${tMaybe(meal.title)}, ${euro(meal.price)}`);
           el.onclick = (e) => { e.stopPropagation(); if (!compact) setSelected(meal.id); };
@@ -174,7 +176,7 @@ export default function MealMap({ meals, criteria, onSelect, onSearchArea, compa
     draw();
     m.on("moveend", draw);
     return () => { m.off("moveend", draw); };
-  }, [ready, points, selected]);
+  }, [ready, points, selected, highlight]);
 
   const searchHere = () => {
     const m = map.current;
