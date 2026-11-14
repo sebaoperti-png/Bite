@@ -1,4 +1,5 @@
 // FOOTER (converted from the original design; edit freely)
+import { openContact } from "../../shared/ContactForm";
 import { openBugReport } from "../../shared/BugReport";
 import { useEffect, useRef, useState } from "react";
 import { asset } from "../asset";
@@ -89,7 +90,7 @@ export function LandingFooter() {
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#help" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Help Center")}</a>
                 {" "}
-                <a href="mailto:hello@bitetable.de" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Contact us")}</a>
+                <a href="legal.html#contact" onClick={(e) => { e.preventDefault(); openContact(); }} style={{ fontSize: "16px", color: "#a897c8" }}>{t("Contact us")}</a>
                 {" "}
                 <a href="#safety" style={{ fontSize: "16px", color: "#a897c8" }}>
                   {t("Trust & Safety")}
