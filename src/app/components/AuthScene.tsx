@@ -58,7 +58,7 @@ export function AuthScene({ name, mode }: { name: string; mode: "signup" | "logi
         <path d="M240 268c-5 0-7 10-7 17h7v15" fill="none" stroke="#8f84a8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         <g className="au-card">
           <path d="M150 322h100l4 26H146z" fill="#fffdf7" stroke="rgba(107,33,217,0.3)" strokeWidth="1.2" />
-          <text x="200" y="341" textAnchor="middle" fontFamily="'Fraunces Variable', serif" fontStyle="italic" fontSize="17" fill="#3b1a78">{card}</text>
+          <text x="200" y="341" textAnchor="middle" fontFamily="'Instrument Serif', serif" fontStyle="italic" fontSize="17" fill="#3b1a78">{card}</text>
         </g>
       </g>
       {/* the candle and its light */}

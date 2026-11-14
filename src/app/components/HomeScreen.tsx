@@ -25,10 +25,10 @@ import { MealCard } from "./ListingsScreen";
 import { Sheet } from "./Sheet";
 import { t, tMaybe, dateLabel, dec, getLang } from "../../shared/i18n";
 import { LangSwitch } from "../../shared/LangSwitch";
-import { ProfileDashboard } from "./ProfileDashboard";
+import { ProfileDashboard, type ProfileRow } from "./ProfileDashboard";
 import { WeekMenu } from "./WeekMenu";
-import { ChefScene } from "./ChefScene";
 import { AboutBiteCard } from "./AboutBiteCard";
+import { NeighbourCooks, HostChalkboard } from "./HomeParts";
 
 export type HomeTab = Exclude<NavTab, "browse">;
 
@@ -129,43 +129,14 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                 </div>
 
                 <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-                  {/* Start Hosting CTA */}
-                  <motion.div className="mx-4 mt-4 rounded-2xl overflow-hidden" style={{ position: "relative" }} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18, type: "spring", stiffness: 300 }}>
-                    <div style={{ background: "linear-gradient(135deg, #160a2e 0%, #3b1278 55%, #6b21d9 100%)", padding: "16px 18px" }}>
-                      <div style={{ position: "absolute", top: -16, right: -16, width: 80, height: 80, borderRadius: "50%", background: "rgba(184,127,255,0.18)", pointerEvents: "none" }} />
-                      <div style={{ position: "absolute", bottom: -8, right: 48, width: 44, height: 44, borderRadius: "50%", background: "rgba(184,127,255,0.12)", pointerEvents: "none" }} />
-                      <div className="flex items-center justify-between" style={{ position: "relative", zIndex: 1 }}>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <div style={{ width: 26, height: 26, background: "rgba(184,127,255,0.28)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                              <ChefHat size={13} color="#b87fff" strokeWidth={2.2} />
-                            </div>
-                            <span style={{ fontSize: 10, fontWeight: 800, color: "#b87fff", textTransform: "uppercase", letterSpacing: "0.08em" }}>{t("Share your table")}</span>
-                          </div>
-                          <p style={{ fontSize: 14, fontWeight: 900, color: "#fff", lineHeight: 1.35, marginBottom: 12 }}>{t("Cook once, share the table,")}<br />{t("split the grocery bill")}</p>
-                          <motion.button onClick={onStartHosting} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl" style={{ background: "#b87fff" }} whileTap={{ scale: 0.92 }}>
-                            <ChefHat size={13} color="#fff" strokeWidth={2.5} />
-                            <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{t("Start Hosting")}</span>
-                          </motion.button>
-                        </div>
-                        <svg aria-hidden viewBox="0 0 120 120" width="62" height="62" style={{ marginLeft: 10, flexShrink: 0, filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))" }}>
-                          <circle cx="60" cy="60" r="38" fill="#fff" /><circle cx="60" cy="60" r="27" fill="none" stroke="rgba(107,33,217,0.15)" strokeWidth="2" />
-                          <path d="M14 30v22M10 30v10a4 4 0 0 0 8 0V30M14 52v40" stroke="#e7dcfb" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-                          <path d="M106 30c-5 0-7 12-7 20h7v42" stroke="#e7dcfb" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                        </svg>
-                      </div>
-                    </div>
+                  <motion.div className="hm-greet-m px-5 pt-5 pb-3" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                    <p className="hm-greet">{store.profile.name ? `${greeting()}, ${store.profile.name.split(" ")[0]}.` : `${greeting()}.`}</p>
+                    <h1 className="hm-title">{t("Who's cooking for you today?")}</h1>
                   </motion.div>
 
-                  <motion.div className="px-5 pt-5 pb-2" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-                    <p style={{ fontSize: 12.5, fontWeight: 700, color: "#9b4aff", marginBottom: 2 }}>{store.profile.name ? `${greeting()}, ${store.profile.name.split(" ")[0]}` : greeting()}</p>
-                    <h1 style={{ fontSize: 22, fontWeight: 800, color: "#160a2e", lineHeight: 1.25 }}>{t("What do you feel like")}<br />
-                      <span style={{ color: "#6b21d9" }}>{t("eating today?")}</span>
-                    </h1>
-                  </motion.div>
-
+                  <div className="hm-book-m mx-4">
                   {/* Service tabs */}
-                  <div className="px-5 pb-3">
+                  <div className="pb-3">
                     <div className="flex gap-2" role="tablist" aria-label={t("Way to eat")}>
                       {SERVICE_TABS.map(({ id, label, Icon }, i) => (
                         <motion.button key={id} role="tab" aria-selected={activeService === id} onClick={() => set({ service: id })} className="flex-1 flex flex-col items-center gap-1 py-3 rounded-2xl relative overflow-hidden" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.07, type: "spring" }} whileTap={{ scale: 0.95 }} style={{ background: activeService === id ? "#6b21d9" : "#ffffff", border: activeService === id ? "none" : "1.5px solid rgba(107,33,217,0.13)" }}>
@@ -178,13 +149,13 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                   </div>
 
                   {/* Search fields — 2×2 grid */}
-                  <div className="px-5 flex flex-col gap-2">
+                  <div className="flex flex-col gap-2">
                     <div className="grid grid-cols-2 gap-2">
                       {searchFields.map(({ id, icon: Icon, label, value }, i) => (
-                        <motion.button key={id} onClick={() => setOpenPicker(id)} className="flex items-center gap-2 px-3 py-2.5 rounded-2xl text-left min-w-0" style={{ background: "#ffffff", border: "1.5px solid rgba(107,33,217,0.1)" }} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.38 + i * 0.05 }} whileTap={{ scale: 0.97 }}>
+                        <motion.button key={id} onClick={() => setOpenPicker(id)} className="flex items-center gap-2 px-3 py-2.5 rounded-2xl text-left min-w-0" style={{ background: "#ffffff", border: "1px solid rgba(107,33,217,0.14)" }} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.38 + i * 0.05 }} whileTap={{ scale: 0.97 }}>
                           <Icon size={13} color="#6b21d9" strokeWidth={1.8} className="flex-shrink-0" />
                           <div className="flex flex-col flex-1 min-w-0">
-                            <span style={{ fontSize: 8.5, color: "#7c6fa0", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</span>
+                            <span style={{ fontSize: 10.5, color: "#8b7bb5", fontWeight: 600 }}>{label}</span>
                             <span style={{ fontSize: 12, color: "#160a2e", fontWeight: 600, marginTop: 0.5 }} className="truncate">{value}</span>
                           </div>
                         </motion.button>
@@ -209,6 +180,10 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                     </motion.button>
                   </div>
 
+                  </div>
+
+                  <div className="pt-5"><NeighbourCooks layout="row" meals={store.meals.filter((m) => store.seatsLeft(m) > 0 && !(store.myId && m.hostId === store.myId))} onSelectMeal={onSelectMeal} onHost={onStartHosting} /></div>
+
                   {/* Quick tags */}
                   <motion.div className="px-5 pt-3 pb-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.58 }}>
                     <p className="dh-serif" style={{ fontSize: 17, color: "#6b21d9", marginBottom: 7 }}>{t("Today's specials")}</p>
@@ -230,6 +205,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                       </button>
                     </div>
                     <MobileWeekMenu meals={store.meals.filter((m) => store.seatsLeft(m) > 0)} active={activeService} onSelectMeal={onSelectMeal} onSeeService={(s) => onSearch({ service: s })} />
+                    <div style={{ marginTop: 24 }}><HostChalkboard compact onHost={onStartHosting} /></div>
                     <div style={{ marginTop: 22 }}><AboutBiteCard compact /></div>
                   </div>
                 </div>
@@ -350,15 +326,16 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
   onSeeService: (s: ServiceType) => void;
   onStartHosting: () => void;
 }) {
+  const myId = useStore().myId;
   return (
     <div className="flex-1 min-h-0 overflow-y-auto">
       <div className="mx-auto w-full max-w-[1240px] px-8 pt-10 pb-16">
-        <div className="grid gap-6 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_320px] items-stretch">
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px] items-stretch">
           {/* Search panel */}
-          <motion.section className="rounded-[28px] p-8 lg:p-10" style={{ background: "#ffffff", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: "#9b4aff" }}>{name ? `${greeting()}, ${name.split(" ")[0]}` : greeting()}</p>
-            <h1 style={{ fontSize: 44, fontWeight: 900, color: "#160a2e", lineHeight: 1.05, letterSpacing: "-0.03em", marginTop: 6 }}>{t("What do you feel like")}{" "}<span className="dh-serif">{t("eating today?")}</span>
-            </h1>
+          <motion.section className="hm-book" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+            <span className="hm-ribbon" aria-hidden />
+            <p className="hm-greet">{name ? `${greeting()}, ${name.split(" ")[0]}.` : `${greeting()}.`}</p>
+            <h1 className="hm-title">{t("Who's cooking for you today?")}</h1>
 
             <div className="flex flex-wrap gap-2.5 mt-7" role="tablist" aria-label={t("Way to eat")}>
               {SERVICE_TABS.map(({ id, label, Icon, desc }) => {
@@ -405,27 +382,10 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
             </div>
           </motion.section>
 
-          {/* Host CTA */}
-          <motion.section className="relative rounded-[28px] overflow-hidden p-8 flex flex-col" style={{ background: "linear-gradient(150deg, #160a2e 0%, #3b1278 55%, #6b21d9 100%)" }} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
-            <div style={{ position: "absolute", top: -40, right: -40, width: 180, height: 180, borderRadius: "50%", background: "rgba(184,127,255,0.16)" }} />
-            <div style={{ position: "absolute", bottom: -30, left: -20, width: 120, height: 120, borderRadius: "50%", background: "rgba(184,127,255,0.1)" }} />
-            <div className="relative flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(184,127,255,0.28)" }}>
-                <ChefHat size={16} color="#d6b8ff" strokeWidth={2.2} />
-              </span>
-              <span style={{ fontSize: 12, fontWeight: 800, color: "#d6b8ff", textTransform: "uppercase", letterSpacing: "0.08em" }}>{t("Share your table")}</span>
-            </div>
-            <p className="relative" style={{ fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1.15, letterSpacing: "-0.02em", marginTop: 18 }}>{t("Cook once, share the table, split the bill.")}</p>
-            <p className="relative" style={{ fontSize: 14.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.55, marginTop: 10 }}>{t("Cooking for six costs barely more than for two. Guests chip in for the groceries — everyone eats better for less.")}</p>
-            <div className="relative flex-1 flex items-center justify-center py-4"><ChefScene /></div>
-            <div className="relative pt-2">
-              <button onClick={onStartHosting} className="flex items-center gap-2 px-5 py-3 rounded-xl transition-transform hover:-translate-y-px" style={{ background: "#fff" }}>
-                <ChefHat size={16} color="#6b21d9" strokeWidth={2.4} />
-                <span style={{ fontSize: 14.5, fontWeight: 800, color: "#160a2e" }}>{t("Start hosting")}</span>
-                <ChevronRight size={16} color="#160a2e" strokeWidth={2.4} />
-              </button>
-            </div>
-          </motion.section>
+          {/* Who is cooking: people first */}
+          <motion.div className="hm-side" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
+            <NeighbourCooks layout="column" meals={meals.filter((m) => !(myId && m.hostId === myId))} onSelectMeal={onSelectMeal} onHost={onStartHosting} />
+          </motion.div>
         </div>
 
         {firstSteps && <div className="fs-wrap mt-8 grid gap-4 lg:grid-cols-[1fr_1fr] items-start">{firstSteps}</div>}
@@ -443,6 +403,8 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
           </div>
           <WeekMenu meals={meals} active={activeTab} onSelectMeal={onSelectMeal} onSeeService={onSeeService} />
         </section>
+
+        <div className="mt-14"><HostChalkboard onHost={onStartHosting} /></div>
 
         <div className="mt-12 mb-4"><AboutBiteCard /></div>
       </div>
@@ -539,15 +501,15 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
     myReviews.host && myReviews.host.length ? t("{r}★ as host", { r: dec(myReviews.hostAvg) }) : null,
     myReviews.guest && myReviews.guest.length ? t("{r}★ as guest", { r: dec(myReviews.guestAvg) }) : null,
   ].filter(Boolean).join(" · ") || t("What guests and hosts said about you");
-  const rows: { Icon: React.ElementType; label: string; sub: string; onClick: () => void }[] = [
-    { Icon: BookOpen,   label: t("My bookings"),         sub: upcoming.length ? (upcoming.length > 1 ? t("{n} upcoming meals", { n: upcoming.length }) : t("1 upcoming meal")) : t("No upcoming meals"), onClick: () => setSheet("bookings") },
-    { Icon: Heart,      label: t("Saved meals"),         sub: saved.length ? t("{n} saved", { n: saved.length }) : t("Tap ♥ on a meal to save it"), onClick: () => setSheet("saved") },
-    { Icon: ChefHat,    label: t("My listings"),         sub: myListings.length ? t("{n} live", { n: myListings.length }) : t("Host your first meal"), onClick: () => setSheet("listings") },
-    { Icon: Star,       label: t("Your reviews"),        sub: reviewSub, onClick: () => setSheet("reviews") },
-    { Icon: Users,      label: t("People you follow"),   sub: store.following.length ? (store.following.length === 1 ? t("1 person") : t("{n} people", { n: store.following.length })) : t("Nobody yet"), onClick: () => setSheet("following") },
-    { Icon: Leaf,       label: t("Dietary preferences"), sub: profile.dietary.length ? profile.dietary.map((d) => t(d)).join(" · ") : t("None set"), onClick: () => setSheet("dietary") },
+  const rows: ProfileRow[] = [
+    { Icon: BookOpen,   course: "table", label: t("My bookings"),         sub: upcoming.length ? (upcoming.length > 1 ? t("{n} upcoming meals", { n: upcoming.length }) : t("1 upcoming meal")) : t("No upcoming meals"), onClick: () => setSheet("bookings") },
+    { Icon: Heart,      course: "table", label: t("Saved meals"),         sub: saved.length ? t("{n} saved", { n: saved.length }) : t("Tap ♥ on a meal to save it"), onClick: () => setSheet("saved") },
+    { Icon: ChefHat,    course: "table", label: t("My listings"),         sub: myListings.length ? t("{n} live", { n: myListings.length }) : t("Host your first meal"), onClick: () => setSheet("listings") },
+    { Icon: Star,       course: "table", label: t("Your reviews"),        sub: reviewSub, onClick: () => setSheet("reviews") },
+    { Icon: Users,      course: "people", label: t("People you follow"),   sub: store.following.length ? (store.following.length === 1 ? t("1 person") : t("{n} people", { n: store.following.length })) : t("Nobody yet"), onClick: () => setSheet("following") },
+    { Icon: Leaf,       course: "people", label: t("Dietary preferences"), sub: profile.dietary.length ? profile.dietary.map((d) => t(d)).join(" · ") : t("None set"), onClick: () => setSheet("dietary") },
     { Icon: CreditCard, label: t("Payment methods"),     sub: store.live ? t("For now you pay at the table") : t("Visa ···· 4242 (demo)"), onClick: () => setSheet("payment") },
-    { Icon: UserPlus,   label: t("Invite friends"),      sub: t("Bring your neighbours to the table"), onClick: invite },
+    { Icon: UserPlus,   course: "people", label: t("Invite friends"),      sub: t("Bring your neighbours to the table"), onClick: invite },
     ...(store.live ? [{ Icon: Sparkles, label: t("How Bite works"), sub: t("The 30-second tour"), onClick: openTour }] : []),
     { Icon: ShieldCheck, label: t("Safety tips"),        sub: t("How to meet neighbours safely"), onClick: openSafetyTips },
     { Icon: Globe,      label: t("About Bite"),          sub: t("How it works, safety and hosting on bitetable.de"), onClick: () => { window.top!.location.href = "./?from=app"; } },
@@ -680,7 +642,7 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
           <div className="flex flex-col gap-3">
             <div className="rounded-2xl p-5" style={{ background: "#fbf7ef", border: "1px dashed rgba(107,33,217,0.3)" }}>
               <p style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9a8bb8" }}>{t("How paying works for now")}</p>
-              <p style={{ fontFamily: "'Fraunces Variable', serif", fontStyle: "italic", fontSize: 24, color: "#160a2e", margin: "4px 0 8px" }}>{t("You pay at the table.")}</p>
+              <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 24, color: "#160a2e", margin: "4px 0 8px" }}>{t("You pay at the table.")}</p>
               <p style={{ fontSize: 13.5, color: "#4b3a6b", lineHeight: 1.55 }}>{t("Bite charges nothing in this early phase. Once the host confirms your seat, you hand them their share of the groceries, as shown on the meal.")}</p>
             </div>
             <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "#f7f4fd" }}>

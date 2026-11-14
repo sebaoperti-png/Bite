@@ -21,7 +21,7 @@ export function AboutBiteCard({ compact = false }: { compact?: boolean }) {
     <section className={`ab-card ${compact ? "ab-compact" : ""}`} aria-labelledby="ab-title">
       <div className="ab-inner">
         <div className="ab-text">
-          <p className="ab-kicker">{t("Bite · the full menu")}</p>
+          <p className="ab-kicker">{t("The full menu")}</p>
           <h2 id="ab-title" className="ab-title">{t("Wanna know more?")}</h2>
           <p className="ab-sub">{t("The story behind Bite, told course by course on our website.")}</p>
           <a className="ab-cta" href={SITE} target="_top">

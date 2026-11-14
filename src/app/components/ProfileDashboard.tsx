@@ -14,7 +14,7 @@ import { usePhotoPicker } from "./Avatar";
 import { HouseRulesSheet } from "./SafetySheets";
 import { t, tMaybe, dateLabel, dec, getLang } from "../../shared/i18n";
 
-export interface ProfileRow { Icon: React.ElementType; label: string; sub: string; onClick: () => void }
+export interface ProfileRow { Icon: React.ElementType; label: string; sub: string; onClick: () => void; course?: "table" | "people" | "house"; val?: string }
 
 // Cuisines in the passport (tags used by the demo meals) with a stamp colour and emoji each
 const STAMPS = [
@@ -94,39 +94,61 @@ function Medal({ Icon, tone, on, delay }: { Icon: React.ElementType; tone: strin
     while "verified neighbour" turns around the edge */
 /** "Your seat at the table": what makes a profile trustworthy, drawn as a place setting. Each missing piece is a
  *  button that does the job right there (add a photo, write a few words, read the house rules), so nobody gets lost. */
+/** "Mise en place": the four things a neighbour needs before their first dinner, written on a waiter's pad.
+    Each line is a thing on the table (glass = email, plate = photo, cutlery = a few words, napkin = house rules);
+    tapping an unfinished line opens exactly the screen that finishes it. When all four are set, the pad is stamped. */
+const COURSES = [
+  { id: "table", name: "Your table" },
+  { id: "people", name: "Your people" },
+  { id: "house", name: "The house" },
+] as const;
+
 function SeatReady({ steps }: { steps: { key: string; label: string; done: boolean; cta: string; onClick?: () => void }[] }) {
   const done = steps.filter((s) => s.done).length;
   const all = done === steps.length;
   const has = (k: string) => steps.find((s) => s.key === k)?.done;
   return (
     <div className={`sr ${all ? "all" : ""}`}>
+      <div className="sr-holes" aria-hidden />
       <div className="sr-top">
-        <svg className="sr-set" viewBox="0 0 120 70" aria-hidden>
-          {/* placemat */}
-          <rect x="6" y="8" width="108" height="56" rx="10" className="sr-mat" />
-          {/* plate = photo and name */}
-          <g className={`sr-i ${has("photo") ? "on" : ""}`}><circle cx="60" cy="36" r="19" className="sr-plate" /><circle cx="60" cy="36" r="12" className="sr-plate-in" /></g>
-          {/* fork + knife = a few words about you */}
-          <g className={`sr-i ${has("bio") ? "on" : ""}`}><path d="M30 20v32M26 20v10a4 4 0 0 0 8 0V20" className="sr-line" /><path d="M90 20c4 4 4 14 0 16v16" className="sr-line" /></g>
-          {/* glass = email confirmed */}
-          <g className={`sr-i ${has("email") ? "on" : ""}`}><path d="M98 12h10l-1 9a4 4 0 0 1-8 0z M103 25v6 M99 31h8" className="sr-line" /></g>
+        <svg className="sr-set" viewBox="0 0 132 84" aria-hidden>
+          <ellipse cx="66" cy="44" rx="62" ry="36" className="sr-mat" />
           {/* napkin = house rules */}
-          <g className={`sr-i ${has("rules") ? "on" : ""}`}><path d="M12 22l10-4 4 10-10 4z" className="sr-napkin" /></g>
+          <g className={`sr-i ${has("rules") ? "on" : ""}`}><path d="M10 30l16-6 7 18-16 6z" className="sr-napkin" /><path d="M14 34l12-4.5" className="sr-napkin-line" /></g>
+          {/* plate = photo and name */}
+          <g className={`sr-i ${has("photo") ? "on" : ""}`}><circle cx="66" cy="45" r="23" className="sr-plate" /><circle cx="66" cy="45" r="15" className="sr-plate-in" /></g>
+          {/* fork + knife = a few words about you */}
+          <g className={`sr-i ${has("bio") ? "on" : ""}`}><path d="M36 26v38M31.5 26v11a4.5 4.5 0 0 0 9 0V26" className="sr-line" /><path d="M96 26c5 5 5 16 0 19v19" className="sr-line" /></g>
+          {/* glass = email confirmed */}
+          <g className={`sr-i ${has("email") ? "on" : ""}`}><path d="M106 12h14l-1.5 12a5.5 5.5 0 0 1-11 0z M113 29.5v8 M108 37.5h10" className="sr-line" /><path d="M107.5 17h11" className="sr-wine" /></g>
         </svg>
-        <div>
-          <b>{all ? t("Your seat is ready") : t("Set your seat at the table")}</b>
-          <span>{all ? t("Neighbours can see who they'll eat with.") : t("{n} of {total} done · takes about a minute", { n: done, total: steps.length })}</span>
+        <div className="sr-head">
+          <em>{t("Mise en place")}</em>
+          <h3>{all ? t("Your place is set") : t("Set your place at the table")}</h3>
+          <p>{all ? t("Neighbours can see who they'll eat with.") : t("{n} of {total} ready. Tap a line to finish it.", { n: done, total: steps.length })}</p>
         </div>
       </div>
-      <ul className="sr-steps">
-        {steps.map((s) => (
-          <li key={s.key} className={s.done ? "done" : ""}>
-            <span className="sr-check" aria-hidden>{s.done ? <Check size={12} strokeWidth={3.5} /> : null}</span>
-            <span className="sr-label">{s.label}</span>
-            {!s.done && s.onClick && <button type="button" onClick={s.onClick}>{s.cta} <ArrowRight size={13} /></button>}
-          </li>
-        ))}
-      </ul>
+      <ol className="sr-steps">
+        {steps.map((s) => {
+          const go = !s.done && s.onClick;
+          const inner = (
+            <>
+              <span className="sr-tick" aria-hidden>
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" className="sr-tick-ring" />{s.done && <path d="M6.5 12.5l3.6 3.6L18 7.5" className="sr-tick-mark" />}</svg>
+              </span>
+              <span className="sr-name">{s.label}</span>
+              <span className="sr-lead" aria-hidden />
+              <span className="sr-act">{s.done ? t("set") : go ? <>{s.cta}<ChevronRight size={14} strokeWidth={2.6} /></> : t("to do")}</span>
+            </>
+          );
+          return (
+            <li key={s.key} className={s.done ? "done" : ""}>
+              {go ? <button type="button" onClick={s.onClick}>{inner}</button> : <div>{inner}</div>}
+            </li>
+          );
+        })}
+      </ol>
+      {all && <span className="sr-stamp" aria-hidden><i>{t("Ready")}</i><small>Bite</small></span>}
     </div>
   );
 }
@@ -414,20 +436,33 @@ export function ProfileDashboard({ rows, onEdit, onShare, onStartHosting, onBrow
       </div>
 
       {/* ── The account options, with room to breathe ── */}
-      <div className="pd-account">
-        <section className="pd-card pd-menu">
-          <h2>{t("Account")}</h2>
-          <div className="pd-menu-grid">
-          {rows.map(({ Icon, label, sub, onClick }) => (
-            <button key={label} onClick={onClick} className="pd-menu-line">
-              <Icon size={16} strokeWidth={2} />
-              <span><b>{label}</b><em>{sub}</em></span>
-              <ChevronRight size={16} />
-            </button>
-          ))}
+      <section className="carte" aria-labelledby="carte-title">
+        <div className="carte-in">
+          <header className="carte-head">
+            <span className="carte-orn" aria-hidden><i /><svg viewBox="0 0 40 14"><path d="M2 7c6-6 12-6 18 0s12 6 18 0" /></svg><i /></span>
+            <h2 id="carte-title">{t("Your account")}</h2>
+            <p>{t("Bookings, people and the house rules, all on one card.")}</p>
+          </header>
+          <div className="carte-cols">
+            {COURSES.map((c) => {
+              const items = rows.filter((r) => (r.course ?? "house") === c.id);
+              if (!items.length) return null;
+              return (
+                <div key={c.id} className="carte-course">
+                  <h3>{t(c.name)}</h3>
+                  {items.map(({ label, sub, onClick, val }) => (
+                    <button key={label} onClick={onClick} className="carte-item">
+                      <span className="ci-line"><b>{label}</b><span className="ci-lead" aria-hidden />{val ? <span className="ci-val">{val}</span> : <ChevronRight size={15} className="ci-go" />}</span>
+                      <span className="ci-desc">{sub}</span>
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
           </div>
-        </section>
-      </div>
+          <p className="carte-foot">{t("Service included. Enjoy your meal.")}</p>
+        </div>
+      </section>
     </div>
   );
 }

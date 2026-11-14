@@ -200,7 +200,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   const empty = store.live ? (
     <div className="flex flex-col items-center justify-center py-14 px-6 gap-3 rounded-3xl text-center" style={{ background: isDesktop ? "#fff" : "transparent" }}>
       <EmptyPlate size={96} />
-      <p style={{ fontFamily: "'Fraunces Variable', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "#160a2e" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
+      <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "#160a2e" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
       <p style={{ color: "#7c6fa0", fontSize: 14, maxWidth: 360, lineHeight: 1.5 }}>{t("Bite is just starting. Cook something you love and open the first table near you, or look a bit further.")}</p>
       <div className="flex flex-wrap justify-center gap-2 mt-1">
         {onStartHosting && <button onClick={onStartHosting} className="px-4 py-2.5 rounded-full" style={{ background: "#6b21d9", fontSize: 13.5, color: "#fff", fontWeight: 800 }}>{t("Host the first table")}</button>}
