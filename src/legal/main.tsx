@@ -4,6 +4,7 @@ import { LegalPage } from "./sections/LegalPage";
 import { ContactHost } from "../shared/ContactForm";
 import "../shared/fonts.css";
 import "./legal.css";
+import { startAnalytics } from "../shared/analytics";
 
 // Smooth-scroll to the section in the URL (#terms, #privacy, ...) and briefly highlight it.
 function Legal() {
@@ -29,3 +30,4 @@ function Legal() {
 }
 
 createRoot(document.getElementById("root")!).render(<Legal />);
+startAnalytics();

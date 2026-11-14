@@ -6,6 +6,7 @@ import "../shared/fonts.css";
 import "../shared/motion.css";
 import "../shared/restaurant.css";
 import "./stand.css";
+import { startAnalytics } from "../shared/analytics";
 
 // stand.html          → survey (phones, from the QR code)
 // stand.html?kiosk    → survey on the stand tablet: resets itself for the next visitor
@@ -14,3 +15,4 @@ import "./stand.css";
 const screen = new URLSearchParams(window.location.search).has("screen");
 const survey = new URLSearchParams(window.location.search).has("survey");
 createRoot(document.getElementById("root")!).render(screen ? (survey ? <Results /> : <FeedbackDesk />) : <Survey />);
+startAnalytics();

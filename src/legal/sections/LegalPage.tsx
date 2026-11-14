@@ -2,6 +2,7 @@
 import { openContact } from "../../shared/ContactForm";
 import { ThemeToggle } from "../../shared/ThemeToggle";
 import { asset } from "../asset";
+import { ANALYTICS } from "../../shared/analytics";
 
 export function LegalPage() {
   return (
@@ -285,6 +286,9 @@ export function LegalPage() {
               <li><strong>Unsplash</strong>{" (Unsplash Inc., USA): when a host searches for a photo of their dish, the search words go to Unsplash, and photos picked from Unsplash are loaded from Unsplash's servers, which receive your IP address. Such photos are marked with the photographer's name on the meal page."}</li>
               <li><strong>Google Gemini API</strong>{" (Google, USA): only if a host taps \"Improve my text with AI\" or lets Bite estimate the cost from the ingredients, and when a visitor asks \"Ask Bite\" on the website (the question and the last few lines of that chat, without name or IP address; to limit abuse our server counts questions per day under a hashed IP address that changes daily and is deleted after two days, Art. 6(1)(f) GDPR). Then the host's own text or ingredient list, the meal's name, cuisine and number of people are sent to Google through our server (not the host's name, email or address). On Google's free tier Google may use this text to improve its services, so don't put personal details in it. Transfers to the USA rely on the EU-US Data Privacy Framework."}</li>
               <li><strong>jsDelivr</strong>{" (public content delivery network): only when a host scans a receipt, the reading program and its German language data are downloaded from it; it receives the IP address."}</li>
+              {/* cookie-free visitor statistics: shown only once switched on in src/shared/analytics.ts */}
+              {ANALYTICS?.provider === "plausible" && <li><strong>Plausible Analytics</strong>{" (Plausible Insights OÜ, Estonia; servers in Germany): counts page views and where visitors come from, without cookies and without storing anything on your device. Your IP address and browser details are only used to form an anonymous code that changes every day, and are not stored; we only see totals. Art. 6(1)(f) GDPR, our interest in knowing which pages help."}</li>}
+              {ANALYTICS?.provider === "umami" && <li><strong>Umami</strong>{" (Umami Software, Inc., USA; EU data region): counts page views and where visitors come from, without cookies and without storing anything on your device. Your IP address is not stored; we only see totals. Art. 6(1)(f) GDPR, our interest in knowing which pages help."}</li>}
             </ul>
             <p>{"Between users, guests and hosts see only the profile and booking information needed to arrange a meal. We do not sell personal data."}</p>
             <h3>
@@ -295,6 +299,9 @@ export function LegalPage() {
               {"Kurz auf Deutsch: Empfänger"}
             </h3>
             <p lang="de">{"Bite nutzt: Supabase (Datenbank, Login, Fotos; Server in Frankfurt am Main), Resend (E-Mails der App; Server in Irland), GitHub Pages (Website), Apple iCloud Mail (unser Postfach), Google Apps Script und Google Sheets (Umfrage, Newsletter, Kontaktformular „Write to us“: Name falls angegeben, E-Mail und Nachricht, weitergeleitet an hello@bitetable.de, gelöscht wenn erledigt, spätestens nach 12 Monaten; und Fehlermeldungen über „Fehler melden“: der Text, auf Wunsch Seite, Bildschirmgröße, Browser und Sprache, deine E-Mail nur, wenn du sie angibst; gelöscht, sobald der Fehler erledigt ist, spätestens nach 12 Monaten), Photon von komoot (Ortssuche), OpenFreeMap (Karte), jsDelivr (nur beim Scannen eines Kassenbons), OpenPLZ API (Postleitzahl zu Ort), Unsplash (Fotos von Gerichten, die Gastgeber auswählen) und die Google Gemini API (nur wenn ein Gastgeber die KI-Hilfe nutzt oder jemand auf der Website „Ask Bite“ fragt: dann gehen sein Text, seine Zutatenliste oder die Frage samt den letzten Zeilen des Chats ohne Namen, Adresse oder IP-Adresse an Google; gegen Missbrauch zählen wir Fragen pro Tag unter einer täglich wechselnden, gehashten IP-Adresse, nach zwei Tagen gelöscht; im kostenlosen Tarif kann Google diese Texte zur Verbesserung seiner Dienste nutzen). Zahlungen und Ausweisdaten werden derzeit nicht verarbeitet. Wir verkaufen keine personenbezogenen Daten. Fragen: hello@bitetable.de."}</p>
+            {ANALYTICS && <p lang="de">{ANALYTICS.provider === "plausible"
+              ? "Besucherstatistik: Plausible Analytics (Plausible Insights OÜ, Estland; Server in Deutschland) zählt Seitenaufrufe und woher Besucher kommen, ohne Cookies und ohne etwas auf deinem Gerät zu speichern. IP-Adresse und Browserdaten werden nur zu einem täglich wechselnden, anonymen Code verrechnet und nicht gespeichert; wir sehen nur Summen. Art. 6 Abs. 1 lit. f DSGVO."
+              : "Besucherstatistik: Umami (Umami Software, Inc., USA; EU-Datenregion) zählt Seitenaufrufe und woher Besucher kommen, ohne Cookies und ohne etwas auf deinem Gerät zu speichern. Deine IP-Adresse wird nicht gespeichert; wir sehen nur Summen. Art. 6 Abs. 1 lit. f DSGVO."}</p>}
             <h3>
               6. Retention
             </h3>
