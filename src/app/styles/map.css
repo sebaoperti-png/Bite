@@ -20,6 +20,7 @@
 .mm-pin::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; box-shadow: 2px 2px 4px rgba(46,16,96,0.12); z-index: -1; }
 .mm-pin:hover { transform: scale(1.08); z-index: 5; }
 .mm-pin.on { background: #6b21d9; color: #fff; transform: scale(1.12); z-index: 6; }
+.mm-pin.hl { background: #160a2e; color: #fff; transform: scale(1.18); z-index: 7; }
 
 /* a group of meals: tap to zoom in */
 .mm-group {
@@ -54,13 +55,6 @@
 .mm .maplibregl-ctrl-attrib { font-size: 10px; }
 
 /* List / Map switch */
-.vw-switch { display: inline-flex; padding: 3px; border-radius: 999px; background: #f0ecfa; position: relative; }
-.vw-switch button { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 800; color: #6b21d9; z-index: 1; }
-.vw-switch button.on { color: #fff; }
-.vw-pill { position: absolute; inset: 0; border-radius: 999px; background: #6b21d9; z-index: -1; }
-.vw-float { position: absolute; left: 50%; transform: translateX(-50%); bottom: 86px; z-index: 6; box-shadow: 0 10px 26px rgba(22,10,46,0.28); background: #160a2e; }
-.vw-float button { color: #fff; }
-.vw-float .vw-pill { background: #6b21d9; }
 @media (max-width: 767px) { .mm-card { bottom: 74px; } .mm-empty { bottom: 78px; } .mm-note { bottom: 70px; } }
 
 /* the small preview in the "Where?" picker */
