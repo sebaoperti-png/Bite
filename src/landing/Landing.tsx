@@ -27,7 +27,7 @@ type Consent = { functional: boolean; analytics: boolean; marketing: boolean };
  */
 export function Landing() {
   const lang = useLang(); // re-render the whole page when the language changes
-  useEffect(() => { document.title = t("Bite — Real food, real people, your neighbourhood"); }, [lang]);
+  useEffect(() => { document.title = t("Bite: real food, real people, your neighbourhood"); }, [lang]);
   const [showCookies, setShowCookies] = useState(false);
   const [showPrefs, setShowPrefs] = useState(false);
   const [prefFunctional, setPrefFunctional] = useState(false);
@@ -106,7 +106,7 @@ export function Landing() {
   };
 
   return (
-    <div style={{ overflowX: "clip" }}>
+    <div className="lp" style={{ overflowX: "clip" }}>
       <LandingIntro />
       <LandingNav />
       <LandingHero />
