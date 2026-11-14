@@ -5,7 +5,8 @@
 //                    at a German supermarket, item by item. The app keeps it within sensible bounds and the price
 //                    cap still applies (the database checks it).
 // Only signed-in people can call it (Supabase checks the JWT) and each account has a daily allowance (ai_take).
-// Secrets (Supabase dashboard → Edge Functions → Secrets): GEMINI_API_KEY (required), GEMINI_MODEL (optional).
+// Also the Unsplash photo search for cover photos (tasks "photos" and "photo_used"), so the Access Key never reaches the browser.
+// Secrets (Supabase dashboard → Edge Functions → Secrets): GEMINI_API_KEY, UNSPLASH_ACCESS_KEY, GEMINI_MODEL (optional).
 // SUPABASE_URL and the service key (SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SECRET_KEYS) are provided by Supabase automatically.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -89,6 +90,34 @@ function estimatePrompt(b: Record<string, unknown>) {
   ].join("\n");
 }
 
+// ---- Unsplash (cover photos). The Access Key stays here on the server (secret UNSPLASH_ACCESS_KEY), as Unsplash asks.
+async function unsplashSearch(query: string, lang: string) {
+  const key = Deno.env.get("UNSPLASH_ACCESS_KEY");
+  if (!key) throw new Error("not_configured");
+  if (!query) return { photos: [] };
+  const q = encodeURIComponent(`${query} food`);
+  const res = await fetch(`https://api.unsplash.com/search/photos?query=${q}&per_page=12&orientation=landscape&content_filter=high&lang=${lang === "de" ? "de" : "en"}`, {
+    headers: { Authorization: `Client-ID ${key}`, "Accept-Version": "v1" },
+  });
+  if (res.status === 403 || res.status === 429) throw new Error("busy");
+  if (!res.ok) throw new Error(`unsplash_${res.status}`);
+  const data = await res.json();
+  const photos = (Array.isArray(data?.results) ? data.results : []).map((p: any) => ({
+    id: String(p.id),
+    raw: String(p.urls?.raw ?? ""),
+    alt: clip(p.alt_description || p.description || query, 120),
+    credit: { name: clip(p.user?.name || p.user?.username || "Unsplash", 60), username: clip(p.user?.username, 40), link: clip(p.user?.links?.html || "https://unsplash.com", 200) },
+    download: String(p.links?.download_location ?? ""),
+  })).filter((p: { raw: string }) => p.raw.startsWith("https://images.unsplash.com/"));
+  return { photos };
+}
+// Unsplash asks apps to report when a photo is actually used
+async function unsplashUsed(download: string) {
+  const key = Deno.env.get("UNSPLASH_ACCESS_KEY");
+  if (!key || !download.startsWith("https://api.unsplash.com/")) return;
+  await fetch(download, { headers: { Authorization: `Client-ID ${key}` } }).catch(() => {});
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors(req) });
   if (req.method !== "POST") return json(req, { error: "method" }, 405);
@@ -99,6 +128,8 @@ Deno.serve(async (req) => {
     const uid = token ? (await admin.auth.getUser(token)).data.user?.id : undefined;
     if (!uid) return json(req, { error: "sign_in" }, 401);
     const body = await req.json().catch(() => ({}));
+    if (body.task === "photos") return json(req, await unsplashSearch(clip(body.query, 60), clip(body.lang, 2)));
+    if (body.task === "photo_used") { await unsplashUsed(String(body.download ?? "")); return json(req, { ok: true }); }
     if (body.task !== "polish" && body.task !== "estimate") return json(req, { error: "task" }, 400);
     if (body.task === "polish" && clip(body.text, 1200).length < 8) return json(req, { error: "too_short" }, 400);
     if (body.task === "estimate" && clip(body.ingredients, 1200).length < 3) return json(req, { error: "no_ingredients" }, 400);
