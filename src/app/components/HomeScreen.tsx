@@ -523,6 +523,7 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
     ...(store.live ? [{ Icon: Sparkles, label: t("How Bite works"), sub: t("The 30-second tour"), onClick: openTour }] : []),
     { Icon: ShieldCheck, label: t("Safety tips"),        sub: t("How to meet neighbours safely"), onClick: openSafetyTips },
     { Icon: Globe,      label: t("About Bite"),          sub: t("How it works, safety and hosting on bitetable.de"), onClick: () => { window.top!.location.href = "./?from=app"; } },
+    { Icon: Star,       label: t("Rate Bite"),           sub: t("Two minutes: how easy was it?"), onClick: () => window.open("feedback.html?tried&ref=app", "_blank", "noopener") },
     { Icon: Bug,        label: t("Report a bug"),        sub: t("Something not working? Tell us, we fix it fast"), onClick: openBugReport },
     { Icon: Settings,   label: t("Settings"),            sub: store.live ? t("Notifications, language, blocked people") : t("Notifications, language, Bite news, demo data"), onClick: () => setSheet("settings") },
   ];
