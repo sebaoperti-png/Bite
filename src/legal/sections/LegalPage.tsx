@@ -1,4 +1,5 @@
 // Legal page: terms, privacy, cookies, community, GDPR, impressum, accessibility, modern slavery
+import { openContact } from "../../shared/ContactForm";
 import { asset } from "../asset";
 
 export function LegalPage() {
@@ -273,7 +274,7 @@ export function LegalPage() {
               <li><strong>Resend</strong>{" (Plus Five Five, Inc., USA): sends the app's emails (confirming your address, resetting your password). Servers in Ireland (EU)."}</li>
               <li><strong>{"GitHub Pages"}</strong>{" (GitHub, Inc., a Microsoft company, USA): hosts the website bitetable.de; receives your IP address when you open a page."}</li>
               <li><strong>{"Apple iCloud Mail"}</strong>{" (Apple Distribution International Ltd., Ireland): our mailbox hello@bitetable.de; receives the emails you send us."}</li>
-              <li><strong>{"Google Apps Script & Google Sheets"}</strong>{" (Google Ireland Ltd.): the survey, the newsletter list (see the Survey section) and bug reports sent with \"Report a bug\" (the text, and only if you tick it the page, screen size, browser and language; your email only if you give it, to answer you; deleted once the bug is closed and at the latest after 12 months; Art. 6(1)(f) GDPR)."}</li>
+              <li><strong>{"Google Apps Script & Google Sheets"}</strong>{" (Google Ireland Ltd.): the survey, the newsletter list (see the Survey section), messages sent with the contact form \"Write to us\" (name if given, email and message, forwarded to our mailbox hello@bitetable.de so we can answer; deleted once the matter is settled, at the latest after 12 months; Art. 6(1)(b) and (f) GDPR) and bug reports sent with \"Report a bug\" (the text, and only if you tick it the page, screen size, browser and language; your email only if you give it, to answer you; deleted once the bug is closed and at the latest after 12 months; Art. 6(1)(f) GDPR)."}</li>
               <li><strong>{"Photon by komoot"}</strong>{" (komoot GmbH, Germany): the place search in the app; receives the place or postcode you type and your IP address."}</li>
               <li><strong>OpenFreeMap</strong>{" (map tiles from OpenStreetMap data): draws the map in the app; receives your IP address and the map area shown."}</li>
               <li><strong>OpenPLZ API</strong>{" (open data on German postcodes): when a host types a postcode, it finds the town; receives the postcode and your IP address."}</li>
@@ -289,7 +290,7 @@ export function LegalPage() {
             <h3 lang="de">
               {"Kurz auf Deutsch: Empfänger"}
             </h3>
-            <p lang="de">{"Bite nutzt: Supabase (Datenbank, Login, Fotos; Server in Frankfurt am Main), Resend (E-Mails der App; Server in Irland), GitHub Pages (Website), Apple iCloud Mail (unser Postfach), Google Apps Script und Google Sheets (Umfrage, Newsletter und Fehlermeldungen über „Fehler melden“: der Text, auf Wunsch Seite, Bildschirmgröße, Browser und Sprache, deine E-Mail nur, wenn du sie angibst; gelöscht, sobald der Fehler erledigt ist, spätestens nach 12 Monaten), Photon von komoot (Ortssuche), OpenFreeMap (Karte), jsDelivr (nur beim Scannen eines Kassenbons), OpenPLZ API (Postleitzahl zu Ort), Unsplash (Fotos von Gerichten, die Gastgeber auswählen) und die Google Gemini API (nur wenn ein Gastgeber die KI-Hilfe nutzt oder jemand auf der Website „Ask Bite“ fragt: dann gehen sein Text, seine Zutatenliste oder die Frage samt den letzten Zeilen des Chats ohne Namen, Adresse oder IP-Adresse an Google; gegen Missbrauch zählen wir Fragen pro Tag unter einer täglich wechselnden, gehashten IP-Adresse, nach zwei Tagen gelöscht; im kostenlosen Tarif kann Google diese Texte zur Verbesserung seiner Dienste nutzen). Zahlungen und Ausweisdaten werden derzeit nicht verarbeitet. Wir verkaufen keine personenbezogenen Daten. Fragen: hello@bitetable.de."}</p>
+            <p lang="de">{"Bite nutzt: Supabase (Datenbank, Login, Fotos; Server in Frankfurt am Main), Resend (E-Mails der App; Server in Irland), GitHub Pages (Website), Apple iCloud Mail (unser Postfach), Google Apps Script und Google Sheets (Umfrage, Newsletter, Kontaktformular „Write to us“: Name falls angegeben, E-Mail und Nachricht, weitergeleitet an hello@bitetable.de, gelöscht wenn erledigt, spätestens nach 12 Monaten; und Fehlermeldungen über „Fehler melden“: der Text, auf Wunsch Seite, Bildschirmgröße, Browser und Sprache, deine E-Mail nur, wenn du sie angibst; gelöscht, sobald der Fehler erledigt ist, spätestens nach 12 Monaten), Photon von komoot (Ortssuche), OpenFreeMap (Karte), jsDelivr (nur beim Scannen eines Kassenbons), OpenPLZ API (Postleitzahl zu Ort), Unsplash (Fotos von Gerichten, die Gastgeber auswählen) und die Google Gemini API (nur wenn ein Gastgeber die KI-Hilfe nutzt oder jemand auf der Website „Ask Bite“ fragt: dann gehen sein Text, seine Zutatenliste oder die Frage samt den letzten Zeilen des Chats ohne Namen, Adresse oder IP-Adresse an Google; gegen Missbrauch zählen wir Fragen pro Tag unter einer täglich wechselnden, gehashten IP-Adresse, nach zwei Tagen gelöscht; im kostenlosen Tarif kann Google diese Texte zur Verbesserung seiner Dienste nutzen). Zahlungen und Ausweisdaten werden derzeit nicht verarbeitet. Wir verkaufen keine personenbezogenen Daten. Fragen: hello@bitetable.de."}</p>
             <h3>
               6. Retention
             </h3>
@@ -690,6 +691,25 @@ export function LegalPage() {
               <a href="mailto:hello@bitetable.de">
                 hello@bitetable.de
               </a>
+              <br />
+              {"Contact form: "}
+              <a href="#contact" onClick={(e) => { e.preventDefault(); openContact(); }}>
+                write to us here
+              </a>
+              {" (answer by email, usually within a day)"}
+              <br />
+              {"LinkedIn: "}
+              <a href="https://www.linkedin.com/in/sebastiano-operti-a71965254" target="_blank" rel="noopener">
+                Sebastiano Operti
+              </a>
+            </p>
+            {" "}
+            <h3>
+              Picture credits
+            </h3>
+            {" "}
+            <p>
+              Food and profile photos in the demo app: Unsplash (unsplash.com), used under the Unsplash License. The people shown are not Bite users; names in the demo are invented. Cover photos chosen by hosts: Unsplash, the photographer is named on the meal page. Founder photos: the founders.
             </p>
             {" "}
             <h3>
