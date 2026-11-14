@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { useEffect } from "react";
 import { LegalPage } from "./sections/LegalPage";
+import { ContactHost } from "../shared/ContactForm";
 import "../shared/fonts.css";
 import "./legal.css";
 
@@ -24,7 +25,7 @@ function Legal() {
     window.addEventListener("hashchange", onHash);
     return () => { clearTimeout(t); window.removeEventListener("hashchange", onHash); };
   }, []);
-  return <LegalPage />;
+  return <><LegalPage /><ContactHost /></>;
 }
 
 createRoot(document.getElementById("root")!).render(<Legal />);
