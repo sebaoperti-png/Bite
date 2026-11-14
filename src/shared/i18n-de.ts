@@ -239,6 +239,8 @@ const DE_LANDING: Record<string, string> = {
   "Watch again": "Nochmal ansehen",
   "Tonight's menu": "Heute auf der Karte",
   "in the hero": "ganz oben",
+  "Bite survey, AIM 2026": "Bite-Umfrage, AIM 2026",
+  "eat 8 or more meals a week alone": "essen 8+ Mahlzeiten pro Woche allein",
   "news by email": "Neuigkeiten per E-Mail",
   "tell us how you eat": "erzähl uns, wie du isst",
   "60-second survey": "60-Sekunden-Umfrage",
