@@ -1155,7 +1155,7 @@ function Step6({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
 
 /** "Find a photo of your dish": searches Unsplash for the meal and adds the picked photo with its credit.
  *  While the host still has only the sample photo, the first result becomes the cover by itself. */
-function StockPicker({ form, set }: { form: FormData; set: (k: keyof FormData, v: any) => void }) {
+function StockPicker({ form, set, fallback }: { form: FormData; set: (k: keyof FormData, v: any) => void; fallback: React.ReactNode }) {
   const [query, setQuery] = useState(form.mealName.trim() || form.eventTitle.trim() || form.cuisineType || "");
   const [results, setResults] = useState<StockPhoto[] | null>(null);
   const [error, setError] = useState(false);
@@ -1192,7 +1192,8 @@ function StockPicker({ form, set }: { form: FormData; set: (k: keyof FormData, v
       </form>
       {auto && <p className="sp-note">{t("We put a photo of your dish as the cover for now. A photo of your own food is always better.")}</p>}
       {results === null ? <div className="sp-grid">{Array.from({ length: 6 }, (_, i) => <span key={i} className="sp-ph" />)}</div>
-        : results.length === 0 ? <p className="sp-note">{error ? t("Photo search isn't available right now. Upload your own photo above.") : t("No photos found. Try another word, like the main ingredient.")}</p>
+        : error ? <>{fallback}</>
+        : results.length === 0 ? <p className="sp-note">{t("No photos found. Try another word, like the main ingredient.")}</p>
         : (
           <div className="sp-grid">
             {results.map((p) => {
@@ -1283,7 +1284,8 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       </motion.div>
 
       {/* No photo of your own yet? A photo of the dish from Unsplash (credited), or the sample photos without it */}
-      {unsplashReady() ? <StockPicker form={form} set={set} /> : (
+      {(() => { const samples = (
+
       <div>
         <Label>{t("Add from suggestions")}</Label>
         <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
@@ -1315,7 +1317,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           })}
         </div>
       </div>
-      )}
+      ); return unsplashReady() ? <StockPicker form={form} set={set} fallback={samples} /> : samples; })()}
 
       {/* Photo gallery */}
       {photos.length > 0 && (
