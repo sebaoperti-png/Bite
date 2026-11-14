@@ -2,7 +2,7 @@ import { BugReportHost } from "../shared/BugReport";
 import { ContactHost } from "../shared/ContactForm";
 import { LandingMobile } from "./sections/LandingMobile";
 import { usePhone } from "./usePhone";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { LandingNav } from "./sections/LandingNav";
 import { LandingIntro, AppTransition, APP_TRANSITION_MS } from "./sections/LandingIntro";
 import { LandingAssistant } from "./sections/LandingAssistant";
@@ -14,7 +14,8 @@ import { LandingSafety } from "./sections/LandingSafety";
 import { LandingHelpCustomerService } from "./sections/LandingHelpCustomerService";
 import { LandingPeople } from "./sections/LandingPeople";
 import { LandingAbout } from "./sections/LandingAbout";
-import { FloatingLogos } from "./sections/FloatingLogos";
+// the floating logos are a desktop treat: phones never download them
+const FloatingLogos = lazy(() => import("./sections/FloatingLogos").then((m) => ({ default: m.FloatingLogos })));
 import { LandingStayUpdated } from "./sections/LandingStayUpdated";
 import { LandingTestimonial } from "./sections/LandingTestimonial";
 import { LandingBecomeAHost } from "./sections/LandingBecomeAHost";
@@ -116,7 +117,7 @@ export function Landing() {
   const phone = usePhone();
   return (
     <div className="lp" style={{ overflowX: "clip" }}>
-      <FloatingLogos />
+      {!phone && <Suspense fallback={null}><FloatingLogos /></Suspense>}
       <LandingIntro />
       <LandingNav />
       <main>

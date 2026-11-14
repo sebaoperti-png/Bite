@@ -236,7 +236,15 @@ function useClock(paused: boolean, still: boolean, box: React.RefObject<HTMLDivE
   const [t, setT] = useState(still ? 12.6 : 0);
   const base = useRef(0);
   const now = useRef(0);
-  const [visible, setVisible] = useState(true);
+  // the film starts only once it is on screen, and not before the page has finished loading
+  const [visible, setVisible] = useState(false);
+  const [loaded, setLoaded] = useState(() => typeof document !== "undefined" && document.readyState === "complete");
+  useEffect(() => {
+    if (loaded) return;
+    const on = () => setLoaded(true);
+    window.addEventListener("load", on, { once: true });
+    return () => window.removeEventListener("load", on);
+  }, [loaded]);
   useEffect(() => {
     const el = box.current;
     if (!el) return;
@@ -247,14 +255,14 @@ function useClock(paused: boolean, still: boolean, box: React.RefObject<HTMLDivE
     return () => { io.disconnect(); document.removeEventListener("visibilitychange", vis); };
   }, [box]);
   useEffect(() => {
-    if (still || paused || !visible) return;
+    if (still || paused || !visible || !loaded) return;
     base.current = performance.now() - now.current * 1000;
     let raf = 0, last = 0;
     // 30 frames a second is plenty for this film and halves the work on phones
     const tick = (ms: number) => { if (ms - last > 32) { last = ms; const v = ((ms - base.current) / 1000) % LOOP; now.current = v; setT(v); } raf = requestAnimationFrame(tick); };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [paused, still, visible]);
+  }, [paused, still, visible, loaded]);
   return t;
 }
 
