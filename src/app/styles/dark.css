@@ -1,0 +1,40 @@
+/* Theme colours for the app. Components use these variables instead of literal colours (codemod 2026-11-14),
+   so the dark theme is just a second set of values. The choice (auto / light / dark) lives in localStorage
+   "bite_theme" and is applied to <html data-theme> by the inline script in bite.html (no white flash). */
+:root {
+  --page: #f5f4f9; --surface: #ffffff; --paper: #fffdf7;
+  --tint: #f0ecfa; --tint-soft: #f7f4fd; --tint-2: #e6dcfa;
+  --ink: #160a2e; --ink-2: #695a8c; --ink-3: #7c6fa0; --brand-ink: #6b21d9;
+  --solid: #160a2e;
+  --ok-ink: #0a7c4e; --ok-bg: #e5f7f0; --warn-ink: #c05e00; --warn-bg: #fff4e5; --bad-bg: #fff0f3;
+  --glass: rgba(255,255,255,0.92);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --page: #110a1d; --surface: #1b1329; --paper: #211830;
+  --tint: #271c3d; --tint-soft: #1f1633; --tint-2: #33254f;
+  --ink: #f2edfb; --ink-2: #c4b7de; --ink-3: #9a8cba; --brand-ink: #c3a0ff;
+  --solid: #3b2670;
+  --glass: rgba(27,19,41,0.9);
+  --ok-ink: #5fd6a1; --ok-bg: #12301f; --warn-ink: #ffb357; --warn-bg: #33230f; --bad-bg: #3a1420;
+  --background: #110a1d; --foreground: #f2edfb; --card: #1b1329; --card-foreground: #f2edfb; --popover: #1b1329; --popover-foreground: #f2edfb;
+  --secondary: #271c3d; --secondary-foreground: #c3a0ff; --muted: #271c3d; --muted-foreground: #9a8cba;
+  --border: rgba(195, 160, 255, 0.16); --input-background: #271c3d;
+  color-scheme: dark;
+}
+:root[data-theme="dark"] body { background: var(--page); color: var(--ink); }
+/* borders and shadows drawn with the light purple tint read as glow on dark: soften them */
+:root[data-theme="dark"] img { color-scheme: normal; }
+/* icons get their colour as an SVG attribute (lucide color="#…"), which var() can't reach: recolour them here */
+:root[data-theme="dark"] svg[stroke="#6b21d9"] { stroke: #c3a0ff; }
+:root[data-theme="dark"] svg[fill="#6b21d9"] { fill: #c3a0ff; }
+:root[data-theme="dark"] svg[stroke="#160a2e"], :root[data-theme="dark"] svg[stroke="#2a1553"] { stroke: #f2edfb; }
+:root[data-theme="dark"] svg[stroke="#695a8c"], :root[data-theme="dark"] svg[stroke="#7c6fa0"], :root[data-theme="dark"] svg[stroke="#a99cc8"] { stroke: #b3a5d3; }
+/* appearance switch in Settings */
+.th-seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: var(--surface); border: 1.5px solid rgba(107,33,217,0.15); }
+.th-seg button { min-height: 32px; padding: 0 11px; border-radius: 999px; border: 0; background: none; font: inherit; font-size: 12px; font-weight: 800; color: var(--ink-3); cursor: pointer; }
+.th-seg button.on { background: #6b21d9; color: #fff; }
+@media (pointer: coarse) { .th-seg button { min-height: 38px; } }
+/* round white buttons sitting on a photo stay white in dark mode, so their icons stay dark */
+:root[data-theme="dark"] .on-photo svg { stroke: #160a2e; }
+:root[data-theme="dark"] .hm-greet { color: #c3a0ff; }

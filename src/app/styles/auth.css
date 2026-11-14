@@ -1,5 +1,5 @@
 /* Log in / sign up: the night outside, the table with your seat, and the reservation book (AuthScreen.tsx) */
-.au { position: relative; height: 100%; overflow-y: auto; font-family: 'Figtree Variable', sans-serif; color: #2a1553;
+.au { position: relative; height: 100%; overflow-y: auto; font-family: 'Figtree Variable', sans-serif; color: var(--ink);
   background:
     radial-gradient(ellipse 60% 45% at 30% 35%, rgba(242,166,90,0.16), transparent 70%),
     radial-gradient(ellipse 80% 60% at 50% -10%, rgba(107,33,217,0.5), transparent 70%),
@@ -32,45 +32,45 @@
 .au-tabs { display: flex; gap: 6px; padding-left: 18px; position: relative; z-index: 1; }
 .au-tab { position: relative; padding: 9px 18px 12px; margin-bottom: -6px; border-radius: 12px 12px 0 0; font-size: 13.5px; font-weight: 800; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); transition: background .2s, color .2s, transform .2s; }
 .au-tab:hover { color: #fff; }
-.au-tab.on { background: #fbf6ec; color: #6b21d9; transform: translateY(-3px); }
+.au-tab.on { background: var(--paper); color: var(--brand-ink); transform: translateY(-3px); }
 .au-page { position: relative; z-index: 2; padding: 22px 24px 20px; border-radius: 6px 18px 18px 18px; background:
     repeating-linear-gradient(180deg, transparent 0 31px, rgba(107,33,217,0.06) 31px 32px),
-    #fbf6ec;
+    var(--paper);
   box-shadow: 0 30px 70px rgba(0,0,0,0.45), inset 3px 0 0 rgba(192,57,43,0.25); }
 .au-page::after { content: ""; position: absolute; top: -6px; right: 28px; width: 18px; height: 54px; background: #c0392b; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-.au-page-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; margin-bottom: 14px; border-bottom: 2px dashed rgba(42,21,83,0.2); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7c6aa3; padding-right: 30px; }
-.au-title { margin: 0; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 38px; line-height: 1; letter-spacing: 0; color: #160a2e; }
+.au-page-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; margin-bottom: 14px; border-bottom: 2px dashed rgba(42,21,83,0.2); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); padding-right: 30px; }
+.au-title { margin: 0; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 38px; line-height: 1; letter-spacing: 0; color: var(--ink); }
 .au-lead { margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: #6a5a8c; }
-.au-small { margin: 8px 0 0; font-size: 12.5px; color: #695a8c; }
+.au-small { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-2); }
 .au-form { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
 .au-field { display: block; }
-.au-label { display: block; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7c6aa3; }
-.au-line { display: flex; align-items: center; gap: 10px; height: 44px; border-bottom: 2px solid rgba(42,21,83,0.25); color: #695a8c; transition: border-color .2s; }
-.au-line:focus-within { border-color: #6b21d9; color: #6b21d9; }
-.au-line input { flex: 1; min-width: 0; height: 100%; background: transparent; border: 0; outline: none; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; color: #160a2e; }
+.au-label { display: block; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.au-line { display: flex; align-items: center; gap: 10px; height: 44px; border-bottom: 2px solid rgba(42,21,83,0.25); color: var(--ink-2); transition: border-color .2s; }
+.au-line:focus-within { border-color: var(--brand-ink); color: var(--brand-ink); }
+.au-line input { flex: 1; min-width: 0; height: 100%; background: transparent; border: 0; outline: none; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; color: var(--ink); }
 .au-line input::placeholder { color: rgba(42,21,83,0.28); }
 .au-line input[type="password"] { font-family: 'Figtree Variable', sans-serif; font-style: normal; font-size: 16px; letter-spacing: .12em; }
 .au-field.bad .au-line { border-color: #d6455d; }
 .au-field-error, .au-error { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 700; color: #c0392b; }
-.au-eye { padding: 4px; color: #695a8c; }
-.au-check { position: relative; display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: #4a3a6e; cursor: pointer; }
+.au-eye { padding: 4px; color: var(--ink-2); }
+.au-check { position: relative; display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
 .au-check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.au-box { width: 20px; height: 20px; flex-shrink: 0; border-radius: 5px; border: 2px solid rgba(42,21,83,0.35); display: grid; place-items: center; background: #fff; }
+.au-box { width: 20px; height: 20px; flex-shrink: 0; border-radius: 5px; border: 2px solid rgba(42,21,83,0.35); display: grid; place-items: center; background: var(--surface); }
 .au-check input:focus-visible + .au-box { outline: 2px solid #6b21d9; outline-offset: 2px; }
 .au-box svg { width: 14px; height: 14px; fill: none; stroke: #6b21d9; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
-.au-link { font-size: 12.5px; font-weight: 700; color: #6b21d9; }
+.au-link { font-size: 12.5px; font-weight: 700; color: var(--brand-ink); }
 /* the submit button, like a reservation ticket */
-.au-submit { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 6px; padding: 16px; border-radius: 14px; background: #160a2e; color: #fff; font-size: 15.5px; font-weight: 800; box-shadow: 0 12px 26px rgba(22,10,46,0.3); overflow: hidden; }
+.au-submit { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 6px; padding: 16px; border-radius: 14px; background: var(--solid); color: #fff; font-size: 15.5px; font-weight: 800; box-shadow: 0 12px 26px rgba(22,10,46,0.3); overflow: hidden; }
 .au-submit::before { content: ""; position: absolute; right: 54px; top: 8px; bottom: 8px; border-left: 2px dashed rgba(255,255,255,0.25); }
 .au-submit i { position: absolute; right: 0; top: 0; bottom: 0; width: 54px; display: grid; place-items: center; font-style: normal; background: #6b21d9; font-size: 18px; transition: background .2s; }
 .au-submit:hover i { background: #7c30e8; }
 .au-submit:disabled { opacity: .7; }
-.au-or { display: flex; align-items: center; gap: 12px; margin: 16px 0 12px; font-size: 12px; color: #695a8c; }
+.au-or { display: flex; align-items: center; gap: 12px; margin: 16px 0 12px; font-size: 12px; color: var(--ink-2); }
 .au-or span { flex: 1; height: 1px; background: rgba(42,21,83,0.15); }
-.au-ghost { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 14px; background: rgba(107,33,217,0.08); color: #6b21d9; font-size: 14.5px; font-weight: 700; }
-.au-legal { margin: 16px 0 0; text-align: center; font-size: 11.5px; line-height: 1.6; color: #695a8c; }
-.au-legal a { color: #6b21d9; font-weight: 700; }
-.au-sent { text-align: center; padding: 26px 24px 22px; border-radius: 18px; background: #fbf6ec; box-shadow: 0 30px 70px rgba(0,0,0,0.45); }
+.au-ghost { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 14px; background: rgba(107,33,217,0.08); color: var(--brand-ink); font-size: 14.5px; font-weight: 700; }
+.au-legal { margin: 16px 0 0; text-align: center; font-size: 11.5px; line-height: 1.6; color: var(--ink-2); }
+.au-legal a { color: var(--brand-ink); font-weight: 700; }
+.au-sent { text-align: center; padding: 26px 24px 22px; border-radius: 18px; background: var(--paper); box-shadow: 0 30px 70px rgba(0,0,0,0.45); }
 .au-envelope { width: 120px; height: 90px; margin: 0 auto 14px; display: block; }
 .au-sent .au-ghost { margin-top: 18px; }
 

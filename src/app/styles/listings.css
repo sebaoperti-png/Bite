@@ -1,22 +1,22 @@
 /* Listings: the List / Map switch (here, not in map.css: the map is loaded only when opened) */
-.vw-switch { display: inline-flex; padding: 3px; border-radius: 999px; background: #f0ecfa; position: relative; }
-.vw-switch button { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 800; color: #6b21d9; z-index: 1; }
+.vw-switch { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--tint); position: relative; }
+.vw-switch button { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 800; color: var(--brand-ink); z-index: 1; }
 .vw-switch button.on { color: #fff; }
 .vw-pill { position: absolute; inset: 0; border-radius: 999px; background: #6b21d9; z-index: -1; }
-.vw-float { position: absolute; left: 50%; transform: translateX(-50%); bottom: 86px; z-index: 6; box-shadow: 0 10px 26px rgba(22,10,46,0.28); background: #160a2e; }
+.vw-float { position: absolute; left: 50%; transform: translateX(-50%); bottom: 86px; z-index: 6; box-shadow: 0 10px 26px rgba(22,10,46,0.28); background: var(--solid); }
 .vw-float button { color: #fff; }
 .vw-float .vw-pill { background: #6b21d9; }
 
 /* desktop map view: the meals as a menu column beside the map */
 .lm-split { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 16px; height: calc(100vh - 290px); min-height: 520px; }
 .lm-side { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px 6px 2px 2px; scrollbar-width: thin; }
-.lm-row { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border-radius: 18px; background: #fff; text-align: left; box-shadow: 0 2px 10px rgba(46,16,96,0.05); border: 1.5px solid transparent; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.lm-row { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border-radius: 18px; background: var(--surface); text-align: left; box-shadow: 0 2px 10px rgba(46,16,96,0.05); border: 1.5px solid transparent; transition: border-color .2s, transform .2s, box-shadow .2s; }
 .lm-row:hover, .lm-row.on { border-color: rgba(107,33,217,0.35); transform: translateX(3px); box-shadow: 0 8px 22px rgba(46,16,96,0.1); }
 .lm-row img { width: 76px; height: 64px; border-radius: 12px; object-fit: cover; }
 .lm-row-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.lm-row-text b { font-size: 14px; font-weight: 800; color: #160a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lm-row-text em { font-style: normal; font-size: 12px; color: #695a8c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lm-row-text span { font-size: 11.5px; color: #a99cc8; }
+.lm-row-text b { font-size: 14px; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lm-row-text em { font-style: normal; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lm-row-text span { font-size: 11.5px; color: var(--ink-3); }
 .lm-row-price { padding: 4px 10px; border-radius: 999px; background: #6b21d9; color: #fff; font-size: 13px; font-weight: 900; }
 .lm-map { border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(46,16,96,0.08); }
 .lm-map > * { height: 100%; }
