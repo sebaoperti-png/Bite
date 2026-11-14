@@ -198,13 +198,13 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
 
                   {/* This week's menu, by way of eating (same as the desktop menu) */}
                   <div className="px-5 pt-3 pb-24">
-                    {firstSteps && <div className="fs-wrap flex flex-col gap-3 mb-5">{firstSteps}</div>}
                     <div className="flex items-center justify-between mb-2.5">
                       <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{t("Cooking this week")}</p>
                       <button onClick={() => onSearch({ service: "all" })} className="flex items-center gap-0.5" style={{ fontSize: 12, fontWeight: 700, color: "#6b21d9" }}>{t("See all")}{" "}<ChevronRight size={14} />
                       </button>
                     </div>
                     <MobileWeekMenu meals={store.meals.filter((m) => store.seatsLeft(m) > 0)} active={activeService} onSelectMeal={onSelectMeal} onSeeService={(s) => onSearch({ service: s })} />
+                    {firstSteps && <div className="fs-wrap flex flex-col gap-3 mt-6">{firstSteps}</div>}
                     <div style={{ marginTop: 24 }}><HostChalkboard compact onHost={onStartHosting} /></div>
                     <div style={{ marginTop: 22 }}><AboutBiteCard compact /></div>
                   </div>
@@ -388,8 +388,6 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
           </motion.div>
         </div>
 
-        {firstSteps && <div className="fs-wrap mt-8 grid gap-4 lg:grid-cols-[1fr_1fr] items-start">{firstSteps}</div>}
-
         <section className="mt-12">
           <div className="flex items-end justify-between mb-5">
             <div>
@@ -403,6 +401,8 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
           </div>
           <WeekMenu meals={meals} active={activeTab} onSelectMeal={onSelectMeal} onSeeService={onSeeService} />
         </section>
+
+        {firstSteps && <div className="fs-wrap mt-10 grid gap-4 lg:grid-cols-[1fr_1fr] items-start">{firstSteps}</div>}
 
         <div className="mt-14"><HostChalkboard onHost={onStartHosting} /></div>
 
