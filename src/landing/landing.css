@@ -1595,3 +1595,13 @@ body { background-color: #f3eefb;
   .kn-pill u { color: #6b21d9; text-underline-offset: 3px; }
   .kn { bottom: calc(16px + env(safe-area-inset-bottom)); }
 }
+/* phones: a shorter page. "Ways to eat" is shown in the app itself, and the help section keeps only the
+   emergency ticket and the FAQ (reporting and email are in the safety section and the footer). */
+@media (max-width: 640px) {
+  #services, .wide-only { display: none !important; }
+  .rl-ticket:not(.dark) { display: none; }
+  .rl { grid-template-columns: 1fr !important; }
+  .rl-ticket.dark { max-width: 340px; margin-inline: auto; width: 100%; rotate: -1deg; }
+}
+.as-meal-noimg { width: 56px; height: 46px; border-radius: 10px; flex-shrink: 0; background: #efe6ff; }
+.as-foot a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
