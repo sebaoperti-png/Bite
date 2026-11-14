@@ -15,7 +15,8 @@ export type Analytics =
   | { provider: "umami"; websiteId: string; src?: string }
   | null;
 
-export const ANALYTICS: Analytics = null;
+// ON since 14 Nov 2026: Umami Cloud, free Hobby plan, EU data region, website "Bite" (bitetable.de)
+export const ANALYTICS: Analytics = { provider: "umami", websiteId: "dabe1f74-8809-493c-af1b-41f145ccd09c", src: "https://cloud.umami.is/script.js" };
 
 /** adds the provider's script once; does nothing while ANALYTICS is null, on localhost, or in automated browsers */
 export function startAnalytics() {
