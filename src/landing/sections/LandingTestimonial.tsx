@@ -23,7 +23,7 @@ export function LandingTestimonial() {
         <span className="fn-tape" aria-hidden />
         <div className="fn-top"><i aria-hidden /><span>{t("A note from the kitchen")}</span><i aria-hidden /></div>
         <svg className="fn-quotes" viewBox="0 0 60 44" aria-hidden><path d="M4 40c0-14 4-26 18-34l3 4c-7 5-10 11-10 16h9v14zM34 40c0-14 4-26 18-34l3 4c-7 5-10 11-10 16h9v14z" /></svg>
-        <p className="fn-quote"><RevealWords step={35}>{t("The best meals I've ever had were cooked in someone's home. Bite is about making that possible for everyone — and sharing the cost fairly.")}</RevealWords></p>
+        <p className="fn-quote"><RevealWords step={35}>{t("The best meals I've ever had were cooked in someone's home. Bite is about making that possible for everyone, and sharing the cost fairly.")}</RevealWords></p>
         <div className="fn-sign">
           <span className="fn-seal" aria-hidden>
             <svg viewBox="0 0 100 100">

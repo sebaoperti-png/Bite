@@ -42,7 +42,7 @@ export function LogoWord({ id, top, bottom, className, bClass, teethClass, iteCl
           </g>
         </g>
       </g>
-      <text className={iteClass} x="226" y="296" fontSize="330" fontWeight="900" fill={`url(#${id}-g)`} fontFamily="Inter, sans-serif" letterSpacing="-14">ite</text>
+      <text className={iteClass} x="226" y="296" fontSize="330" fontWeight="900" fill={`url(#${id}-g)`} fontFamily="Figtree Variable, sans-serif" letterSpacing="-14">ite</text>
     </svg>
   );
 }

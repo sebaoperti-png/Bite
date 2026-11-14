@@ -12,26 +12,16 @@ export function LandingHero() {
         <span className="hero-spot" aria-hidden />
         <div style={{ animation: "riseIn .7s both" }}>
           <div style={{ marginBottom: "14px" }}><Course n={1} name="Aperitivo" size={18}>{t("tonight's menu")}</Course></div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#f0e9fb", border: "1px solid rgba(107,33,217,0.12)", padding: "7px 14px", borderRadius: "999px", marginBottom: "22px" }}>
-            <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#10b981" }} />
-            {" "}
-            <span style={{ fontSize: "12.5px", fontWeight: "700", color: "#6b21d9" }}>{t("Early stage · help us shape Bite")}</span>
-          </div>
           {" "}
           <h1 className="r-h-62" style={{ fontSize: "62px", lineHeight: "1.02", fontWeight: "900", letterSpacing: "-0.035em", margin: "0 0 20px" }}><RevealWords step={55} delay={150}>{t("Real food,")}<br />{t("real people,")}<br />
-            <span style={{ color: "#6b21d9" }}>{t("your neighbourhood.")}</span></RevealWords>
+            {t("your neighbourhood.")}</RevealWords>
           </h1>
           {" "}
-          <p style={{ fontSize: "19px", lineHeight: "1.55", color: "#4b3a6b", maxWidth: "460px", margin: "0 0 32px" }}>{t("Bite connects you with home cooks nearby. Share a home-cooked meal, split the cost of the groceries, and pay less than takeaway —")}{" "}
-            <span style={{ fontFamily: "'Instrument Serif',serif", fontStyle: "italic", fontSize: "22px", color: "#160a2e" }}>{t("food is better shared.")}</span>
+          <p style={{ fontSize: "19px", lineHeight: "1.55", color: "#4b3a6b", maxWidth: "460px", margin: "0 0 32px" }}>{t("Bite connects you with home cooks nearby. Share a home-cooked meal, split the cost of the groceries and pay less than takeaway, because")}{" "}{t("food is better shared.")}
           </p>
           {" "}
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
-            <a href="bite.html" style={{ display: "inline-flex", alignItems: "center", gap: "10px", background: "#160a2e", color: "#fff", padding: "15px 26px", borderRadius: "14px", fontWeight: "700", fontSize: "15px" }}>{t("I want to eat")}{" "}
-              <span style={{ fontSize: "18px" }}>
-                →
-              </span>
-            </a>
+            <a href="bite.html" style={{ display: "inline-flex", alignItems: "center", gap: "10px", background: "#160a2e", color: "#fff", padding: "15px 26px", borderRadius: "14px", fontWeight: "700", fontSize: "15px" }}>{t("I want to eat")}</a>
             {" "}
             <a href="bite.html?host" style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: "#160a2e", padding: "15px 22px", borderRadius: "14px", fontWeight: "700", fontSize: "15px", border: "1.5px solid rgba(22,10,46,0.14)", background: "#fff" }}>{t("I want to host")}</a>
           </div>
@@ -49,10 +39,10 @@ export function LandingHero() {
             {" "}
             <div>
               <div style={{ fontSize: "14px", fontWeight: "800", color: "#160a2e" }}>
-                <a className="lm" href="stand.html?ref=landing" style={{ color: "#160a2e" }}><Arrowed text={t("Tell us how you eat — 60-second survey →")} /></a>
+                <a className="lm" href="stand.html?ref=landing" style={{ color: "#160a2e" }}><Arrowed text={t("Tell us how you eat in 60 seconds")} /></a>
               </div>
               {" "}
-              <div style={{ fontSize: "13px", color: "#7c6fa0" }}>{t("Home cooks next door · split the cost · less food waste")}</div>
+              <div style={{ fontSize: "13px", color: "#7c6fa0" }}>{t("Early days, so your say counts")}</div>
             </div>
           </div>
         </div>

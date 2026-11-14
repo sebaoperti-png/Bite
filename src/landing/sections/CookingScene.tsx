@@ -120,7 +120,7 @@ export function CookingScene({ onStep }: { onStep?: (step: number) => void }) {
         <path d={`M${POT.x - 86} ${POT.y}a86 16 0 0 0 172 0`} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="3" />
         <rect x={POT.x - 108} y={POT.y + 12} width="24" height="10" rx="5" fill="#2a1553" />
         <rect x={POT.x + 84} y={POT.y + 12} width="24" height="10" rx="5" fill="#2a1553" />
-        <text x={POT.x} y={POT.y + 62} textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="15" fontWeight="900" letterSpacing="5" fill="rgba(255,255,255,0.85)">BITE</text>
+        <text x={POT.x} y={POT.y + 62} textAnchor="middle" fontFamily="Figtree Variable, sans-serif" fontSize="15" fontWeight="900" letterSpacing="5" fill="rgba(255,255,255,0.85)">BITE</text>
 
         {/* steam */}
         <g className="ck-steam" fill="none" stroke="#c9b8e8" strokeWidth="5" strokeLinecap="round">
@@ -142,7 +142,7 @@ export function CookingScene({ onStep }: { onStep?: (step: number) => void }) {
             </g>
             <g className="ck-tag" style={{ ["--i" as string]: i }}>
               <rect x="-22" y="-52" width="44" height="24" rx="12" fill="#160a2e" />
-              <text y="-35" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="13" fontWeight="900" fill="#fff">{eur(6)}</text>
+              <text y="-35" textAnchor="middle" fontFamily="Figtree Variable, sans-serif" fontSize="13" fontWeight="900" fill="#fff">{eur(6)}</text>
             </g>
           </g>
         ))}

@@ -17,12 +17,12 @@ const TICKETS: { kind: string; title: string; text: React.ReactNode; foot: strin
     icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>,
   },
   {
-    kind: "Guides", title: "Questions from the table", foot: "Booking · hosting · costs",
+    kind: "Guides", title: "Questions from the table", foot: "Booking, hosting, costs",
     text: "Answers on booking, hosting and cost sharing, just below.",
     icon: <><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z" /><path d="M4 19a2 2 0 0 1 2-2h13" /></>,
   },
   {
-    kind: "Urgent", title: "In an emergency", foot: "Police 110 · Emergency 112", dark: true,
+    kind: "Urgent", title: "In an emergency", foot: "Police 110, emergency 112", dark: true,
     text: "Feel unsafe during a meal? Leave, call 110 or 112 first, then tell us and report the host in the app.",
     icon: <><path d="M4 17h16M5.5 17a6.5 6.5 0 0 1 13 0" /><path d="M12 8.5V7M10.5 7h3" /><path d="M3 20h18" /></>,
   },
@@ -31,8 +31,8 @@ const TICKETS: { kind: string; title: string; text: React.ReactNode; foot: strin
 const FAQ = [
   { q: "What happens if a meal is cancelled?", a: "Right now nothing is paid in advance: you pay your share to the host at the table, so a cancellation costs you nothing. Please cancel as early as you can, so the host or the other guests can plan." },
   { q: "How are hosts checked before they can cook?", a: "Today every host needs a real name and a profile photo and must accept Bite's house rules (hygiene, allergens, fair prices, respect). Hosts choose who joins, anyone can be reported or blocked, and guests and hosts review each other after every dinner. ID checks are coming next." },
-  { q: "I have a food allergy — is that handled?", a: "Every listing declares allergens and dietary tags, and you can filter by them. You can also message the host before booking to confirm." },
-  { q: "How does cost sharing work?", a: "The host sets a contribution per guest based on what the ingredients cost — an equal share, not a restaurant price. A price cap makes sure nobody profits. For now you pay your share at the table and Bite charges no fee; payments in the app will come later." },
+  { q: "I have a food allergy. Is that handled?", a: "Every listing declares allergens and dietary tags, and you can filter by them. You can also message the host before booking to confirm." },
+  { q: "How does cost sharing work?", a: "The host sets a contribution per guest based on what the ingredients cost, an equal share, not a restaurant price. A price cap makes sure nobody profits. For now you pay your share at the table and Bite charges no fee; payments in the app will come later." },
 ];
 
 export function LandingHelpCustomerService() {

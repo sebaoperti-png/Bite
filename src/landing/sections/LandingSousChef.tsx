@@ -89,7 +89,7 @@ export function LandingSousChef() {
         <div className="sc-sous-head">
           <Course n={5} name={t("Chef's table")}>{t("for cooks")}</Course>
           <h2 className="r-h-44"><RevealWords>{t("You cook. The sous-chef does the paperwork.")}</RevealWords></h2>
-          <p>{t("Already cooking every night? Cook a little extra and open your table. Guests chip in for the ingredients, so a proper home-cooked dinner costs everyone less — you included.")}</p>
+          <p>{t("Already cooking every night? Cook a little extra and open your table. Guests chip in for the ingredients, so a proper home-cooked dinner costs everyone less, you included.")}</p>
         </div>
       </div>
     </section>
@@ -169,9 +169,9 @@ export function LandingSousChef() {
             <div className={`sx-math ${phase >= 3 ? "on" : ""}`}>
               <span>{money(total)} {t("groceries")} ÷ {people} {t("plates")}</span>
               <b className="sx-price">{money(share, false)} <small>{t("per plate")}</small></b>
-              <em>{t("Capped at {cap} — never more than the real cost", { cap: money(cap, false) })}</em>
+              <em>{t("Capped at {cap}, never more than the real cost", { cap: money(cap, false) })}</em>
             </div>
-            <a className={`sx-publish ${phase === 4 ? "on" : ""}`} href="bite.html?host">{t("Publish it in the app →")}</a>
+            <a className={`sx-publish ${phase === 4 ? "on" : ""}`} href="bite.html?host">{t("Publish it in the app")}</a>
           </div>
         </div>
       </div>

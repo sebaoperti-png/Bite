@@ -8,9 +8,9 @@ import { Course } from "../../shared/Restaurant";
 import { t, getLang } from "../../shared/i18n";
 
 const STEPS = [
-  { title: "Browse tonight's menus", text: "See what neighbours are cooking near you — filter by cuisine, diet or allergens." },
-  { title: "Book your seat or pick-up", text: "Reserve in seconds, chat with your host and pay securely in the app." },
-  { title: "Sit down & enjoy", text: "Eat something made with care, meet the person who made it — then rate your meal." },
+  { title: "Browse tonight's menus", text: "See what neighbours are cooking near you, filter by cuisine, diet or allergens." },
+  { title: "Book your seat or pick-up", text: "Reserve in seconds, chat with your host and pay your share at the table." },
+  { title: "Sit down & enjoy", text: "Eat something made with care, meet the person who made it, then rate your meal." },
 ];
 
 const APP_W = 1280;
@@ -128,7 +128,7 @@ export function LandingLaptop() {
 
       <p className="lp-foot">
         <span className="lp-demo-note">{t("Above: a demo with sample meals.")}</span>{" "}
-        <a className="lm" href="bite.html"><Arrowed text={t("Open the real app →")} /></a>
+        <a className="lm" href="bite.html"><Arrowed text={t("Open the real app")} /></a>
       </p>
     </section>
   );

@@ -90,7 +90,6 @@ export function LandingSeatCard() {
       <div className={`rs-card rs-survey ${front === "survey" ? "front" : "back"}`} onClick={front === "survey" ? undefined : () => setFront("survey")}>
         <div className="rs-head">
           <span>{t("Survey")}</span>
-          <span className="rs-no">60 SEC</span>
         </div>
         <div className="rs-survey-top">
           <h2>{t("Got 60 seconds?")}</h2>
@@ -100,19 +99,19 @@ export function LandingSeatCard() {
             <circle className="rs-timer-ring" cx="40" cy="44" r="32" fill="none" stroke="#9b4aff" strokeWidth="6" strokeLinecap="round" pathLength={1} transform="rotate(-90 40 44)" />
             <line className="rs-timer-hand" x1="40" y1="44" x2="40" y2="22" stroke="#160a2e" strokeWidth="3.5" strokeLinecap="round" />
             <circle cx="40" cy="44" r="4" fill="#160a2e" />
-            <text x="40" y="66" textAnchor="middle" fontSize="10" fontWeight="900" fill="#6b21d9" fontFamily="Inter, sans-serif">60s</text>
+            <text x="40" y="66" textAnchor="middle" fontSize="10" fontWeight="900" fill="#6b21d9" fontFamily="Figtree Variable, sans-serif">60s</text>
           </svg>
         </div>
-        <p className="rs-sub">{t("Tell us how you eat — 8 quick questions that shape what we build next.")}</p>
+        <p className="rs-sub">{t("Tell us how you eat. Eight quick questions that shape what we build next.")}</p>
         <ul className="rs-qs">
           <li><span>1</span>{t("How often do you cook at home?")}</li>
           <li><span>2</span>{t("Would you eat at a neighbour's table?")}</li>
           <li><span>3</span>{t("What would you pay per plate?")}</li>
           <li className="more">{t("+ 5 more, just as quick")}</li>
         </ul>
-        <a className="rs-go" href="stand.html?ref=landing">{t("Start the survey")} <span aria-hidden>→</span></a>
-        <p className="rs-fine">{t("Anonymous · 8 questions · about 1 minute")}</p>
-        <button type="button" className="rs-switch" onClick={(e) => { e.stopPropagation(); setFront("seat"); }}>{t("Rather get updates? Save me a seat")} ↓</button>
+        <a className="rs-go" href="stand.html?ref=landing">{t("Start the survey")}</a>
+        <p className="rs-fine">{t("Anonymous, about a minute")}</p>
+        <button type="button" className="rs-switch" onClick={(e) => { e.stopPropagation(); setFront("seat"); }}>{t("Rather get updates? Save me a seat")}</button>
       </div>
 
       {/* Card 2: the reservation (stay-updated sign-up) */}
@@ -131,14 +130,14 @@ export function LandingSeatCard() {
             <h3>{t("Your seat is saved.")}</h3>
             <p>{t("Last step: we sent an email to")} <b>{email.trim()}</b>{t(". Click the link inside to confirm.")}</p>
             <div className="rs-links">
-              <a className="lm" href="bite.html"><Arrowed text={t("Try the demo app →")} /></a>
-              <a className="lm" href="stand.html?ref=landing"><Arrowed text={t("Got 60 seconds? Take our survey →")} /></a>
+              <a className="lm" href="bite.html"><Arrowed text={t("Try the demo app")} /></a>
+              <a className="lm" href="stand.html?ref=landing"><Arrowed text={t("Got 60 seconds? Take our survey")} /></a>
             </div>
           </div>
         ) : (
           <form className="rs-form" onSubmit={submit} noValidate>
             <h2>{t("Save me a seat.")}</h2>
-            <p className="rs-sub">{t("Bite is still in the kitchen. Leave your email and we'll keep a seat for you — plus news on how to be part of it.")}</p>
+            <p className="rs-sub">{t("Bite is still in the kitchen. Leave your email and we'll keep a seat for you, plus news on how to be part of it.")}</p>
 
             <div className="rs-label">{t("I'm coming…")}</div>
             <div className="rs-roles" role="radiogroup" aria-label={t("I'm interested as…")}>
@@ -161,11 +160,10 @@ export function LandingSeatCard() {
               <span>{t("Yes, send me Bite news by email (at most once a month). I'll first get an email to confirm. I can withdraw my consent any time with the link in every email. I'm at least 16. Details in the")} <a href="legal.html#survey">{t("privacy policy")}</a>.</span>
             </label>
 
-            {(error || state === "error") && <p className="rs-error" role="alert">{error || t("Something went wrong — please try again in a moment.")}</p>}
+            {(error || state === "error") && <p className="rs-error" role="alert">{error || t("Something went wrong, please try again in a moment.")}</p>}
 
             <button type="submit" className="rs-go" disabled={state === "sending"}>
               {state === "sending" ? t("Saving…") : t("Save my seat")}
-              <span aria-hidden>→</span>
             </button>
           </form>
         )}

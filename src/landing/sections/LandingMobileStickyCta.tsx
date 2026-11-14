@@ -1,11 +1,23 @@
-// MOBILE STICKY CTA (converted from the original design; edit freely)
+// MOBILE STICKY CTA: slides up only once the hero (which has its own buttons) has scrolled away, so it never
+// covers the first screen; it hides again near the footer, which has the same buttons.
+import { useEffect, useState } from "react";
 import { asset } from "../asset";
 import { t } from "../../shared/i18n";
 
 export function LandingMobileStickyCta() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY, h = window.innerHeight, total = document.documentElement.scrollHeight;
+      setShow(y > h * 0.9 && y + h < total - h * 0.8);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   return (
     <>
-      <div className="mobile-cta" style={{ position: "fixed", left: "0", right: "0", bottom: "0", zIndex: "800", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "12px 16px calc(12px + env(safe-area-inset-bottom))", background: "rgba(255,255,255,0.94)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(107,33,217,0.12)", boxShadow: "0 -6px 24px rgba(46,16,96,0.1)" }}>
+      <div className={`mobile-cta ${show ? "in" : ""}`} aria-hidden={!show} style={{ position: "fixed", left: "0", right: "0", bottom: "0", zIndex: "800", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "12px 16px calc(12px + env(safe-area-inset-bottom))", background: "rgba(255,255,255,0.94)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(107,33,217,0.12)", boxShadow: "0 -6px 24px rgba(46,16,96,0.1)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: "0" }}>
           <img src={asset("landing/logo.png")} alt="Bite" style={{ width: "34px", height: "34px", borderRadius: "9px", flexShrink: "0" }} />
           {" "}

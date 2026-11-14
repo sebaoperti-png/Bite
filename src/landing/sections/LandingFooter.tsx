@@ -46,7 +46,7 @@ export function LandingFooter() {
             <h2 className="ft-title">{t("See you at the table.")}</h2>
             <p className="ft-sub">{t("Bite is a young startup building a new way to eat with your neighbours. Try the demo, tell us what you think, or just say hi.")}</p>
             <div className="ft-ctas">
-              <a href="bite.html" className="ft-btn primary">{t("Open the demo app →")}</a>
+              <a href="bite.html" className="ft-btn primary">{t("Open the demo app")}</a>
               <a href="stand.html?ref=footer" className="ft-btn">{t("Take the 60-second survey")}</a>
               <a href="mailto:hello@bitetable.de" className="ft-btn">{t("Write to Sebastiano")}</a>
             </div>
@@ -69,7 +69,7 @@ export function LandingFooter() {
             </div>
             {" "}
             <div>
-              <h4 className="ft-h4">{t("PRODUCT")}</h4>
+              <h4 className="ft-h4">{t("Product")}</h4>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#how" style={{ fontSize: "16px", color: "#a897c8" }}>{t("How it works")}</a>
@@ -83,7 +83,7 @@ export function LandingFooter() {
             </div>
             {" "}
             <div>
-              <h4 className="ft-h4">{t("SUPPORT")}</h4>
+              <h4 className="ft-h4">{t("Support")}</h4>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#help" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Help Center")}</a>
@@ -99,7 +99,7 @@ export function LandingFooter() {
             </div>
             {" "}
             <div>
-              <h4 className="ft-h4">{t("LEGAL")}</h4>
+              <h4 className="ft-h4">{t("Legal")}</h4>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="legal.html#terms" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Terms of Service")}</a>
@@ -120,7 +120,7 @@ export function LandingFooter() {
           {/* the bill: a receipt torn off at the bottom of the dinner */}
           <div className="ft-bill">
             <div className="ft-bill-row">
-              <span>{t("TABLE 01 · SERVICE INCLUDED")}</span>
+              <span>{t("Table 1, service included")}</span>
               <b>{t("Thank you for visiting")}</b>
               <span>{t("© 2026 Bite · Germany")}</span>
             </div>

@@ -7,7 +7,7 @@ import { SpinningText, RevealWords } from "../../shared/Motion";
 // SAVINGS — the core idea right under the hero: a real home-cooked dinner costs less when it's shared
 
 const BENEFITS = [
-  { t: "Split the cost", Icon: Wallet, d: "Guests chip in for the ingredients — no restaurant mark-up, and the host eats for less too." },
+  { t: "Split the cost", Icon: Wallet, d: "Guests chip in for the ingredients, no restaurant mark-up, and the host eats for less too." },
   { t: "Meet your neighbours", Icon: Users, d: "Small tables of up to six people who live a few streets away." },
   { t: "Less food waste", Icon: Leaf, d: "Cooking once for many uses whole ingredients instead of half-empty packs." },
 ];
@@ -40,7 +40,7 @@ export function LandingSavings() {
       <div style={{ textAlign: "center", marginBottom: "8px" }}>
         <Course n={2} name={t("Starter")}>{t("why Bite")}</Course>
         <h2 className="r-h-44" style={{ fontSize: "44px", fontWeight: 900, letterSpacing: "-0.03em", margin: "8px 0 0" }}><RevealWords>{t("Same dinner. A fraction of the price.")}</RevealWords></h2>
-        <p style={{ fontSize: "17px", color: "#4b3a6b", maxWidth: "600px", margin: "16px auto 0", lineHeight: 1.6 }}>{t("What one dinner costs you, per plate. A neighbour is already cooking tonight — pull up a chair and split the cost of the groceries.")}</p>
+        <p style={{ fontSize: "17px", color: "#4b3a6b", maxWidth: "600px", margin: "16px auto 0", lineHeight: 1.6 }}>{t("What one dinner costs you, per plate. A neighbour is already cooking tonight, pull up a chair and split the cost of the groceries.")}</p>
       </div>
       {/* Price comparison: Bite in the middle, the alternatives floating around it */}
       <div ref={stageRef} className={`sv-stage ${priced ? "priced" : ""}`} aria-label={t("Price per dinner: takeaway about 15 euros, Bite about 6 euros, restaurant about 25 euros")}>

@@ -219,7 +219,7 @@ export function LandingSafety() {
               </g>
               <g className={`tb-item tb-card ${isOn(0) ? "on" : ""}`} onClick={() => place(0)}>
                 <path d="M200 128h196l6 40H194z" fill="#fffdf7" stroke="rgba(107,33,217,0.2)" strokeWidth="1.5" />
-                <text x="298" y="155" textAnchor="middle" fontFamily="'Instrument Serif', serif" fontStyle="italic" fontSize="22" fill="#3b1a78">{t("Your host · name & photo")}</text>
+                <text x="298" y="155" textAnchor="middle" fontFamily="'Fraunces Variable', serif" fontStyle="italic" fontSize="22" fill="#3b1a78">{t("Your host: name and photo")}</text>
                 <circle cx="396" cy="128" r="11" fill="#0a9c62" /><path d="M391 128l3.5 3.5 6-7" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
               </g>
               {/* the cloche that comes down and lifts at the end */}
@@ -273,7 +273,7 @@ export function LandingSafety() {
                 {sealed ? (
                   <button type="button" className="mc-next" onClick={() => setPicked(null)}>{t("Back to the safety receipt")}</button>
                 ) : locked < 4 ? (
-                  <p className="mc-left">{t("{n} of 4 set · tap the next thing on the table", { n: locked })}</p>
+                  <p className="mc-left">{t("{n} of 4 set. Tap the next thing on the table", { n: locked })}</p>
                 ) : null}
               </div>
             ) : (

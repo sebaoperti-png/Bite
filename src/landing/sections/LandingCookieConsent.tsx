@@ -25,7 +25,7 @@ export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnal
                   </svg>
                   <div>
                     <h3>{t("Before you order…")}</h3>
-                    <span>{t("a word about cookies — the digital kind")}</span>
+                    <span>{t("a word about cookies, the digital kind")}</span>
                   </div>
                 </div>
                 {" "}
@@ -39,7 +39,7 @@ export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnal
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "#f7f3fc" }}>
                         <div>
                           <div style={{ fontSize: "14px", fontWeight: "800", color: "#160a2e" }}>{t("Strictly necessary")}</div>
-                          <div style={{ fontSize: "12px", color: "#8a7aa8" }}>{t("Always active — sign-in, security, session.")}</div>
+                          <div style={{ fontSize: "12px", color: "#8a7aa8" }}>{t("Always active, sign-in, security, session.")}</div>
                         </div>
                         {" "}
                         <span style={{ fontSize: "12px", fontWeight: "800", color: "#0a7c4e" }}>{t("ON")}</span>

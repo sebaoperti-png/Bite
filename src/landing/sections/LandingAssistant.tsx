@@ -113,7 +113,7 @@ export function LandingAssistant() {
             <span className="as-avatar"><img src={asset("landing/logo.png")} alt="" /><BowTie className="as-avatar-tie" /></span>
             <div>
               <b>{t("Your maître d'")}</b>
-              <span><i className="as-online" />{" "}{t("Finds you a table · answers questions")}</span>
+              <span><i className="as-online" />{" "}{t("Finds you a table and answers questions")}</span>
             </div>
             <button onClick={() => setOpen(false)} aria-label={t("Close")}>✕</button>
           </header>
@@ -141,7 +141,7 @@ export function LandingAssistant() {
                   <div className="as-chips">
                     {m.reply.chips.map((c) =>
                       c === t("Open the hosting demo") ? (
-                        <a key={c} className="as-chip link" href={LINK_CHIPS["Open the hosting demo"]}>{c} →</a>
+                        <a key={c} className="as-chip link" href={LINK_CHIPS["Open the hosting demo"]}>{c}</a>
                       ) : (
                         <button key={c} className="as-chip" onClick={() => send(c)}>{c}</button>
                       ),
@@ -174,7 +174,7 @@ export function LandingAssistant() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
             </button>
           </form>
-          <p className="as-foot">{t("Demo assistant · runs in your browser, nothing is stored")}</p>
+          <p className="as-foot">{t("Demo assistant. It runs in your browser and stores nothing.")}</p>
         </div>
       )}
     </>

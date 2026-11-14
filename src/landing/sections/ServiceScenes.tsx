@@ -21,7 +21,7 @@ function Chip({ x, y, text, dot, cls = "" }: { x: number; y: number; w?: number;
     <g className={`sc-chip ${cls}`} transform={`translate(${x} ${y})`}>
       <rect width={w} height="34" rx="17" fill="#fff" />
       <circle cx="18" cy="17" r="6" fill={dot} />
-      <text x="32" y="22" fontSize="14" fontWeight="800" fill="#160a2e" fontFamily="Inter, sans-serif">{label}</text>
+      <text x="32" y="22" fontSize="14" fontWeight="800" fill="#160a2e" fontFamily="Figtree Variable, sans-serif">{label}</text>
     </g>
   );
 }
@@ -39,7 +39,7 @@ export function PickupScene() {
         <path d="M168 110v-14a32 32 0 0 1 64 0v14" fill="none" stroke="#f0dcc0" strokeWidth="9" strokeLinecap="round" />
         {/* sticker */}
         <circle cx="200" cy="190" r="34" fill="#6b21d9" />
-        <text x="200" y="204" textAnchor="middle" fontSize="40" fontWeight="900" fill="#fff" fontFamily="Inter, sans-serif">B</text>
+        <text x="200" y="204" textAnchor="middle" fontSize="40" fontWeight="900" fill="#fff" fontFamily="Figtree Variable, sans-serif">B</text>
         <path d="M222 168a12 12 0 1 0 14 10" fill="#6b21d9" />
       </g>
       <Chip x={18} y={70} w={124} text="Ready 18:30" dot={FOOD.leaf} cls="d1" />
@@ -82,7 +82,7 @@ export function TogetherScene() {
                 ) : (
                   <circle className="sc-free" cx={ax} cy={ay} r="17" fill="rgba(255,255,255,0.1)" stroke="#fff" strokeWidth="2.5" strokeDasharray="5 4" />
                 )}
-                <text x={ax} y={ay + 6} textAnchor="middle" fontSize="16" fontWeight="900" fill={s.c ? "#160a2e" : "#fff"} fontFamily="Inter, sans-serif">{s.n}</text>
+                <text x={ax} y={ay + 6} textAnchor="middle" fontSize="16" fontWeight="900" fill={s.c ? "#160a2e" : "#fff"} fontFamily="Figtree Variable, sans-serif">{s.n}</text>
               </g>
             </g>
           );
@@ -96,7 +96,7 @@ export function TogetherScene() {
       <Steam x={200} y={128} s={0.55} />
       <g className="sc-chip d2" transform="translate(296 18)">
         <rect width="92" height="34" rx="17" fill="#ff3d7f" />
-        <text x="46" y="22" textAnchor="middle" fontSize="14" fontWeight="800" fill="#fff" fontFamily="Inter, sans-serif">{t("5 / 6 seats")}</text>
+        <text x="46" y="22" textAnchor="middle" fontSize="14" fontWeight="800" fill="#fff" fontFamily="Figtree Variable, sans-serif">{t("5 / 6 seats")}</text>
       </g>
     </svg>
   );
@@ -128,7 +128,7 @@ export function CookScene() {
       </g>
       <g className="sc-chip d1" transform="translate(286 52) rotate(6)">
         <rect width="100" height="66" rx="12" fill="#fff" />
-        <text x="14" y="24" fontSize="12" fontWeight="900" fill="#6b21d9" fontFamily="Inter, sans-serif">{t("RECIPE")}</text>
+        <text x="14" y="24" fontSize="12" fontWeight="900" fill="#6b21d9" fontFamily="Figtree Variable, sans-serif">{t("RECIPE")}</text>
         <rect x="14" y="34" width="70" height="6" rx="3" fill="#e5dbf5" />
         <rect x="14" y="46" width="52" height="6" rx="3" fill="#e5dbf5" />
       </g>
@@ -151,7 +151,7 @@ export function DeliveryScene() {
           <circle className="sc-wheel" cx="40" cy="40" r="22" fill="none" stroke="#fff" strokeWidth="7" strokeDasharray="10 6" />
           <path d="M-34 40L0 0h30L40 40M0 0l-8-16h-14M30 0l-6-14" fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
           <rect x="-8" y="-58" width="44" height="40" rx="8" fill="#d6d1de" />
-          <text x="14" y="-30" textAnchor="middle" fontSize="20" fontWeight="900" fill="#3a3545" fontFamily="Inter, sans-serif">B</text>
+          <text x="14" y="-30" textAnchor="middle" fontSize="20" fontWeight="900" fill="#3a3545" fontFamily="Figtree Variable, sans-serif">B</text>
         </g>
       </g>
     </svg>

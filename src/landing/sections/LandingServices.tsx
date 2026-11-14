@@ -43,13 +43,13 @@ export function LandingServices() {
   }, [active, visible, hovering, reduceMotion]);
 
   return (
-    <section ref={ref} className="r-pad-96 sv-dark" id="services" style={{ padding: "380px 24px", position: "relative", isolation: "isolate" }}>
+    <section ref={ref} className="r-pad-96 sv-dark" id="services" style={{ padding: "236px 24px", position: "relative", isolation: "isolate" }}>
       <div className="chalk-dust" aria-hidden />
       <div style={{ maxWidth: "1160px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "56px" }}>
           <Course n={4} name={t("Sides")} light size={28}>{t("four ways to eat")}</Course>
           <h2 className="r-h-44" style={{ fontSize: "72px", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1.02, margin: "8px 0 0", color: "#fff" }}><span className="chalk-text"><RevealWords>{t("However you like your food")}</RevealWords></span><svg className="chalk-line" viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden><path pathLength={1} d="M4 10c40-7 80-8 120-4s90 6 172-2" /></svg></h2>
-          <p style={{ fontSize: "21px", color: "#c4b4e2", maxWidth: "720px", margin: "22px auto 0", lineHeight: 1.55 }}>{t("Take it home, pull up a chair or cook side by side — every option is home-cooked by a neighbour, and the cost is split fairly.")}</p>
+          <p style={{ fontSize: "21px", color: "#c4b4e2", maxWidth: "720px", margin: "22px auto 0", lineHeight: 1.55 }}>{t("Take it home, pull up a chair or cook side by side, every option is home-cooked by a neighbour, and the cost is split fairly.")}</p>
         </div>
 
         <div className="sd" onMouseLeave={() => setHovering(false)}>
