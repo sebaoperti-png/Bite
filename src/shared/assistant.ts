@@ -56,7 +56,7 @@ const FAQ: { test: (q: string) => boolean; reply: () => AssistantReply }[] = [
     test: (q) => has(q, "host", "cook for", "become", "publish", "my own", "gastgeb", "selbst koch", "anbiet", "einstell"),
     reply: () => ({
       text: t("Hosting takes about 2 minutes: describe your dish (our assistant can write it for you), pick a date and how many seats, and scan your grocery receipt so guests see the real cost. Your guests chip in, so your own dinner gets cheaper too."),
-      chips: [t("Open the hosting demo"), t("How does cost sharing work?")],
+      chips: [t("Start hosting"), t("How does cost sharing work?")],
     }),
   },
   {
@@ -169,7 +169,7 @@ const looksLikeFood = (q: string) =>
 export function answer(input: string): AssistantReply {
   const q = norm(input) + " ";
 
-  if (has(q, "open the hosting demo", "start hosting", "hosting-demo", "gastgeber-demo")) return { text: t("Great — click the button below to open the hosting demo in the app."), chips: [] };
+  if (has(q, "start hosting", "open the hosting", "gastgeber werden")) return { text: t("Great, tap the button below to start hosting in the app."), chips: [] };
 
   if (looksLikeFood(q) && !has(q, "sicher", "safe")) {
     const { meals, understood } = findMeals(input);
