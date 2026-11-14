@@ -1,0 +1,21 @@
+/* Touch targets: on phones and tablets every control gets at least ~44 px to hit (WCAG 2.5.8 / Apple HIG).
+   Visual size stays the same where an invisible ::after hit area is enough. Used by the landing and the app. */
+@media (pointer: coarse) {
+  :root .ls-btn { position: relative; min-height: 34px; min-width: 40px; }
+  :root .ls-btn::after { content: ""; position: absolute; inset: -6px -2px; }
+  :root .r-grid-footer > div > div[style] { gap: 0 !important; }
+  :root .r-grid-footer > div > div > a, :root .r-grid-footer .ft-linkbtn { display: block; padding: 12px 0 !important; }
+  :root .ft-bill-links a { display: inline-block; padding: 12px 4px; }
+  :root .hs2-play { width: 44px; height: 44px; }
+  :root .sx-step button { width: 44px; height: 44px; }
+  :root .rs-tabs button, :root .rs-switch { min-height: 44px; }
+  :root .kn-x { width: 44px; height: 44px; }
+  :root .wt-skip { min-height: 44px; padding-inline: 14px; }
+  :root .wt-dots button { position: relative; }
+  :root .wt-dots button::after { content: ""; position: absolute; inset: -18px -6px; }
+  :root .gs-x { width: 44px; height: 44px; }
+  :root .gs-tour { padding-block: 12px; }
+  :root .mwm-tabs button { min-height: 40px; }
+  :root .tap-chip { min-height: 40px; }
+  :root .tap-link { min-height: 44px; }
+}

@@ -1,4 +1,5 @@
 // EN | DE switch, used in the landing nav and in the app
+import "./touch.css";
 import { setLang, useLang, type Lang } from "./i18n";
 
 export function LangSwitch({ dark = false, size = "md" }: { dark?: boolean; size?: "sm" | "md" }) {
@@ -10,6 +11,7 @@ export function LangSwitch({ dark = false, size = "md" }: { dark?: boolean; size
       <button
         key={l}
         type="button"
+        className="ls-btn"
         onClick={() => setLang(l)}
         aria-pressed={on}
         lang={l}

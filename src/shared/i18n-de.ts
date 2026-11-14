@@ -239,6 +239,7 @@ const DE_LANDING: Record<string, string> = {
   "Watch again": "Nochmal ansehen",
   "Tonight's menu": "Heute auf der Karte",
   "in the hero": "ganz oben",
+  "What's ready?": "Was gibt's schon?",
   "Something not working? Tell us, we fix it fast": "Funktioniert etwas nicht? Sag es uns, wir beheben es schnell",
   "Report a bug": "Fehler melden",
   "Reports are stored in our team's Google Sheet. Details in the": "Meldungen werden in der Google-Tabelle unseres Teams gespeichert. Details in der",
