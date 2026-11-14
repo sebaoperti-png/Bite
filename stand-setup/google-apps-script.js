@@ -6,7 +6,7 @@
  *   type "Web app", execute as "Me", who has access "Anyone" → copy the /exec URL into
  *   src/shared/forms.ts (FORMS_ENDPOINT).
  *
- * POST  (from the website)     → appends one row to "Survey" or "Waitlist"
+ * POST  (from the website)     → appends one row to "Survey", "Waitlist" or "Bugs" (type "bug")
  * GET   ?action=stats          → survey answers WITHOUT emails, for the live results screen
  * GET   ?action=confirm&t=…    → double opt-in: confirms a newsletter sign-up
  * GET   ?action=unsubscribe&t=… → removes someone from the newsletter
@@ -32,6 +32,8 @@ const WAITLIST_COLUMNS = [
   "received", "email", "role", "area", "at", "source", "lang",
   "newsletterStatus", "confirmedAt", "token", "consentVersion",
 ];
+const BUG_SHEET = "Bugs";
+const BUG_COLUMNS = ["received", "where", "page", "report", "email", "lang", "screen", "browser", "status", "notes"];
 const KEEP_UNCONFIRMED_DAYS = 30;
 
 function book_() {
@@ -65,6 +67,17 @@ function doPost(e) {
     const email = clean_(data.email, 120).trim().toLowerCase();
     const validEmail = EMAIL_RE.test(email);
     const lang = data.lang === "de" ? "de" : "en";
+
+    // "Report a bug" from the website or the app: one row in "Bugs" (the email only if the reporter gave one)
+    if (data.type === "bug") {
+      const text = clean_(data.text, 2000).trim();
+      if (text.length < 10) return json_({ ok: false, error: "report too short" });
+      sheet_(BUG_SHEET, BUG_COLUMNS).appendRow([
+        new Date(), data.where === "app" ? "app" : "site", "'" + clean_(data.page, 200), "'" + text, validEmail ? email : "", lang,
+        clean_(data.screen, 30), clean_(data.ua, 200), "new", "",
+      ]);
+      return json_({ ok: true });
+    }
 
     if (data.type === "waitlist") {
       if (!validEmail || !data.newsletter) return json_({ ok: false, error: "consent and a valid email are required" });
