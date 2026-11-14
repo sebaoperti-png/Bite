@@ -16,7 +16,7 @@ export function LandingHero() {
           <nav className="hx-tabs" aria-label={t("Get started")}>
             <a href="bite.html" className="hx-tab main"><b>{t("Find a table")}</b><small>{t("see who is cooking")}</small></a>
             <a href="bite.html?host" className="hx-tab"><b>{t("Become a host")}</b><small>{t("cook for your street")}</small></a>
-            <a href="stand.html?ref=landing" className="hx-tab"><b>{t("60-second survey")}</b><small>{t("tell us how you eat")}</small></a>
+            <a href="feedback.html?ref=landing" className="hx-tab"><b>{t("Your feedback")}</b><small>{t("rate Bite or tell us how you eat")}</small></a>
             <a href="#waitlist" className="hx-tab"><b>{t("Save me a seat")}</b><small>{t("news by email")}</small></a>
           </nav>
         </div>

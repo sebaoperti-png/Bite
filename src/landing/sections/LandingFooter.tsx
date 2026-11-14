@@ -49,7 +49,7 @@ export function LandingFooter() {
             <p className="ft-sub">{t("Bite is a young startup building a new way to eat with your neighbours. Try the app, tell us what you think, or just say hi.")}</p>
             <div className="ft-ctas">
               <a href="bite.html" className="ft-btn primary">{t("Open the app")}</a>
-              <a href="stand.html?ref=footer" className="ft-btn">{t("Take the 60-second survey")}</a>
+              <a href="feedback.html?ref=footer" className="ft-btn">{t("Give us feedback")}</a>
               <a href="mailto:hello@bitetable.de" className="ft-btn">{t("Write to Sebastiano")}</a>
             </div>
           </div>
