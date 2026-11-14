@@ -1703,8 +1703,10 @@ body { background-color: #f3eefb;
 .mx-dots button::after { content: ""; width: 8px; height: 8px; border-radius: 999px; background: #d3c4ec; transition: width .25s, background .25s; }
 .mx-dots button.on::after { width: 22px; background: #6b21d9; }
 
-.mx-app { padding: 40px 20px 24px; }
+.mx-app { padding: 28px 20px 24px; }
 .mx-phone { width: min(250px, 66vw); margin: 0 auto 18px; padding: 9px; border-radius: 38px; background: #160a2e; box-shadow: 0 30px 60px -28px rgba(22,10,46,0.6); }
 .mx-phone img { display: block; width: 100%; height: auto; border-radius: 30px; }
 @media (min-width: 641px) { .mx-hero, .mx-story, .mx-app { display: none; } }
 .mx-card { scroll-margin-top: 90px; }
+/* phones: the footer ends below the receipt (it used to be cut off once the big wordmark was hidden) */
+@media (max-width: 640px) { .ft-fade { padding-bottom: 56px !important; } }
