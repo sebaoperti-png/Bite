@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { asset } from "../asset";
 import { t } from "../../shared/i18n";
 import { LangSwitch } from "../../shared/LangSwitch";
+import { ThemeToggle } from "../../shared/ThemeToggle";
 
 const LINKS = [
   { href: "#savings", label: "Why Bite", n: 2 },
@@ -58,6 +59,7 @@ export function LandingNav() {
             <a key={l.href} className={`r-navlink nv-link ${l.href === "#help" || l.href === "#how" ? "r-nav-extra" : ""}`} href={l.href} style={{ fontSize: "14.5px", fontWeight: "600", color: "#4b3a6b" }}>{l.n ? <sup className="nv-no">{l.n}</sup> : null}{t(l.label)}</a>
           ))}
           <a className="r-navlink r-nav-extra" href="#waitlist" style={{ fontSize: "14.5px", fontWeight: "700", color: "#6b21d9" }}>{t("Stay updated")}</a>
+          <ThemeToggle className="nv-theme" />
           <LangSwitch />
           <a href="bite.html" className="r-navlink" style={{ display: "inline-flex", alignItems: "center", gap: "7px", background: "#6b21d9", color: "#fff", fontSize: "14px", fontWeight: "700", padding: "11px 20px", borderRadius: "999px", boxShadow: "0 8px 20px rgba(107,33,217,0.28)" }}>{t("Open the app")}</a>
           <button
@@ -89,6 +91,7 @@ export function LandingNav() {
               <span>{t(l.label)}</span><i />{l.n ? <em>No. {l.n}</em> : <em>{l.href === "#about" ? t("the three of us") : t("in the hero")}</em>}
             </a>
           ))}
+          <div style={{ marginTop: "14px" }}><ThemeToggle className="wide" label /></div>
           <a href="bite.html?host" onClick={() => setOpen(false)} style={{ display: "block", marginTop: "16px", textAlign: "center", padding: "14px", borderRadius: "14px", border: "1.5px solid rgba(22,10,46,0.14)", fontWeight: 800, color: "#160a2e" }}>{t("I want to host")}</a>
         </div>
       )}
