@@ -1,5 +1,6 @@
 // Legal page: terms, privacy, cookies, community, GDPR, impressum, accessibility, modern slavery
 import { openContact } from "../../shared/ContactForm";
+import { ThemeToggle } from "../../shared/ThemeToggle";
 import { asset } from "../asset";
 
 export function LegalPage() {
@@ -15,9 +16,12 @@ export function LegalPage() {
             </span>
           </a>
           {" "}
-          <a href="./" style={{ fontSize: "14px", fontWeight: "700", color: "#6b21d9" }}>
-            ← Back to Bite
-          </a>
+          <span style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <ThemeToggle />
+            <a href="./" style={{ fontSize: "14px", fontWeight: "700", color: "#6b21d9" }}>
+              ← Back to Bite
+            </a>
+          </span>
         </div>
       </header>
       <div className="lg-wrap" style={{ maxWidth: "1080px", margin: "0 auto", padding: "44px 24px 90px", display: "grid", gridTemplateColumns: "230px 1fr", gap: "48px", alignItems: "start" }}>
