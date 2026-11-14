@@ -11,6 +11,8 @@
     "test:costing": "esbuild tests/costing.test.ts --bundle --platform=node --format=cjs --define:import.meta.env.DEV=false --define:import.meta.env.BASE_URL=\"\\\"/\\\"\" --loader:.jpg=empty --loader:.png=empty --outfile=/tmp/costing.test.cjs --log-level=error && node /tmp/costing.test.cjs"
   },
   "dependencies": {
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
     "@supabase/supabase-js": "^2.119.0",
     "canvas-confetti": "^1.9.4",
     "lucide-react": "0.487.0",
