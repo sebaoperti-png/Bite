@@ -1,14 +1,15 @@
-// Cookie-free visitor statistics (Plausible or Umami): page views and where people come from, no cookies, nothing
+// Cookie-free visitor statistics (Umami or Plausible): page views and where people come from, no cookies, nothing
 // stored on the device, no personal profiles, so no consent banner is needed for it (§ 25 TDDDG, Art. 6(1)(f) GDPR).
 //
 // OFF until you fill in ANALYTICS below, then push: every page (landing, app, legal, survey, feedback) loads the script.
 // The privacy policy (legal.html#privacy, "Recipients & processors") shows the matching line automatically once it is on.
 //
-//   Plausible: create the site "bitetable.de" at plausible.io, then
+//   Umami Cloud, free "Hobby" plan (recommended, costs nothing): sign up at cloud.umami.is, choose the EU data region
+//   when asked (it cannot be changed later), add the website "bitetable.de", copy its Website ID and the script URL, then
+//     export const ANALYTICS: Analytics = { provider: "umami", websiteId: "<the Website ID>", src: "<the script URL Umami shows>" };
+//   Plausible (paid, after a trial): create the site "bitetable.de" at plausible.io, then
 //     export const ANALYTICS: Analytics = { provider: "plausible", domain: "bitetable.de" };
 //     (if Plausible gives you a personal script like https://plausible.io/js/pa-XXXX.js, add  src: "<that URL>")
-//   Umami: create the website at cloud.umami.is (choose the EU region), copy its Website ID, then
-//     export const ANALYTICS: Analytics = { provider: "umami", websiteId: "<the Website ID>", src: "<the script URL Umami shows>" };
 export type Analytics =
   | { provider: "plausible"; domain: string; src?: string }
   | { provider: "umami"; websiteId: string; src?: string }
