@@ -48,7 +48,7 @@
 
 /* the "table booked" moment in the checkout */
 .bk-done { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; background: rgba(245,244,249,0.94); backdrop-filter: blur(6px); animation: bkIn .3s ease both; }
-.bk-done h2 { font-family: 'Fraunces Variable', serif; font-style: italic; font-weight: 400; font-size: 40px; line-height: 1; color: #160a2e; margin-top: 8px; animation: bkUp .5s var(--check-ease-out) .35s both; }
+.bk-done h2 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 40px; line-height: 1; color: #160a2e; margin-top: 8px; animation: bkUp .5s var(--check-ease-out) .35s both; }
 .bk-done p { font-size: 14px; color: #6b5a8e; max-width: 300px; animation: bkUp .5s var(--check-ease-out) .5s both; }
 @keyframes bkIn { from { opacity: 0; } }
 @keyframes bkUp { from { opacity: 0; transform: translateY(10px); } }

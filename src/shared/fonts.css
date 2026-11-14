@@ -1,15 +1,12 @@
-/* Bite's two typefaces, self-hosted (no Google Fonts, nothing leaves our server):
- *  - Fraunces (variable, with its soft and "wonky" axes): the menu's voice: titles, menu lines, prices on cards
- *  - Figtree (variable): everything else: clear and friendly to read at every size
- * Both open source (SIL OFL), from @fontsource-variable. */
-@import "@fontsource-variable/fraunces/full.css";
-@import "@fontsource-variable/fraunces/full-italic.css";
+/* Titles: Instrument Serif (the menu's voice, italic for the menu lines). Text: Figtree.
+   Both self-hosted from npm (@fontsource), no Google Fonts. */
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/instrument-serif/400-italic.css";
 @import "@fontsource-variable/figtree/wght.css";
 @import "@fontsource-variable/figtree/wght-italic.css";
-
 :root {
-  --font-serif: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
   --font-sans: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Instrument Serif has one weight: never let the browser fake a bold version of it */
+  font-synthesis-weight: none;
 }
-/* Fraunces at its friendliest: soft corners, the playful "wonky" italic */
-:where(*) { font-optical-sizing: auto; }
