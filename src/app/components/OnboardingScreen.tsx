@@ -26,7 +26,7 @@ export function OnboardingScreen({ onCook, onEat, onSignIn }: OnboardingScreenPr
   return (
     <div
       className="relative flex flex-col h-full overflow-y-auto md:justify-center"
-      style={{ fontFamily: "'Figtree Variable', sans-serif", background: "#160a2e" }}
+      style={{ fontFamily: "'Figtree Variable', sans-serif", background: "var(--solid)" }}
     >
       {/* Top gradient background */}
       <div

@@ -1,9 +1,10 @@
 import { openBugReport } from "../../shared/BugReport";
+import { useThemeChoice, type ThemeChoice } from "../theme";
 import { InstallBanner } from "./InstallBanner";
 import { useState } from "react";
 import { EmptyPlate } from "../../shared/Restaurant";
 import { openSafetyTips } from "./SafetySheets";
-import { GetStartedCard, openTour } from "./GetStarted";
+import { openTour } from "./GetStarted";
 import { ReviewNudge } from "./ReviewSheet";
 import { MyReviews, FollowingList, useMyReviews } from "./ProfileExtras";
 import { PlusMenu } from "./PlusMenu";
@@ -15,7 +16,7 @@ import { COUNTRIES, countryByName, postalError, placeLabel, localPlace } from ".
 import {
   Bug,
   MapPin, Calendar, Clock, Users, Search, ChevronRight, ShoppingBag, Utensils, ChefHat, Home, MessageCircle, User, X, Check,
-  Star, Bell, BadgeCheck, Globe, Shield, Ban, CheckCircle, Camera, Settings, CreditCard, UserPlus, BookOpen, Heart, LogOut,
+  Star, Bell, BadgeCheck, Globe, Shield, Ban, CheckCircle, Camera, Settings, Moon, CreditCard, UserPlus, BookOpen, Heart, LogOut,
   RotateCcw, FileText, LifeBuoy, Leaf, Plus, Minus, Trash2, Eye, Sparkles, ChevronDown, ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -65,6 +66,8 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
   const store = useStore();
   const [searching, setSearching] = useState(false);
   const [openPicker, setOpenPicker] = useState<Picker | null>(null);
+  // phones: just "Where?" up front; date, time and guests sit behind "More filters"
+  const [moreFilters, setMoreFilters] = useState(false);
   const activeService: ServiceType = criteria.service === "all" ? "eat-together" : criteria.service;
 
   const set = (patch: Partial<SearchCriteria>) => setCriteria((c) => ({ ...c, ...patch }));
@@ -72,7 +75,6 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
   const firstSteps = store.live ? (
     <>
       <ReviewNudge />
-      <GetStartedCard onAccount={() => onNavigate("profile")} onBrowse={() => onSearch({ service: "all" })} onHost={onStartHosting} />
     </>
   ) : null;
 
@@ -92,7 +94,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
   const resultCount = store.meals.filter((m) => matchesCriteria(m, { ...criteria, service: activeService }, store.seatsLeft(m))).length;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: "var(--page)", fontFamily: "'Figtree Variable', sans-serif" }}>
       {!isDesktop && <div style={{ height: "max(env(safe-area-inset-top), 14px)", flexShrink: 0 }} />}
 
       <AnimatePresence mode="wait">
@@ -124,9 +126,9 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                   <motion.img src={logoImg} alt="Bite" style={{ height: 36, width: 36, borderRadius: 10, objectFit: "cover" }} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} />
                   <div className="flex items-center gap-2">
                   <LangSwitch size="sm" />
-                  <motion.button onClick={() => onNavigate("profile")} aria-label={t("Your profile")} className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: "#ede8fb" }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, type: "spring" }} whileTap={{ scale: 0.94 }}>
+                  <motion.button onClick={() => onNavigate("profile")} aria-label={t("Your profile")} className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: "var(--tint)" }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, type: "spring" }} whileTap={{ scale: 0.94 }}>
                     {store.account ? <Avatar size={24} fontSize={10} /> : null}
-                    <span style={{ fontSize: 13, color: "#6b21d9", fontWeight: store.account ? 600 : 800 }}>{store.account ? store.profile.name.split(" ")[0] : t("Log in")}</span>
+                    <span style={{ fontSize: 13, color: "var(--brand-ink)", fontWeight: store.account ? 600 : 800 }}>{store.account ? store.profile.name.split(" ")[0] : t("Log in")}</span>
                   </motion.button>
                   </div>
                 </div>
@@ -142,10 +144,10 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                   <div className="pb-3">
                     <div className="flex gap-2" role="tablist" aria-label={t("Way to eat")}>
                       {SERVICE_TABS.map(({ id, label, Icon }, i) => (
-                        <motion.button key={id} role="tab" aria-selected={activeService === id} onClick={() => set({ service: id })} className="flex-1 flex flex-col items-center gap-1 py-3 rounded-2xl relative overflow-hidden" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.07, type: "spring" }} whileTap={{ scale: 0.95 }} style={{ background: activeService === id ? "#6b21d9" : "#ffffff", border: activeService === id ? "none" : "1.5px solid rgba(107,33,217,0.13)" }}>
+                        <motion.button key={id} role="tab" aria-selected={activeService === id} onClick={() => set({ service: id })} className="flex-1 flex flex-col items-center gap-1 py-3 rounded-2xl relative overflow-hidden" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.07, type: "spring" }} whileTap={{ scale: 0.95 }} style={{ background: activeService === id ? "#6b21d9" : "var(--surface)", border: activeService === id ? "none" : "1.5px solid rgba(107,33,217,0.13)" }}>
                           {activeService === id && <motion.div layoutId="tab-glow" className="absolute inset-0" style={{ background: "linear-gradient(135deg, #7c30e8, #9b4aff)" }} transition={{ type: "spring", stiffness: 400, damping: 30 }} />}
                           <Icon size={15} className="relative z-10" color={activeService === id ? "#ffffff" : "#6b21d9"} strokeWidth={activeService === id ? 2.5 : 1.8} />
-                          <span className="relative z-10" style={{ fontSize: 9.5, fontWeight: 700, color: activeService === id ? "#fff" : "#7c6fa0", textAlign: "center", lineHeight: 1.2 }}>{t(label)}</span>
+                          <span className="relative z-10" style={{ fontSize: 11.5, fontWeight: 700, color: activeService === id ? "#fff" : "var(--ink-3)", textAlign: "center", lineHeight: 1.2 }}>{t(label)}</span>
                         </motion.button>
                       ))}
                     </div>
@@ -154,16 +156,19 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                   {/* Search fields — 2×2 grid */}
                   <div className="flex flex-col gap-2">
                     <div className="grid grid-cols-2 gap-2">
-                      {searchFields.map(({ id, icon: Icon, label, value }, i) => (
-                        <motion.button key={id} onClick={() => setOpenPicker(id)} className="flex items-center gap-2 px-3 py-2.5 rounded-2xl text-left min-w-0" style={{ background: "#ffffff", border: "1px solid rgba(107,33,217,0.14)" }} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.38 + i * 0.05 }} whileTap={{ scale: 0.97 }}>
-                          <Icon size={13} color="#6b21d9" strokeWidth={1.8} className="flex-shrink-0" />
+                      {(moreFilters ? searchFields : searchFields.slice(0, 1)).map(({ id, icon: Icon, label, value }, i) => (
+                        <motion.button key={id} onClick={() => setOpenPicker(id)} className={`flex items-center gap-2 px-3 rounded-2xl text-left min-w-0 ${moreFilters ? "py-2.5" : "col-span-2 py-3"}`} style={{ background: "var(--surface)", border: "1px solid rgba(107,33,217,0.14)", minHeight: 48 }} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.38 + i * 0.05 }} whileTap={{ scale: 0.97 }}>
+                          <Icon size={16} color="#6b21d9" strokeWidth={1.8} className="flex-shrink-0" />
                           <div className="flex flex-col flex-1 min-w-0">
-                            <span style={{ fontSize: 10.5, color: "#695a8c", fontWeight: 600 }}>{label}</span>
-                            <span style={{ fontSize: 12, color: "#160a2e", fontWeight: 600, marginTop: 0.5 }} className="truncate">{value}</span>
+                            <span style={{ fontSize: 11.5, color: "var(--ink-2)", fontWeight: 600 }}>{label}</span>
+                            <span style={{ fontSize: 14, color: "var(--ink)", fontWeight: 600, marginTop: 0.5 }} className="truncate">{value}</span>
                           </div>
                         </motion.button>
                       ))}
                     </div>
+                    <button type="button" className="hm-more" onClick={() => setMoreFilters((m) => !m)} aria-expanded={moreFilters}>
+                      {moreFilters ? t("Fewer filters") : `${t("More filters")}: ${searchFields.slice(1).map((f) => f.value).join(", ")}`}
+                    </button>
 
                     <motion.button onClick={handleSearch} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl relative overflow-hidden" style={{ background: "linear-gradient(135deg, #6b21d9, #9b4aff)" }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.52 }} whileTap={{ scale: 0.97 }}>
                       <AnimatePresence mode="wait">
@@ -176,7 +181,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                         ) : (
                           <motion.div key="label" className="flex items-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                             <Search size={15} color="#fff" strokeWidth={2.5} />
-                            <span style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}><SpinningText text={resultCount === 1 ? t("Search 1 meal") : t("Search {n} meals", { n: resultCount })} cell="1.2em" /></span>
+                            <span style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}><SpinningText text={resultCount === 0 ? t("Search") : resultCount === 1 ? t("Search 1 meal") : t("Search {n} meals", { n: resultCount })} cell="1.2em" /></span>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -191,10 +196,10 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
 
                   {/* Quick tags */}
                   <motion.div className="px-5 pt-3 pb-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.58 }}>
-                    <p className="dh-serif" style={{ fontSize: 17, color: "#6b21d9", marginBottom: 7 }}>{t("Today's specials")}</p>
+                    <p className="dh-serif" style={{ fontSize: 17, color: "var(--brand-ink)", marginBottom: 7 }}>{t("Today's specials")}</p>
                     <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
                       {CUISINE_TAGS.map((tag, i) => (
-                        <motion.button key={tag} onClick={() => onSearch({ cuisine: tag, service: "all" })} className="tap-chip flex-shrink-0 px-3 py-1.5 rounded-full" style={{ background: "#ffffff", border: "1.5px solid rgba(107,33,217,0.13)", fontSize: 11.5, color: "#6b21d9", fontWeight: 600 }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.62 + i * 0.04, type: "spring" }} whileTap={{ scale: 0.9 }}>
+                        <motion.button key={tag} onClick={() => onSearch({ cuisine: tag, service: "all" })} className="tap-chip flex-shrink-0 px-3 py-1.5 rounded-full" style={{ background: "var(--surface)", border: "1.5px solid rgba(107,33,217,0.13)", fontSize: 11.5, color: "var(--brand-ink)", fontWeight: 600 }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.62 + i * 0.04, type: "spring" }} whileTap={{ scale: 0.9 }}>
                           {t(tag)}
                         </motion.button>
                       ))}
@@ -204,8 +209,8 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                   {/* This week's menu, by way of eating (same as the desktop menu) */}
                   <div className="px-5 pt-3 pb-24">
                     <div className="flex items-center justify-between mb-2.5">
-                      <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{t("Cooking this week")}</p>
-                      <button onClick={() => onSearch({ service: "all" })} className="tap-link flex items-center gap-0.5" style={{ fontSize: 12, fontWeight: 700, color: "#6b21d9" }}>{t("See all")}{" "}<ChevronRight size={14} />
+                      <p style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)" }}>{t("Cooking this week")}</p>
+                      <button onClick={() => onSearch({ service: "all" })} className="tap-link flex items-center gap-0.5" style={{ fontSize: 12, fontWeight: 700, color: "var(--brand-ink)" }}>{t("See all")}{" "}<ChevronRight size={14} />
                       </button>
                     </div>
                     <MobileWeekMenu meals={store.meals.filter((m) => store.seatsLeft(m) > 0)} active={activeService} onSelectMeal={onSelectMeal} onSeeService={(s) => onSearch({ service: s })} />
@@ -261,9 +266,9 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
           ))}
           {openPicker === "guests" && (
             <div className="flex flex-col items-center gap-6 py-8">
-              <p style={{ fontSize: 48, fontWeight: 800, color: "#160a2e" }} aria-live="polite">{criteria.guests}</p>
+              <p style={{ fontSize: 48, fontWeight: 800, color: "var(--ink)" }} aria-live="polite">{criteria.guests}</p>
               <div className="flex items-center gap-6">
-                <motion.button aria-label={t("Fewer guests")} disabled={criteria.guests <= 1} onClick={() => set({ guests: Math.max(1, criteria.guests - 1) })} className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "#ede8fb", border: "2px solid #6b21d9", opacity: criteria.guests <= 1 ? 0.4 : 1 }} whileTap={{ scale: 0.88 }}>
+                <motion.button aria-label={t("Fewer guests")} disabled={criteria.guests <= 1} onClick={() => set({ guests: Math.max(1, criteria.guests - 1) })} className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "var(--tint)", border: "2px solid #6b21d9", opacity: criteria.guests <= 1 ? 0.4 : 1 }} whileTap={{ scale: 0.88 }}>
                   <Minus size={22} color="#6b21d9" />
                 </motion.button>
                 <motion.button aria-label={t("More guests")} disabled={criteria.guests >= 8} onClick={() => set({ guests: Math.min(8, criteria.guests + 1) })} className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "#6b21d9", opacity: criteria.guests >= 8 ? 0.4 : 1 }} whileTap={{ scale: 0.88 }}>
@@ -346,12 +351,12 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
               {SERVICE_TABS.map(({ id, label, Icon, desc }) => {
                 const on = activeTab === id;
                 return (
-                  <button key={id} role="tab" aria-selected={on} onClick={() => setActiveTab(id)} className="flex items-center gap-3 pl-3 pr-5 py-2.5 rounded-2xl transition-colors" style={{ background: on ? "linear-gradient(135deg, #7c30e8, #9b4aff)" : "#f7f4fd", border: on ? "1.5px solid transparent" : "1.5px solid rgba(107,33,217,0.1)" }}>
-                    <span className={`dh-doodle ${on ? "on" : ""}`} style={{ background: on ? "rgba(255,255,255,0.16)" : "#ede8fb", color: on ? "#fff" : "#6b21d9" }}>
+                  <button key={id} role="tab" aria-selected={on} onClick={() => setActiveTab(id)} className="flex items-center gap-3 pl-3 pr-5 py-2.5 rounded-2xl transition-colors" style={{ background: on ? "linear-gradient(135deg, #7c30e8, #9b4aff)" : "var(--tint-soft)", border: on ? "1.5px solid transparent" : "1.5px solid rgba(107,33,217,0.1)" }}>
+                    <span className={`dh-doodle ${on ? "on" : ""}`} style={{ background: on ? "rgba(255,255,255,0.16)" : "var(--tint)", color: on ? "#fff" : "var(--brand-ink)" }}>
                       <ServiceDoodle kind={id} />
                     </span>
                     <span className="text-left">
-                      <span className="block" style={{ fontSize: 14.5, fontWeight: 800, color: on ? "#fff" : "#160a2e" }}>{t(label)}</span>
+                      <span className="block" style={{ fontSize: 14.5, fontWeight: 800, color: on ? "#fff" : "var(--ink)" }}>{t(label)}</span>
                       <span className="block" style={{ fontSize: 12, color: on ? "rgba(255,255,255,0.8)" : "#7c6fa0" }}>{t(desc)}</span>
                     </span>
                   </button>
@@ -396,11 +401,11 @@ function DesktopHome({ name, activeTab, setActiveTab, searchFields, criteria, op
         <section className="mt-12">
           <div className="flex items-end justify-between mb-5">
             <div>
-              <h2 style={{ fontSize: 26, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.02em" }}>{t("Cooking this week")}</h2>
-              <p style={{ fontSize: 14.5, color: "#695a8c", marginTop: 2 }}>{t("Home-cooked meals from neighbours across Germany")}</p>
+              <h2 style={{ fontSize: 26, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.02em" }}>{t("Cooking this week")}</h2>
+              <p style={{ fontSize: 14.5, color: "var(--ink-2)", marginTop: 2 }}>{t("Home-cooked meals from neighbours across Germany")}</p>
             </div>
-            <button onClick={onSeeAll} className="flex items-center gap-1 px-4 py-2 rounded-xl hover:bg-[#ede8fb] transition-colors">
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#6b21d9" }}>{t("See all")}</span>
+            <button onClick={onSeeAll} className="flex items-center gap-1 px-4 py-2 rounded-xl hover:bg-[var(--tint)] transition-colors">
+              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--brand-ink)" }}>{t("See all")}</span>
               <ChevronRight size={16} color="#6b21d9" strokeWidth={2.4} />
             </button>
           </div>
@@ -426,9 +431,9 @@ function MessagesView({ onOpenChat, onBrowse }: { onOpenChat: (id: string) => vo
 
   const list = (
     <>
-      <div className="px-5 pt-4 pb-4 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(107,33,217,0.08)", background: "#fff" }}>
-        <h1 style={{ fontSize: isDesktop ? 26 : 22, fontWeight: 800, color: "#160a2e" }}>{t("Messages")}</h1>
-        <button onClick={store.markAllRead} className="relative p-1.5 rounded-lg hover:bg-[#f5f0ff]" aria-label={store.unreadTotal ? t("{n} unread — mark all as read", { n: store.unreadTotal }) : t("No unread messages")}>
+      <div className="px-5 pt-4 pb-4 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(107,33,217,0.08)", background: "var(--surface)" }}>
+        <h1 style={{ fontSize: isDesktop ? 26 : 22, fontWeight: 800, color: "var(--ink)" }}>{t("Messages")}</h1>
+        <button onClick={store.markAllRead} className="relative p-1.5 rounded-lg hover:bg-[var(--tint-soft)]" aria-label={store.unreadTotal ? t("{n} unread — mark all as read", { n: store.unreadTotal }) : t("No unread messages")}>
           <Bell size={20} color="#6b21d9" strokeWidth={1.8} />
           {store.unreadTotal > 0 && (
             <div className="absolute top-0 right-0 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#e9345a" }}>
@@ -438,17 +443,17 @@ function MessagesView({ onOpenChat, onBrowse }: { onOpenChat: (id: string) => vo
         </button>
       </div>
       {convs.length === 0 && (
-        <div className="flex flex-col items-center gap-3 py-16" style={{ background: "#fff" }}>
+        <div className="flex flex-col items-center gap-3 py-16" style={{ background: "var(--surface)" }}>
           <MessageCircle size={34} color="#c4b8de" strokeWidth={1.4} />
-          <p style={{ fontSize: 14, color: "#695a8c", fontWeight: 600 }}>{t("No conversations yet")}</p>
-          <button onClick={onBrowse} className="px-4 py-2 rounded-full" style={{ background: "#ede8fb", fontSize: 13, color: "#6b21d9", fontWeight: 700 }}>{t("Find a meal")}</button>
+          <p style={{ fontSize: 14, color: "var(--ink-2)", fontWeight: 600 }}>{t("No conversations yet")}</p>
+          <button onClick={onBrowse} className="px-4 py-2 rounded-full" style={{ background: "var(--tint)", fontSize: 13, color: "var(--brand-ink)", fontWeight: 700 }}>{t("Find a meal")}</button>
         </div>
       )}
       {convs.map((conv, i) => {
         const last = conv.messages[conv.messages.length - 1];
         const meal = conv.mealId ? store.mealById(conv.mealId) : undefined;
         return (
-          <motion.button key={conv.id} onClick={() => onOpenChat(conv.id)} className="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-[#faf8fd]" style={{ borderBottom: "1px solid rgba(107,33,217,0.05)", background: "#fff" }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} whileTap={{ background: "#f5f4f9" }}>
+          <motion.button key={conv.id} onClick={() => onOpenChat(conv.id)} className="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-[var(--tint-soft)]" style={{ borderBottom: "1px solid rgba(107,33,217,0.05)", background: "var(--surface)" }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} whileTap={{ background: "var(--page)" }}>
             <div className="relative flex-shrink-0">
               <img src={conv.avatar} alt="" className="w-12 h-12 rounded-full object-cover" style={{ border: conv.unread ? "2.5px solid #6b21d9" : "2px solid #ede8fb" }} />
               {conv.unread > 0 && (
@@ -459,12 +464,12 @@ function MessagesView({ onOpenChat, onBrowse }: { onOpenChat: (id: string) => vo
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <p className="truncate" style={{ fontSize: 14, fontWeight: conv.unread ? 800 : 600, color: "#160a2e" }}>
-                  {conv.name}{meal && <span style={{ fontWeight: 500, color: "#695a8c" }}> · {tMaybe(meal.title)}</span>}
+                <p className="truncate" style={{ fontSize: 14, fontWeight: conv.unread ? 800 : 600, color: "var(--ink)" }}>
+                  {conv.name}{meal && <span style={{ fontWeight: 500, color: "var(--ink-2)" }}> · {tMaybe(meal.title)}</span>}
                 </p>
-                <p className="flex-shrink-0" style={{ fontSize: 11, color: conv.unread ? "#6b21d9" : "#7c6fa0", fontWeight: conv.unread ? 700 : 400 }}>{last ? timeLabel(last.at) : ""}</p>
+                <p className="flex-shrink-0" style={{ fontSize: 11, color: conv.unread ? "var(--brand-ink)" : "var(--ink-3)", fontWeight: conv.unread ? 700 : 400 }}>{last ? timeLabel(last.at) : ""}</p>
               </div>
-              <p style={{ fontSize: 12.5, color: conv.unread ? "#160a2e" : "#7c6fa0", fontWeight: conv.unread ? 600 : 400, marginTop: 2 }} className="truncate">
+              <p style={{ fontSize: 12.5, color: conv.unread ? "var(--ink)" : "var(--ink-3)", fontWeight: conv.unread ? 600 : 400, marginTop: 2 }} className="truncate">
                 {store.typing[conv.id] ? t("typing…") : last ? `${last.sender === "me" ? t("You:") + " " : ""}${tMaybe(last.text)}` : t("Say hello")}
               </p>
             </div>
@@ -474,10 +479,10 @@ function MessagesView({ onOpenChat, onBrowse }: { onOpenChat: (id: string) => vo
     </>
   );
 
-  if (!isDesktop) return <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", background: "#fff" }}>{list}</div>;
+  if (!isDesktop) return <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", background: "var(--surface)" }}>{list}</div>;
   return (
     <div className="flex-1 min-h-0 overflow-y-auto py-10 px-8">
-      <div className="mx-auto w-full max-w-[760px] rounded-3xl overflow-hidden" style={{ background: "#fff", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>{list}</div>
+      <div className="mx-auto w-full max-w-[760px] rounded-3xl overflow-hidden" style={{ background: "var(--surface)", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>{list}</div>
     </div>
   );
 }
@@ -528,7 +533,7 @@ function ProfileView({ onSelectMeal, onOpenChat, onStartHosting, onBrowse, onSig
   };
 
   return (
-    <div className={`flex-1 overflow-y-auto ${isDesktop ? "py-8 px-8" : ""}`} style={{ scrollbarWidth: "none", background: "#f5f4f9" }}>
+    <div className={`flex-1 overflow-y-auto ${isDesktop ? "py-8 px-8" : ""}`} style={{ scrollbarWidth: "none", background: "var(--page)" }}>
       <ProfileDashboard rows={rows} onEdit={() => setSheet("edit")} onShare={shareProfile} onStartHosting={onStartHosting} onBrowse={onBrowse} onSelectMeal={onSelectMeal} />
       {!isDesktop && <div style={{ height: 24 }} />}
 
@@ -583,12 +588,12 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
           saved.length === 0 ? <Empty icon={Heart} text="Nothing saved yet — tap ♥ on any meal" action="Browse meals" onAction={() => go(onBrowse)} /> : (
             <div className="flex flex-col gap-2">
               {saved.map((m) => (
-                <div key={m.id} className="flex items-center gap-3 p-2 rounded-2xl" style={{ background: "#f7f4fd" }}>
+                <div key={m.id} className="flex items-center gap-3 p-2 rounded-2xl" style={{ background: "var(--tint-soft)" }}>
                   <button onClick={() => go(() => onSelectMeal(m))} className="flex items-center gap-3 flex-1 min-w-0 text-left">
                     <img src={m.image} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
                     <span className="min-w-0">
-                      <span className="block truncate" style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{tMaybe(m.title)}</span>
-                      <span className="block" style={{ fontSize: 12, color: "#695a8c" }}>{m.host} · {dateLabel(m.date)} · {euro(m.price)}</span>
+                      <span className="block truncate" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{tMaybe(m.title)}</span>
+                      <span className="block" style={{ fontSize: 12, color: "var(--ink-2)" }}>{m.host} · {dateLabel(m.date)} · {euro(m.price)}</span>
                     </span>
                   </button>
                   <button onClick={() => store.toggleLike(m.id)} className="p-2" aria-label={t("Remove from saved")}><Heart size={16} fill="#e9345a" color="#e9345a" /></button>
@@ -604,18 +609,18 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
             {store.published.map((m) => {
               const booked = m.seats - store.seatsLeft(m);
               return (
-                <div key={m.id} className="p-3 rounded-2xl" style={{ background: "#f7f4fd" }}>
+                <div key={m.id} className="p-3 rounded-2xl" style={{ background: "var(--tint-soft)" }}>
                   <div className="flex items-center gap-3">
                     <img src={m.image} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="truncate" style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{tMaybe(m.title)}</p>
-                      <p style={{ fontSize: 12, color: "#695a8c" }}>{dateLabel(m.date)} · {m.time} · {euro(m.price)}</p>
-                      <p style={{ fontSize: 12, color: "#0a7c4e", fontWeight: 700 }}>{t("Live · {booked}/{seats} seats booked", { booked, seats: m.seats })}</p>
+                      <p className="truncate" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{tMaybe(m.title)}</p>
+                      <p style={{ fontSize: 12, color: "var(--ink-2)" }}>{dateLabel(m.date)} · {m.time} · {euro(m.price)}</p>
+                      <p style={{ fontSize: 12, color: "var(--ok-ink)", fontWeight: 700 }}>{t("Live · {booked}/{seats} seats booked", { booked, seats: m.seats })}</p>
                     </div>
                   </div>
                   <div className="flex gap-2 mt-3">
-                    <button onClick={() => go(() => onSelectMeal(m))} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl" style={{ background: "#fff", fontSize: 13, fontWeight: 700, color: "#6b21d9" }}><Eye size={14} />{" "}{t("View")}</button>
-                    <button onClick={() => store.unpublish(m.id)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl" style={{ background: "#fff", fontSize: 13, fontWeight: 700, color: "#e9345a" }}><Trash2 size={14} />{" "}{t("Unpublish")}</button>
+                    <button onClick={() => go(() => onSelectMeal(m))} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl" style={{ background: "var(--surface)", fontSize: 13, fontWeight: 700, color: "var(--brand-ink)" }}><Eye size={14} />{" "}{t("View")}</button>
+                    <button onClick={() => store.unpublish(m.id)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl" style={{ background: "var(--surface)", fontSize: 13, fontWeight: 700, color: "#e9345a" }}><Trash2 size={14} />{" "}{t("Unpublish")}</button>
                   </div>
                 </div>
               );
@@ -629,13 +634,13 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
 
         {sheet === "dietary" && (
           <>
-            <p style={{ fontSize: 13, color: "#695a8c", marginBottom: 12 }}>{t("We'll share these with your host every time you book.")}</p>
+            <p style={{ fontSize: 13, color: "var(--ink-2)", marginBottom: 12 }}>{t("We'll share these with your host every time you book.")}</p>
             <div className="grid grid-cols-2 gap-2">
               {DIETARY_PREFS.map((d) => {
                 const on = store.profile.dietary.includes(d);
                 return (
-                  <button key={d} aria-pressed={on} onClick={() => store.updateProfile({ dietary: on ? store.profile.dietary.filter((x) => x !== d) : [...store.profile.dietary, d] })} className="flex items-center justify-between px-3.5 py-3 rounded-2xl" style={{ background: on ? "#ede8fb" : "#f5f4f9", border: `1.5px solid ${on ? "#6b21d9" : "rgba(107,33,217,0.1)"}` }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: on ? "#6b21d9" : "#160a2e" }}>{t(d)}</span>
+                  <button key={d} aria-pressed={on} onClick={() => store.updateProfile({ dietary: on ? store.profile.dietary.filter((x) => x !== d) : [...store.profile.dietary, d] })} className="flex items-center justify-between px-3.5 py-3 rounded-2xl" style={{ background: on ? "var(--tint)" : "var(--page)", border: `1.5px solid ${on ? "#6b21d9" : "rgba(107,33,217,0.1)"}` }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: on ? "var(--brand-ink)" : "var(--ink)" }}>{t(d)}</span>
                     {on && <Check size={15} color="#6b21d9" strokeWidth={2.6} />}
                   </button>
                 );
@@ -646,14 +651,14 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
 
         {sheet === "payment" && store.live && (
           <div className="flex flex-col gap-3">
-            <div className="rounded-2xl p-5" style={{ background: "#fbf7ef", border: "1px dashed rgba(107,33,217,0.3)" }}>
-              <p style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "#695a8c" }}>{t("How paying works for now")}</p>
-              <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 24, color: "#160a2e", margin: "4px 0 8px" }}>{t("You pay at the table.")}</p>
-              <p style={{ fontSize: 13.5, color: "#4b3a6b", lineHeight: 1.55 }}>{t("Bite charges nothing in this early phase. Once the host confirms your seat, you hand them their share of the groceries, as shown on the meal.")}</p>
+            <div className="rounded-2xl p-5" style={{ background: "var(--paper)", border: "1px dashed rgba(107,33,217,0.3)" }}>
+              <p style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ink-2)" }}>{t("How paying works for now")}</p>
+              <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 24, color: "var(--ink)", margin: "4px 0 8px" }}>{t("You pay at the table.")}</p>
+              <p style={{ fontSize: 13.5, color: "var(--ink-2)", lineHeight: 1.55 }}>{t("Bite charges nothing in this early phase. Once the host confirms your seat, you hand them their share of the groceries, as shown on the meal.")}</p>
             </div>
-            <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "#f7f4fd" }}>
+            <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "var(--tint-soft)" }}>
               <Shield size={15} color="#6b21d9" className="flex-shrink-0 mt-0.5" />
-              <p style={{ fontSize: 12.5, color: "#4a3a6e", lineHeight: 1.5 }}>{t("Never send money in advance or outside Bite. If someone asks you to, report them.")}</p>
+              <p style={{ fontSize: 12.5, color: "var(--ink-2)", lineHeight: 1.5 }}>{t("Never send money in advance or outside Bite. If someone asks you to, report them.")}</p>
             </div>
           </div>
         )}
@@ -669,38 +674,39 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
                 <span>{store.profile.name}</span><span>12/29</span>
               </div>
             </div>
-            <div className="flex items-start gap-2 mt-4 p-3 rounded-xl" style={{ background: "#f7f4fd" }}>
+            <div className="flex items-start gap-2 mt-4 p-3 rounded-xl" style={{ background: "var(--tint-soft)" }}>
               <Shield size={15} color="#6b21d9" className="flex-shrink-0 mt-0.5" />
-              <p style={{ fontSize: 12.5, color: "#4a3a6e", lineHeight: 1.5 }}>{t("Payments will be processed by Stripe. This is a demo: no card is stored and nothing is ever charged.")}</p>
+              <p style={{ fontSize: 12.5, color: "var(--ink-2)", lineHeight: 1.5 }}>{t("Payments will be processed by Stripe. This is a demo: no card is stored and nothing is ever charged.")}</p>
             </div>
           </>
         )}
 
         {sheet === "settings" && (
           <div className="flex flex-col gap-2">
-            <button onClick={() => store.updateProfile({ notifications: !store.profile.notifications })} className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "#f7f4fd" }} role="switch" aria-checked={store.profile.notifications}>
-              <span className="flex items-center gap-3"><Bell size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{t("Booking & message notifications")}</span></span>
+            <button onClick={() => store.updateProfile({ notifications: !store.profile.notifications })} className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "var(--tint-soft)" }} role="switch" aria-checked={store.profile.notifications}>
+              <span className="flex items-center gap-3"><Bell size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>{t("Booking & message notifications")}</span></span>
               <span className={`sw ${store.profile.notifications ? "on" : ""}`}><span /></span>
             </button>
-            <button onClick={() => { store.updateProfile({ news: !store.profile.news }); store.showToast(store.profile.news ? t("You won't get Bite news emails") : t("We'll keep you updated on Bite's news")); }} className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "#f7f4fd" }} role="switch" aria-checked={!!store.profile.news}>
-              <span className="flex items-center gap-3"><Sparkles size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{t("Keep me updated on Bite's news")}</span></span>
+            <button onClick={() => { store.updateProfile({ news: !store.profile.news }); store.showToast(store.profile.news ? t("You won't get Bite news emails") : t("We'll keep you updated on Bite's news")); }} className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "var(--tint-soft)" }} role="switch" aria-checked={!!store.profile.news}>
+              <span className="flex items-center gap-3"><Sparkles size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>{t("Keep me updated on Bite's news")}</span></span>
               <span className={`sw ${store.profile.news ? "on" : ""}`}><span /></span>
             </button>
-            <div className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "#f7f4fd" }}>
-              <span className="flex items-center gap-3"><Globe size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{t("Language")}</span></span>
+            <div className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "var(--tint-soft)" }}>
+              <span className="flex items-center gap-3"><Globe size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>{t("Language")}</span></span>
               <LangSwitch size="sm" />
             </div>
-            <div className="px-4 py-3 rounded-2xl" style={{ background: "#f7f4fd" }}>
-              <span className="flex items-center gap-3"><Ban size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{t("Blocked people")}</span></span>
+            <ThemeRow />
+            <div className="px-4 py-3 rounded-2xl" style={{ background: "var(--tint-soft)" }}>
+              <span className="flex items-center gap-3"><Ban size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>{t("Blocked people")}</span></span>
               {store.blocked.length === 0 ? (
-                <p style={{ fontSize: 12.5, color: "#695a8c", marginTop: 6, marginLeft: 28 }}>{t("Nobody. You can block someone from their meal or your chat with them.")}</p>
+                <p style={{ fontSize: 12.5, color: "var(--ink-2)", marginTop: 6, marginLeft: 28 }}>{t("Nobody. You can block someone from their meal or your chat with them.")}</p>
               ) : (
                 <div className="flex flex-col gap-2 mt-3">
                   {store.blocked.map((p) => (
                     <div key={p.id} className="flex items-center gap-3">
                       <img src={p.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
-                      <span className="flex-1 truncate" style={{ fontSize: 13.5, fontWeight: 600, color: "#160a2e" }}>{p.name}</span>
-                      <button onClick={() => void store.unblock(p.id)} className="px-3 py-1.5 rounded-xl" style={{ background: "#fff", fontSize: 12.5, fontWeight: 700, color: "#6b21d9" }}>{t("Unblock")}</button>
+                      <span className="flex-1 truncate" style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)" }}>{p.name}</span>
+                      <button onClick={() => void store.unblock(p.id)} className="px-3 py-1.5 rounded-xl" style={{ background: "var(--surface)", fontSize: 12.5, fontWeight: 700, color: "var(--brand-ink)" }}>{t("Unblock")}</button>
                     </div>
                   ))}
                 </div>
@@ -708,24 +714,24 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
             </div>
             <SettingsLink Icon={FileText} label={t("Terms & privacy")} onClick={() => window.open("legal.html", "_blank", "noopener")} />
             <SettingsLink Icon={LifeBuoy} label={t("Help & support")} onClick={() => window.open("./#help", "_blank", "noopener")} />
-            {!store.live && <div className="mt-2 p-4 rounded-2xl" style={{ background: "#fff4f6", border: "1px solid rgba(233,52,90,0.15)" }}>
-              <p style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{t("Demo data")}</p>
-              <p style={{ fontSize: 12.5, color: "#695a8c", marginTop: 2 }}>{t("Clear bookings, chats, saved meals and published listings made in this browser.")}</p>
+            {!store.live && <div className="mt-2 p-4 rounded-2xl" style={{ background: "var(--paper)", border: "1px solid rgba(233,52,90,0.15)" }}>
+              <p style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)" }}>{t("Demo data")}</p>
+              <p style={{ fontSize: 12.5, color: "var(--ink-2)", marginTop: 2 }}>{t("Clear bookings, chats, saved meals and published listings made in this browser.")}</p>
               {confirmReset ? (
                 <div className="flex gap-2 mt-3">
                   <button onClick={() => { store.reset(); setConfirmReset(false); close(); }} className="flex-1 py-2.5 rounded-xl" style={{ background: "#e9345a", color: "#fff", fontSize: 13, fontWeight: 800 }}>{t("Yes, reset")}</button>
-                  <button onClick={() => setConfirmReset(false)} className="flex-1 py-2.5 rounded-xl" style={{ background: "#fff", color: "#160a2e", fontSize: 13, fontWeight: 700 }}>{t("Keep")}</button>
+                  <button onClick={() => setConfirmReset(false)} className="flex-1 py-2.5 rounded-xl" style={{ background: "var(--surface)", color: "var(--ink)", fontSize: 13, fontWeight: 700 }}>{t("Keep")}</button>
                 </div>
               ) : (
-                <button onClick={() => setConfirmReset(true)} className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#fff", color: "#e9345a", fontSize: 13, fontWeight: 700 }}>
+                <button onClick={() => setConfirmReset(true)} className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "var(--surface)", color: "#e9345a", fontSize: 13, fontWeight: 700 }}>
                   <RotateCcw size={14} />{" "}{t("Reset demo data")}</button>
               )}
             </div>}
             <button
               onClick={() => go(onSignOut)}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl mt-1" style={{ background: "#f7f4fd" }}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl mt-1" style={{ background: "var(--tint-soft)" }}
             >
-              <LogOut size={16} color="#7c6fa0" /><span style={{ fontSize: 14, fontWeight: 600, color: "#4a3a6e" }}>{t("Log out")}{store.account ? ` (${store.account.email})` : ""}</span>
+              <LogOut size={16} color="#7c6fa0" /><span style={{ fontSize: 14, fontWeight: 600, color: "var(--ink-2)" }}>{t("Log out")}{store.account ? ` (${store.account.email})` : ""}</span>
             </button>
           </div>
         )}
@@ -750,8 +756,8 @@ function ProfileSheets({ sheet, close, onSelectMeal, onOpenChat, onStartHosting,
             <div className="flex items-center gap-3 pb-1">
               <Avatar size={56} fontSize={22} />
               <div className="flex gap-2 flex-wrap">
-                <button type="button" onClick={photoPicker.open} className="px-3 py-2 rounded-xl" style={{ background: "#ede8fb", color: "#6b21d9", fontSize: 13, fontWeight: 800 }}>{store.profile.photo ? t("Change photo") : t("Add photo")}</button>
-                {store.profile.photo && <button type="button" onClick={() => { store.updateProfile({ photo: undefined }); store.showToast(t("Profile photo removed")); }} className="px-3 py-2 rounded-xl" style={{ background: "#fff", color: "#695a8c", fontSize: 13, fontWeight: 700, boxShadow: "inset 0 0 0 1.5px rgba(107,33,217,0.15)" }}>{t("Remove")}</button>}
+                <button type="button" onClick={photoPicker.open} className="px-3 py-2 rounded-xl" style={{ background: "var(--tint)", color: "var(--brand-ink)", fontSize: 13, fontWeight: 800 }}>{store.profile.photo ? t("Change photo") : t("Add photo")}</button>
+                {store.profile.photo && <button type="button" onClick={() => { store.updateProfile({ photo: undefined }); store.showToast(t("Profile photo removed")); }} className="px-3 py-2 rounded-xl" style={{ background: "var(--surface)", color: "var(--ink-2)", fontSize: 13, fontWeight: 700, boxShadow: "inset 0 0 0 1.5px rgba(107,33,217,0.15)" }}>{t("Remove")}</button>}
               </div>
               {photoPicker.input}
             </div>
@@ -792,22 +798,22 @@ function BookingRow({ b, confirmCancel, setConfirmCancel, onOpen, onChat }: { b:
   if (!m) return null;
   const cancelled = b.status === "cancelled";
   return (
-    <div className="p-3 rounded-2xl" style={{ background: "#f7f4fd", opacity: cancelled ? 0.6 : 1 }}>
+    <div className="p-3 rounded-2xl" style={{ background: "var(--tint-soft)", opacity: cancelled ? 0.6 : 1 }}>
       <button onClick={() => onOpen(m)} className="flex items-center gap-3 w-full text-left">
         <img src={m.image} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
         <span className="flex-1 min-w-0">
-          <span className="block truncate" style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{tMaybe(m.title)}</span>
-          <span className="block" style={{ fontSize: 12, color: "#695a8c" }}>{dateLabel(m.date)} · {m.time} · {b.guests === 1 ? t("1 guest") : t("{n} guests", { n: b.guests })}</span>
-          {(() => { const st = bookingStatusText(b, euro(b.total)); return <span className="block" style={{ fontSize: 12, fontWeight: 700, color: st.tone === "off" ? "#e9345a" : st.tone === "wait" ? "#b45309" : "#0a7c4e" }}>{st.text}</span>; })()}
+          <span className="block truncate" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{tMaybe(m.title)}</span>
+          <span className="block" style={{ fontSize: 12, color: "var(--ink-2)" }}>{dateLabel(m.date)} · {m.time} · {b.guests === 1 ? t("1 guest") : t("{n} guests", { n: b.guests })}</span>
+          {(() => { const st = bookingStatusText(b, euro(b.total)); return <span className="block" style={{ fontSize: 12, fontWeight: 700, color: st.tone === "off" ? "#e9345a" : st.tone === "wait" ? "#b45309" : "var(--ok-ink)" }}>{st.text}</span>; })()}
         </span>
       </button>
       {!cancelled && (
         <div className="flex gap-2 mt-3">
-          <button onClick={onChat} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl" style={{ background: "#fff", fontSize: 13, fontWeight: 700, color: "#6b21d9" }}><MessageCircle size={14} />{" "}{t("Message host")}</button>
+          <button onClick={onChat} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl" style={{ background: "var(--surface)", fontSize: 13, fontWeight: 700, color: "var(--brand-ink)" }}><MessageCircle size={14} />{" "}{t("Message host")}</button>
           {confirmCancel === b.id ? (
             <button onClick={() => { store.cancelBooking(b.id); setConfirmCancel(null); }} className="flex-1 py-2 rounded-xl" style={{ background: "#e9345a", fontSize: 13, fontWeight: 800, color: "#fff" }}>{t("Confirm cancel")}</button>
           ) : (
-            <button onClick={() => setConfirmCancel(b.id)} className="flex-1 py-2 rounded-xl" style={{ background: "#fff", fontSize: 13, fontWeight: 700, color: "#e9345a" }}>{t("Cancel booking")}</button>
+            <button onClick={() => setConfirmCancel(b.id)} className="flex-1 py-2 rounded-xl" style={{ background: "var(--surface)", fontSize: 13, fontWeight: 700, color: "#e9345a" }}>{t("Cancel booking")}</button>
           )}
         </div>
       )}
@@ -818,24 +824,38 @@ function BookingRow({ b, confirmCancel, setConfirmCancel, onOpen, onChat }: { b:
 /* ───────────────────────── Small shared bits ───────────────────────── */
 
 const inputStyle: React.CSSProperties = {
-  background: "#f5f4f9", border: "1.5px solid rgba(107,33,217,0.13)", borderRadius: 14, padding: "11px 14px",
-  fontSize: 14, color: "#160a2e", width: "100%", outline: "none", fontFamily: "inherit",
+  background: "var(--page)", border: "1.5px solid rgba(107,33,217,0.13)", borderRadius: 14, padding: "11px 14px",
+  fontSize: 14, color: "var(--ink)", width: "100%", outline: "none", fontFamily: "inherit",
 };
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span style={{ fontSize: 12, fontWeight: 700, color: "#695a8c", textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</span>
+      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-2)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</span>
       {children}
     </label>
   );
 }
 
+/** Appearance: follow the phone, or always light / dark (theme.ts) */
+function ThemeRow() {
+  const [choice, setChoice] = useThemeChoice();
+  const opts: { v: ThemeChoice; label: string }[] = [{ v: "auto", label: t("Auto") }, { v: "light", label: t("Light") }, { v: "dark", label: t("Dark") }];
+  return (
+    <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl" style={{ background: "var(--tint-soft)" }}>
+      <span className="flex items-center gap-3"><Moon size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>{t("Appearance")}</span></span>
+      <div className="th-seg" role="radiogroup" aria-label={t("Appearance")}>
+        {opts.map((o) => <button key={o.v} type="button" role="radio" aria-checked={choice === o.v} className={choice === o.v ? "on" : ""} onClick={() => setChoice(o.v)}>{o.label}</button>)}
+      </div>
+    </div>
+  );
+}
+
 function SettingsLink({ Icon, label, value, onClick }: { Icon: React.ElementType; label: string; value?: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "#f7f4fd" }}>
-      <span className="flex items-center gap-3"><Icon size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "#160a2e" }}>{label}</span></span>
-      <span className="flex items-center gap-1" style={{ fontSize: 13, color: "#695a8c" }}>{value}<ChevronRight size={14} color="#c4b8de" /></span>
+    <button onClick={onClick} className="flex items-center justify-between px-4 py-3 rounded-2xl" style={{ background: "var(--tint-soft)" }}>
+      <span className="flex items-center gap-3"><Icon size={16} color="#6b21d9" /><span style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>{label}</span></span>
+      <span className="flex items-center gap-1" style={{ fontSize: 13, color: "var(--ink-2)" }}>{value}<ChevronRight size={14} color="#c4b8de" /></span>
     </button>
   );
 }
@@ -844,8 +864,8 @@ function Empty({ icon: Icon, text, action, onAction }: { icon: React.ElementType
   return (
     <div className="flex flex-col items-center gap-3 py-10">
       <EmptyPlate size={92} />
-      <p style={{ fontSize: 14, color: "#695a8c", fontWeight: 600, textAlign: "center" }}>{t(text)}</p>
-      {action && <button onClick={onAction} className="px-4 py-2 rounded-full" style={{ background: "#ede8fb", fontSize: 13, color: "#6b21d9", fontWeight: 700 }}>{t(action)}</button>}
+      <p style={{ fontSize: 14, color: "var(--ink-2)", fontWeight: 600, textAlign: "center" }}>{t(text)}</p>
+      {action && <button onClick={onAction} className="px-4 py-2 rounded-full" style={{ background: "var(--tint)", fontSize: 13, color: "var(--brand-ink)", fontWeight: 700 }}>{t(action)}</button>}
     </div>
   );
 }
@@ -853,8 +873,8 @@ function Empty({ icon: Icon, text, action, onAction }: { icon: React.ElementType
 export function SheetHeader({ title, onClose }: { title: string; onClose: () => void }) {
   return (
     <div className="px-5 py-3 md:py-4 flex items-center justify-between flex-shrink-0" style={{ borderBottom: "1px solid rgba(107,33,217,0.08)" }}>
-      <p style={{ fontSize: 16, fontWeight: 800, color: "#160a2e" }}>{title}</p>
-      <motion.button onClick={onClose} aria-label={t("Close")} className="w-8 h-8 flex items-center justify-center rounded-full" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.88 }}>
+      <p style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)" }}>{title}</p>
+      <motion.button onClick={onClose} aria-label={t("Close")} className="w-8 h-8 flex items-center justify-center rounded-full" style={{ background: "var(--tint)" }} whileTap={{ scale: 0.88 }}>
         <X size={15} color="#6b21d9" strokeWidth={2.5} />
       </motion.button>
     </div>
@@ -863,8 +883,8 @@ export function SheetHeader({ title, onClose }: { title: string; onClose: () => 
 
 function PickerRow({ label, active, index, onSelect }: { label: string; active: boolean; index: number; onSelect: () => void }) {
   return (
-    <motion.button onClick={onSelect} className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#faf8fd]" style={{ borderBottom: "1px solid rgba(107,33,217,0.05)", background: active ? "#f5f0ff" : "#fff" }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
-      <span style={{ fontSize: 14, fontWeight: active ? 700 : 500, color: active ? "#6b21d9" : "#160a2e" }}>{dateLabel(label)}</span>
+    <motion.button onClick={onSelect} className="w-full flex items-center justify-between px-5 py-4 hover:bg-[var(--tint-soft)]" style={{ borderBottom: "1px solid rgba(107,33,217,0.05)", background: active ? "var(--tint-soft)" : "var(--surface)" }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
+      <span style={{ fontSize: 14, fontWeight: active ? 700 : 500, color: active ? "var(--brand-ink)" : "var(--ink)" }}>{dateLabel(label)}</span>
       {active && <Check size={16} color="#6b21d9" strokeWidth={2.5} />}
     </motion.button>
   );
@@ -879,19 +899,19 @@ export function BottomNav({ active, unread = 0, onNavigate }: { active: NavTab; 
   ];
 
   return (
-    <nav className="flex items-center justify-around px-2 pt-3 flex-shrink-0" style={{ background: "#ffffff", borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: "max(env(safe-area-inset-bottom), 16px)" }} aria-label={t("Main")}>
+    <nav className="flex items-center justify-around px-2 pt-3 flex-shrink-0" style={{ background: "var(--surface)", borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: "max(env(safe-area-inset-bottom), 16px)" }} aria-label={t("Main")}>
       {items.map(({ id, label, Icon }) => {
         const isActive = active === id;
         return (
           <motion.button key={id} className="relative flex flex-col items-center gap-1 px-3" whileTap={{ scale: 0.82 }} onClick={() => onNavigate?.(id)} aria-current={isActive ? "page" : undefined}>
             <div className="relative flex items-center justify-center w-8 h-8 rounded-xl">
-              {isActive && <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-xl" style={{ background: "#ede8fb" }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}
+              {isActive && <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-xl" style={{ background: "var(--tint)" }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}
               <Icon size={17} color={isActive ? "#6b21d9" : "#a99cc8"} strokeWidth={isActive ? 2.5 : 1.8} style={{ position: "relative", transition: "color .25s" }} />
             </div>
             {id === "messages" && unread > 0 && (
               <motion.span key={unread} initial={{ scale: 0.2, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 520, damping: 14 }} className="absolute top-0 right-2 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#e9345a", fontSize: 8.5, fontWeight: 800, color: "#fff" }}>{unread}</motion.span>
             )}
-            <span style={{ fontSize: 9.5, fontWeight: 700, color: isActive ? "#6b21d9" : "#a99cc8" }}>{t(label)}</span>
+            <span style={{ fontSize: 9.5, fontWeight: 700, color: isActive ? "var(--brand-ink)" : "var(--ink-3)" }}>{t(label)}</span>
           </motion.button>
         );
       })}

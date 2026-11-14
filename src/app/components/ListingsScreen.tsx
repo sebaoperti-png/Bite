@@ -25,9 +25,9 @@ import { useStore } from "../store";
 import { t, tMaybe, dateLabel, dec, getLang } from "../../shared/i18n";
 
 const SVC = {
-  pickup:          { label: "Pick-up",       color: "#c05e00", bg: "#fff4e5", Icon: ShoppingBag },
-  "eat-together":  { label: "Eat Together",  color: "#6b21d9", bg: "#ede8fb", Icon: Utensils },
-  "cook-together": { label: "Cook Together", color: "#0a7c4e", bg: "#e5f7f0", Icon: ChefHat },
+  pickup:          { label: "Pick-up",       color: "var(--warn-ink)", bg: "#fff4e5", Icon: ShoppingBag },
+  "eat-together":  { label: "Eat Together",  color: "var(--brand-ink)", bg: "var(--tint)", Icon: Utensils },
+  "cook-together": { label: "Cook Together", color: "var(--ok-ink)", bg: "#e5f7f0", Icon: ChefHat },
 } as const;
 
 const SERVICE_FILTERS: { id: ServiceType | "all"; label: string }[] = [
@@ -142,7 +142,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   const cycleSort = () => setSort((s) => s === "default" ? (searchCenter(criteria) ? "distance" : "price") : s === "distance" ? "price" : s === "price" ? "rating" : "default");
 
   const searchBox = (
-    <div className="relative flex items-center gap-2 px-3.5 rounded-2xl" style={{ background: isDesktop ? "#fff" : "#f5f4f9", border: "1.5px solid rgba(107,33,217,0.12)", height: isDesktop ? 46 : 40 }}>
+    <div className="relative flex items-center gap-2 px-3.5 rounded-2xl" style={{ background: isDesktop ? "var(--surface)" : "var(--page)", border: "1.5px solid rgba(107,33,217,0.12)", height: isDesktop ? 46 : 40 }}>
       <Search size={16} color="#7c6fa0" />
       {ghost && <span key={ghost} className="clear-ghost" aria-hidden onAnimationEnd={() => setGhost("")} style={{ fontSize: isDesktop ? 14.5 : 13.5 }}>{ghost.split("").map((c, i) => <i key={i} style={{ ["--i" as string]: i }}>{c}</i>)}</span>}
       <input
@@ -151,7 +151,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
         placeholder={t("Search dishes, cooks, neighbourhoods…")}
         aria-label={t("Search meals")}
         className="flex-1 bg-transparent outline-none min-w-0"
-        style={{ fontSize: isDesktop ? 14.5 : 13.5, color: "#160a2e" }}
+        style={{ fontSize: isDesktop ? 14.5 : 13.5, color: "var(--ink)" }}
       />
       {criteria.query && (
         <button onClick={() => { setGhost(criteria.query); set({ query: "" }); }} aria-label={t("Clear search")} className="p-1"><X size={14} color="#7c6fa0" /></button>
@@ -162,7 +162,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   const chips = (criteriaChips.length > 0 || activeFilterCount > 0) && (
     <div className="flex gap-1.5 flex-wrap">
       {criteriaChips.map((c) => (
-        <button key={c.label} onClick={c.clear} className="flex items-center gap-1 px-2.5 py-1 rounded-full" style={{ background: "#ede8fb", fontSize: 12, fontWeight: 700, color: "#6b21d9" }}>
+        <button key={c.label} onClick={c.clear} className="flex items-center gap-1 px-2.5 py-1 rounded-full" style={{ background: "var(--tint)", fontSize: 12, fontWeight: 700, color: "var(--brand-ink)" }}>
           {c.label} <X size={11} strokeWidth={3} />
         </button>
       ))}
@@ -174,7 +174,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
           </button>
         );
       })}
-      <button onClick={clearEverything} className="px-2.5 py-1 rounded-full" style={{ background: "#fff", border: "1px solid rgba(107,33,217,0.15)", fontSize: 12, fontWeight: 700, color: "#695a8c" }}>{t("Clear all")}</button>
+      <button onClick={clearEverything} className="px-2.5 py-1 rounded-full" style={{ background: "var(--surface)", border: "1px solid rgba(107,33,217,0.15)", fontSize: 12, fontWeight: 700, color: "var(--ink-2)" }}>{t("Clear all")}</button>
     </div>
   );
 
@@ -198,39 +198,39 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
 
   // live and nothing here yet: Bite is just starting, so invite people to open the first table
   const empty = store.live ? (
-    <div className="flex flex-col items-center justify-center py-14 px-6 gap-3 rounded-3xl text-center" style={{ background: isDesktop ? "#fff" : "transparent" }}>
+    <div className="flex flex-col items-center justify-center py-14 px-6 gap-3 rounded-3xl text-center" style={{ background: isDesktop ? "var(--surface)" : "transparent" }}>
       <EmptyPlate size={96} />
-      <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "#160a2e" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
-      <p style={{ color: "#695a8c", fontSize: 14, maxWidth: 360, lineHeight: 1.5 }}>{t("Bite is just starting. Cook something you love and open the first table near you, or look a bit further.")}</p>
+      <p style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontSize: 28, lineHeight: 1.05, color: "var(--ink)" }}>{store.meals.length ? t("No table here yet") : t("The first tables are being set")}</p>
+      <p style={{ color: "var(--ink-2)", fontSize: 14, maxWidth: 360, lineHeight: 1.5 }}>{t("Bite is just starting. Cook something you love and open the first table near you, or look a bit further.")}</p>
       <div className="flex flex-wrap justify-center gap-2 mt-1">
         {onStartHosting && <button onClick={onStartHosting} className="px-4 py-2.5 rounded-full" style={{ background: "#6b21d9", fontSize: 13.5, color: "#fff", fontWeight: 800 }}>{t("Host the first table")}</button>}
-        <button onClick={clearEverything} className="px-4 py-2.5 rounded-full" style={{ background: "#ede8fb", fontSize: 13.5, color: "#6b21d9", fontWeight: 700 }}>{t("Show all meals")}</button>
+        <button onClick={clearEverything} className="px-4 py-2.5 rounded-full" style={{ background: "var(--tint)", fontSize: 13.5, color: "var(--brand-ink)", fontWeight: 700 }}>{t("Show all meals")}</button>
       </div>
     </div>
   ) : (
-    <div className="flex flex-col items-center justify-center py-16 gap-3 rounded-3xl" style={{ background: isDesktop ? "#fff" : "transparent" }}>
+    <div className="flex flex-col items-center justify-center py-16 gap-3 rounded-3xl" style={{ background: isDesktop ? "var(--surface)" : "transparent" }}>
       <EmptyPlate size={96} />
-      <p style={{ color: "#695a8c", fontWeight: 600, fontSize: 14.5, textAlign: "center" }}>{t("No meals match your search")}</p>
-      <button onClick={clearEverything} className="px-4 py-2 rounded-full" style={{ background: "#ede8fb", fontSize: 13, color: "#6b21d9", fontWeight: 700 }}>{t("Show all meals")}</button>
+      <p style={{ color: "var(--ink-2)", fontWeight: 600, fontSize: 14.5, textAlign: "center" }}>{t("No meals match your search")}</p>
+      <button onClick={clearEverything} className="px-4 py-2 rounded-full" style={{ background: "var(--tint)", fontSize: 13, color: "var(--brand-ink)", fontWeight: 700 }}>{t("Show all meals")}</button>
     </div>
   );
 
   if (isDesktop) {
     return (
-      <div className="h-full overflow-y-auto" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
+      <div className="h-full overflow-y-auto" style={{ background: "var(--page)", fontFamily: "'Figtree Variable', sans-serif" }}>
         <div className="mx-auto w-full max-w-[1240px] px-8 pt-8 pb-16 grid gap-8 grid-cols-[260px_1fr] items-start">
-          <aside className="sticky top-6 rounded-3xl p-5" style={{ background: "#fff", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
+          <aside className="sticky top-6 rounded-3xl p-5" style={{ background: "var(--surface)", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
             <div className="flex items-center justify-between">
-              <p style={{ fontSize: 17, fontWeight: 800, color: "#160a2e" }}>{t("Filters")}</p>
+              <p style={{ fontSize: 17, fontWeight: 800, color: "var(--ink)" }}>{t("Filters")}</p>
               {activeFilterCount > 0 && <button onClick={clearFilters} style={{ fontSize: 13, color: "#e9345a", fontWeight: 700 }}>{t("Clear (")}{activeFilterCount})</button>}
             </div>
-            <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 20 }}>{t("Way to eat")}</p>
+            <p style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 20 }}>{t("Way to eat")}</p>
             <div className="flex flex-col gap-1 mt-2.5">
               {SERVICE_FILTERS.map((f) => {
                 const on = criteria.service === f.id;
                 return (
-                  <button key={f.id} onClick={() => set({ service: f.id })} className="flex items-center justify-between px-3 py-2 rounded-xl transition-colors hover:bg-[#f5f0ff]" style={{ background: on ? "#ede8fb" : undefined }}>
-                    <span style={{ fontSize: 14, fontWeight: on ? 800 : 600, color: on ? "#6b21d9" : "#160a2e" }}>{t(f.label)}</span>
+                  <button key={f.id} onClick={() => set({ service: f.id })} className="flex items-center justify-between px-3 py-2 rounded-xl transition-colors hover:bg-[var(--tint-soft)]" style={{ background: on ? "var(--tint)" : undefined }}>
+                    <span style={{ fontSize: 14, fontWeight: on ? 800 : 600, color: on ? "var(--brand-ink)" : "var(--ink)" }}>{t(f.label)}</span>
                     {on && <Check size={15} color="#6b21d9" strokeWidth={2.6} />}
                   </button>
                 );
@@ -243,15 +243,15 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
           <section className="flex flex-col gap-4">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p style={{ fontSize: 14, color: "#695a8c", fontWeight: 600 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
-                <h1 style={{ fontSize: 30, fontWeight: 900, color: "#160a2e", letterSpacing: "-0.02em" }}>
+                <p style={{ fontSize: 14, color: "var(--ink-2)", fontWeight: 600 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
+                <h1 style={{ fontSize: 30, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.02em" }}>
                   {filtered.length === 1 ? t("1 meal available") : t("{n} meals available", { n: filtered.length })}</h1>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">
               {viewSwitch(false)}
-              <button onClick={cycleSort} className="flex items-center gap-2 px-4 py-2.5 rounded-xl flex-shrink-0" style={{ background: sort !== "default" ? "#ede8fb" : "#fff", border: "1.5px solid rgba(107,33,217,0.12)" }}>
+              <button onClick={cycleSort} className="flex items-center gap-2 px-4 py-2.5 rounded-xl flex-shrink-0" style={{ background: sort !== "default" ? "var(--tint)" : "var(--surface)", border: "1.5px solid rgba(107,33,217,0.12)" }}>
                 <ArrowUpDown size={15} color="#6b21d9" strokeWidth={2} />
-                <span style={{ fontSize: 13.5, fontWeight: 700, color: "#6b21d9" }}>{sort === "default" ? t("Sort: recommended") : t("Sort: {by}", { by: getLang() === "de" ? sortLabel : sortLabel.toLowerCase() })}</span>
+                <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--brand-ink)" }}>{sort === "default" ? t("Sort: recommended") : t("Sort: {by}", { by: getLang() === "de" ? sortLabel : sortLabel.toLowerCase() })}</span>
               </button>
               </div>
             </div>
@@ -291,25 +291,25 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
   }
 
   return (
-    <div className="relative flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
-      <div style={{ height: "max(env(safe-area-inset-top), 14px)", flexShrink: 0, background: "#fff" }} />
+    <div className="relative flex flex-col h-full" style={{ background: "var(--page)", fontFamily: "'Figtree Variable', sans-serif" }}>
+      <div style={{ height: "max(env(safe-area-inset-top), 14px)", flexShrink: 0, background: "var(--surface)" }} />
 
       {/* Header */}
-      <div className="px-4 pt-2 pb-3 flex flex-col gap-2.5" style={{ background: "#ffffff" }}>
+      <div className="px-4 pt-2 pb-3 flex flex-col gap-2.5" style={{ background: "var(--surface)" }}>
         <div className="flex items-center gap-3">
-          <motion.button onClick={onBack} aria-label={t("Back")} className="p-2 rounded-xl" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.88 }}>
+          <motion.button onClick={onBack} aria-label={t("Back")} className="p-2 rounded-xl" style={{ background: "var(--tint)" }} whileTap={{ scale: 0.88 }}>
             <ChevronLeft size={18} color="#6b21d9" strokeWidth={2.5} />
           </motion.button>
           <div className="flex-1">
-            <p style={{ fontSize: 11, color: "#695a8c", fontWeight: 500 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: "#160a2e" }}>{filtered.length === 1 ? t("1 meal available") : t("{n} meals available", { n: filtered.length })}</p>
+            <p style={{ fontSize: 11, color: "var(--ink-2)", fontWeight: 500 }}>{t("{area} · this week", { area: placeSummary(criteria, t(ANY_AREA)) })}</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>{filtered.length === 1 ? t("1 meal available") : t("{n} meals available", { n: filtered.length })}</p>
           </div>
           <div className="flex gap-2">
-            <motion.button className="p-2 rounded-xl flex items-center gap-1.5" style={{ background: sort !== "default" ? "#ede8fb" : "#f0ecfa", paddingInline: 10 }} whileTap={{ scale: 0.88 }} onClick={cycleSort}>
+            <motion.button className="p-2 rounded-xl flex items-center gap-1.5" style={{ background: sort !== "default" ? "var(--tint)" : "var(--tint)", paddingInline: 10 }} whileTap={{ scale: 0.88 }} onClick={cycleSort}>
               <ArrowUpDown size={14} color="#6b21d9" strokeWidth={2} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#6b21d9" }}>{sortLabel}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brand-ink)" }}>{sortLabel}</span>
             </motion.button>
-            <motion.button className="relative p-2 rounded-xl" style={{ background: activeFilterCount > 0 ? "#6b21d9" : "#f0ecfa" }} whileTap={{ scale: 0.88 }} onClick={() => setShowFilters(true)} aria-label={t("Filters")}>
+            <motion.button className="relative p-2 rounded-xl" style={{ background: activeFilterCount > 0 ? "#6b21d9" : "var(--tint)" }} whileTap={{ scale: 0.88 }} onClick={() => setShowFilters(true)} aria-label={t("Filters")}>
               <SlidersHorizontal size={17} color={activeFilterCount > 0 ? "#fff" : "#6b21d9"} strokeWidth={1.8} />
               {activeFilterCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#e9345a", fontSize: 9, color: "#fff", fontWeight: 800 }}>{activeFilterCount}</span>
@@ -321,11 +321,11 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
       </div>
 
       {/* Service type chips */}
-      <div className="px-4 py-2.5 flex gap-2 overflow-x-auto flex-shrink-0" style={{ background: "#ffffff", borderBottom: "1px solid rgba(107,33,217,0.08)", scrollbarWidth: "none" }}>
+      <div className="px-4 py-2.5 flex gap-2 overflow-x-auto flex-shrink-0" style={{ background: "var(--surface)", borderBottom: "1px solid rgba(107,33,217,0.08)", scrollbarWidth: "none" }}>
         {SERVICE_FILTERS.map((f) => (
           <motion.button key={f.id} onClick={() => set({ service: f.id })} className="relative flex-shrink-0 px-4 py-1.5 rounded-full overflow-hidden" whileTap={{ scale: 0.92 }} style={{ border: criteria.service === f.id ? "none" : "1.5px solid rgba(107,33,217,0.15)" }}>
             {criteria.service === f.id && <motion.div layoutId="filter-bg" className="absolute inset-0" style={{ background: "#6b21d9" }} transition={{ type: "spring", stiffness: 400, damping: 30 }} />}
-            <span className="relative z-10" style={{ fontSize: 12, fontWeight: 700, color: criteria.service === f.id ? "#fff" : "#6b21d9" }}>{t(f.label)}</span>
+            <span className="relative z-10" style={{ fontSize: 12, fontWeight: 700, color: criteria.service === f.id ? "#fff" : "var(--brand-ink)" }}>{t(f.label)}</span>
           </motion.button>
         ))}
       </div>
@@ -358,7 +358,7 @@ export function ListingsScreen({ criteria, setCriteria, onBack, onSelect, onNavi
         </div>
         <div className="px-5 pt-3 flex gap-2" style={{ borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: "max(env(safe-area-inset-bottom), 20px)" }}>
           {activeFilterCount > 0 && (
-            <button onClick={clearFilters} className="px-4 rounded-2xl" style={{ background: "#f0ecfa", fontSize: 14, fontWeight: 700, color: "#e9345a" }}>{t("Clear")}</button>
+            <button onClick={clearFilters} className="px-4 rounded-2xl" style={{ background: "var(--tint)", fontSize: 14, fontWeight: 700, color: "#e9345a" }}>{t("Clear")}</button>
           )}
           <motion.button onClick={() => setShowFilters(false)} className="flex-1 py-3.5 rounded-2xl" style={{ background: "linear-gradient(135deg, #6b21d9, #9b4aff)" }} whileTap={{ scale: 0.97 }}>
             <span style={{ color: "#fff", fontWeight: 800, fontSize: 15 }}>{filtered.length === 1 ? t("Show 1 meal") : t("Show {n} meals", { n: filtered.length })}</span>
@@ -379,17 +379,17 @@ function FilterSection({ title, subtitle, options, selected, onToggle, columns =
 }) {
   return (
     <div className="mt-5">
-      <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", textTransform: "uppercase", letterSpacing: "0.05em" }}>{title}</p>
-      {subtitle && <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 2 }}>{subtitle}</p>}
+      <p style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{title}</p>
+      {subtitle && <p style={{ fontSize: 11.5, color: "var(--ink-2)", marginTop: 2 }}>{subtitle}</p>}
       <div className={`grid ${columns === 1 ? "grid-cols-1" : "grid-cols-2"} gap-2 mt-3`}>
         {options.map(({ id, label, Icon, color, bg }) => {
           const active = selected.has(id);
           return (
-            <motion.button key={id} onClick={() => onToggle(id)} aria-pressed={active} className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl" style={{ background: active ? bg : "#f5f4f9", border: active ? `1.5px solid ${color}44` : "1.5px solid rgba(107,33,217,0.1)" }} whileTap={{ scale: 0.95 }}>
-              <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: active ? color : "#ede8fb" }}>
+            <motion.button key={id} onClick={() => onToggle(id)} aria-pressed={active} className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl" style={{ background: active ? bg : "var(--page)", border: active ? `1.5px solid ${color}44` : "1.5px solid rgba(107,33,217,0.1)" }} whileTap={{ scale: 0.95 }}>
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: active ? color : "var(--tint)" }}>
                 <Icon size={13} color={active ? "#fff" : "#6b21d9"} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 13, fontWeight: 700, color: active ? color : "#160a2e", flex: 1, textAlign: "left" }}>{t(label)}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: active ? color: "var(--ink)", flex: 1, textAlign: "left" }}>{t(label)}</span>
               {active && <Check size={14} color={color} strokeWidth={3} />}
             </motion.button>
           );
@@ -421,7 +421,7 @@ export function MealCard({ meal, onSelect, compact = false, distance = null }: {
       tabIndex={0}
       aria-label={`${tMaybe(meal.title)}, ${t("with {name}", { name: meal.host })}, ${euro(meal.price)}`}
       className="w-full h-full text-left rounded-3xl overflow-hidden block cursor-pointer"
-      style={{ background: "#ffffff", boxShadow: "0 3px 20px rgba(107,33,217,0.09)" }}
+      style={{ background: "var(--surface)", boxShadow: "0 3px 20px rgba(107,33,217,0.09)" }}
       whileHover={{ y: -3, boxShadow: "0 12px 32px rgba(107,33,217,0.16)" }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 28 }}
@@ -443,7 +443,7 @@ export function MealCard({ meal, onSelect, compact = false, distance = null }: {
 
         <motion.button
           className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full"
-          style={{ background: "rgba(255,255,255,0.92)" }}
+          style={{ background: "var(--glass)" }}
           onClick={(e) => { e.stopPropagation(); store.toggleLike(meal.id); }}
           whileTap={{ scale: 0.75 }}
           aria-label={liked ? t("Remove from saved") : t("Save meal")}
@@ -461,21 +461,21 @@ export function MealCard({ meal, onSelect, compact = false, distance = null }: {
         <div className="flex items-center gap-2.5">
           <img src={meal.hostAvatar} alt="" loading="lazy" className="w-9 h-9 rounded-full object-cover flex-shrink-0" style={{ border: "2px solid #ede8fb" }} />
           <div className="flex-1 min-w-0">
-            <p style={{ fontSize: 15, fontWeight: 700, color: "#160a2e" }} className="truncate">{tMaybe(meal.title)}</p>
-            <p className="truncate" style={{ fontSize: 11.5, color: "#695a8c" }}>{t("with {name}", { name: meal.host })} · {meal.time}{store.isFollowing(meal.hostId ?? meal.host) && <span style={{ color: "#6b21d9", fontWeight: 800 }}> · {t("You follow")}</span>}</p>
+            <p style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }} className="truncate">{tMaybe(meal.title)}</p>
+            <p className="truncate" style={{ fontSize: 11.5, color: "var(--ink-2)" }}>{t("with {name}", { name: meal.host })} · {meal.time}{store.isFollowing(meal.hostId ?? meal.host) && <span style={{ color: "var(--brand-ink)", fontWeight: 800 }}> · {t("You follow")}</span>}</p>
           </div>
           <div className="flex items-center gap-0.5 flex-shrink-0">
             {meal.reviews ? <>
               <Star size={11} fill="#f59e0b" color="#f59e0b" />
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#160a2e" }}>{dec(meal.rating)}</span>
-            </> : <span className="px-2 py-0.5 rounded-full" style={{ fontSize: 10.5, fontWeight: 800, color: "#6b21d9", background: "#f0ecfa" }}>{t("New host")}</span>}
+              <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)" }}>{dec(meal.rating)}</span>
+            </> : <span className="px-2 py-0.5 rounded-full" style={{ fontSize: 10.5, fontWeight: 800, color: "var(--brand-ink)", background: "var(--tint)" }}>{t("New host")}</span>}
           </div>
         </div>
 
         {!compact && (
           <div className="flex gap-1.5 mt-2.5 flex-wrap">
             {meal.tags.slice(0, 4).map((tag) => (
-              <span key={tag} className="px-2 py-0.5 rounded-full" style={{ background: "#f0ecfa", fontSize: 11, color: "#6b21d9", fontWeight: 600 }}>{t(tag)}</span>
+              <span key={tag} className="px-2 py-0.5 rounded-full" style={{ background: "var(--tint)", fontSize: 11, color: "var(--brand-ink)", fontWeight: 600 }}>{t(tag)}</span>
             ))}
           </div>
         )}
@@ -483,9 +483,9 @@ export function MealCard({ meal, onSelect, compact = false, distance = null }: {
         <div className="flex items-center justify-between mt-2.5 pt-2.5" style={{ borderTop: "1px solid rgba(107,33,217,0.07)" }}>
           <div className="flex items-center gap-1 min-w-0">
             <MapPin size={10} color="#7c6fa0" strokeWidth={2} className="flex-shrink-0" />
-            <span className="truncate" style={{ fontSize: 11, color: "#695a8c" }}>{distance != null && <b style={{ color: "#6b21d9", fontWeight: 800 }}>{fmtKm(distance)} · </b>}{dateLabel(meal.date)}</span>
+            <span className="truncate" style={{ fontSize: 11, color: "var(--ink-2)" }}>{distance != null && <b style={{ color: "var(--brand-ink)", fontWeight: 800 }}>{fmtKm(distance)} · </b>}{dateLabel(meal.date)}</span>
           </div>
-          <span className="flex-shrink-0" style={{ fontSize: 11, fontWeight: left <= 1 ? 800 : 500, color: left === 0 ? "#e9345a" : left <= 1 ? "#c05e00" : "#7c6fa0" }}>
+          <span className="flex-shrink-0" style={{ fontSize: 11, fontWeight: left <= 1 ? 800 : 500, color: left === 0 ? "#e9345a" : left <= 1 ? "var(--warn-ink)" : "var(--ink-3)" }}>
             {left === 0 ? t("Sold out") : left === 1 ? t("1 seat left") : t("{n} seats left", { n: left })}
           </span>
         </div>

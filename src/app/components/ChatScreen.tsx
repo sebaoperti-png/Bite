@@ -53,7 +53,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   if (!conv) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-3" style={{ fontFamily: "'Figtree Variable', sans-serif" }}>
-        <p style={{ fontSize: 15, fontWeight: 700, color: "#160a2e" }}>{t("This conversation is no longer available.")}</p>
+        <p style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>{t("This conversation is no longer available.")}</p>
         <button onClick={onBack} className="px-4 py-2 rounded-xl" style={{ background: "#6b21d9", color: "#fff", fontWeight: 700 }}>{t("Go back")}</button>
       </div>
     );
@@ -88,8 +88,8 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   };
 
   const header = (
-    <div className="px-4 pt-2 pb-3 md:py-4 flex items-center gap-3 flex-shrink-0" style={{ background: "#ffffff", borderBottom: "1px solid rgba(107,33,217,0.08)" }}>
-      <motion.button onClick={onBack} aria-label={t("Back")} className="p-2 rounded-xl" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.88 }}>
+    <div className="px-4 pt-2 pb-3 md:py-4 flex items-center gap-3 flex-shrink-0" style={{ background: "var(--surface)", borderBottom: "1px solid rgba(107,33,217,0.08)" }}>
+      <motion.button onClick={onBack} aria-label={t("Back")} className="p-2 rounded-xl" style={{ background: "var(--tint)" }} whileTap={{ scale: 0.88 }}>
         <ChevronLeft size={18} color="#6b21d9" strokeWidth={2.5} />
       </motion.button>
       <div className="relative">
@@ -97,14 +97,14 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
         {!store.live && <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full" style={{ background: "#10b981", border: "1.5px solid #fff" }} />}
       </div>
       <div className="flex-1 min-w-0">
-        <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{conv.name}</p>
-        <p style={{ fontSize: 11.5, color: typing ? "#6b21d9" : "#10b981", fontWeight: 600 }}>{typing ? t("Typing…") : store.live ? (meal ? tMaybe(meal.title) : "") : isDesktop ? t("Online · usually replies in minutes") : t("Online")}</p>
+        <p style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)" }}>{conv.name}</p>
+        <p style={{ fontSize: 11.5, color: typing ? "var(--brand-ink)" : "#10b981", fontWeight: 600 }}>{typing ? t("Typing…") : store.live ? (meal ? tMaybe(meal.title) : "") : isDesktop ? t("Online · usually replies in minutes") : t("Online")}</p>
       </div>
-      <motion.button onClick={() => setSafetyOpen(true)} aria-label={t("Safety: report or block")} className="w-9 h-9 flex items-center justify-center rounded-xl" style={{ background: "#f0ecfa" }} whileTap={{ scale: 0.88 }}>
+      <motion.button onClick={() => setSafetyOpen(true)} aria-label={t("Safety: report or block")} className="w-9 h-9 flex items-center justify-center rounded-xl" style={{ background: "var(--tint)" }} whileTap={{ scale: 0.88 }}>
         <MoreHorizontal size={17} color="#6b21d9" strokeWidth={2.5} />
       </motion.button>
       {meal && !isDesktop && (
-        <button onClick={() => onOpenMeal(meal)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl" style={{ background: "#f0ecfa", fontSize: 11.5, fontWeight: 700, color: "#6b21d9" }}>{t("Meal")}{" "}<ChevronRight size={12} />
+        <button onClick={() => onOpenMeal(meal)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl" style={{ background: "var(--tint)", fontSize: 11.5, fontWeight: 700, color: "var(--brand-ink)" }}>{t("Meal")}{" "}<ChevronRight size={12} />
         </button>
       )}
     </div>
@@ -128,8 +128,8 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
         </button>
       </div>
       {booking.status === "confirmed" && !waiting && (!booking.live || (meal.startsAt && Date.parse(meal.startsAt) < Date.now())) && (
-        <div className="px-4 py-2.5 flex items-center justify-between" style={{ background: "#ede8fb" }}>
-          <span style={{ fontSize: 12, color: "#6b21d9", fontWeight: 700 }}>{booking.rating ? t("Thanks! Tap to edit your review") : t("Rate {name} after the meal", { name: conv.name.split(" ")[0] })}</span>
+        <div className="px-4 py-2.5 flex items-center justify-between" style={{ background: "var(--tint)" }}>
+          <span style={{ fontSize: 12, color: "var(--brand-ink)", fontWeight: 700 }}>{booking.rating ? t("Thanks! Tap to edit your review") : t("Rate {name} after the meal", { name: conv.name.split(" ")[0] })}</span>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((i) => (
               <motion.button key={i} aria-label={i > 1 ? t("{n} stars", { n: i }) : t("1 star")} onClick={() => setReviewStars(i)} whileTap={{ scale: 0.72 }} animate={{ scale: i <= (booking.rating ?? 0) ? 1.15 : 1 }}>
@@ -154,7 +154,7 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
       )}
       {!isDesktop && <SafetyTipsStrip />}
       {conv.messages.length === 0 && (
-        <p className="text-center py-8" style={{ fontSize: 13, color: "#695a8c" }}>{t("Say hello to {name} — ask about the menu, allergies or timing.", { name: conv.name.split(" ")[0] })}</p>
+        <p className="text-center py-8" style={{ fontSize: 13, color: "var(--ink-2)" }}>{t("Say hello to {name} — ask about the menu, allergies or timing.", { name: conv.name.split(" ")[0] })}</p>
       )}
       <AnimatePresence initial={false}>
         {conv.messages.map((msg) => (
@@ -179,23 +179,23 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   );
 
   const input = blocked ? (
-    <div className="px-4 pt-3 flex-shrink-0 flex items-center gap-3" style={{ background: "#ffffff", borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: isDesktop ? 14 : "max(env(safe-area-inset-bottom), 16px)" }}>
+    <div className="px-4 pt-3 flex-shrink-0 flex items-center gap-3" style={{ background: "var(--surface)", borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: isDesktop ? 14 : "max(env(safe-area-inset-bottom), 16px)" }}>
       <Ban size={16} color="#7c6fa0" />
-      <p className="flex-1" style={{ fontSize: 13, color: "#4b3a6b" }}>{t("You blocked {name}. You can no longer write to each other.", { name: conv.name.split(" ")[0] })}</p>
-      <button onClick={() => void store.unblock(person.id)} className="px-3 py-1.5 rounded-xl" style={{ background: "#f0ecfa", fontSize: 12.5, fontWeight: 700, color: "#6b21d9" }}>{t("Unblock")}</button>
+      <p className="flex-1" style={{ fontSize: 13, color: "var(--ink-2)" }}>{t("You blocked {name}. You can no longer write to each other.", { name: conv.name.split(" ")[0] })}</p>
+      <button onClick={() => void store.unblock(person.id)} className="px-3 py-1.5 rounded-xl" style={{ background: "var(--tint)", fontSize: 12.5, fontWeight: 700, color: "var(--brand-ink)" }}>{t("Unblock")}</button>
     </div>
   ) : (
-    <div className="px-4 pt-2 flex-shrink-0" style={{ background: "#ffffff", borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: isDesktop ? 14 : "max(env(safe-area-inset-bottom), 16px)" }}>
+    <div className="px-4 pt-2 flex-shrink-0" style={{ background: "var(--surface)", borderTop: "1px solid rgba(107,33,217,0.08)", paddingBottom: isDesktop ? 14 : "max(env(safe-area-inset-bottom), 16px)" }}>
       <div className="flex gap-2 mb-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
         {QUICK_REPLIES.map(({ icon: Icon, label }) => (
-          <motion.button key={label} onClick={() => send(t(label))} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-[#e6dcfa]" style={{ background: "#f0ecfa", fontSize: 12, color: "#6b21d9", fontWeight: 600, whiteSpace: "nowrap" }} whileTap={{ scale: 0.92 }}>
+          <motion.button key={label} onClick={() => send(t(label))} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-[var(--tint-2)]" style={{ background: "var(--tint)", fontSize: 12, color: "var(--brand-ink)", fontWeight: 600, whiteSpace: "nowrap" }} whileTap={{ scale: 0.92 }}>
             <Icon size={11} color="#6b21d9" strokeWidth={2} />
             {t(label)}
           </motion.button>
         ))}
       </div>
       <form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); send(); }}>
-        <div className="flex-1 flex items-center px-4 py-2.5 rounded-full" style={{ background: "#f0ecfa" }}>
+        <div className="flex-1 flex items-center px-4 py-2.5 rounded-full" style={{ background: "var(--tint)" }}>
           <input
             ref={inputRef}
             type="text"
@@ -204,11 +204,11 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
             placeholder={t("Message {name}…", { name: conv.name })}
             aria-label={t("Message {name}", { name: conv.name })}
             className="flex-1 bg-transparent outline-none"
-            style={{ fontSize: 14, color: "#160a2e" }}
+            style={{ fontSize: 14, color: "var(--ink)" }}
             maxLength={500}
           />
         </div>
-        <motion.button type="submit" aria-label={t("Send")} className="w-10 h-10 flex items-center justify-center rounded-full flex-shrink-0" style={{ background: text.trim() ? "#6b21d9" : "#ede8fb" }} whileTap={{ scale: 0.85 }}>
+        <motion.button type="submit" aria-label={t("Send")} className="w-10 h-10 flex items-center justify-center rounded-full flex-shrink-0" style={{ background: text.trim() ? "#6b21d9" : "var(--tint)" }} whileTap={{ scale: 0.85 }}>
           <Send size={15} color={text.trim() ? "#fff" : "#a99cc8"} strokeWidth={2} />
         </motion.button>
       </form>
@@ -217,8 +217,8 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
 
   if (!isDesktop) {
     return (
-      <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
-        <div style={{ height: "max(env(safe-area-inset-top), 14px)", background: "#fff", flexShrink: 0 }} />
+      <div className="flex flex-col h-full" style={{ background: "var(--page)", fontFamily: "'Figtree Variable', sans-serif" }}>
+        <div style={{ height: "max(env(safe-area-inset-top), 14px)", background: "var(--surface)", flexShrink: 0 }} />
         {header}
         {messages}
         {input}
@@ -228,33 +228,33 @@ export function ChatScreen({ conversationId, bookingId, onBack, onOpenMeal }: {
   }
 
   return (
-    <div className="h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
+    <div className="h-full" style={{ background: "var(--page)", fontFamily: "'Figtree Variable', sans-serif" }}>
       <div className="mx-auto h-full w-full max-w-[1100px] px-8 py-8 grid gap-6" style={{ gridTemplateColumns: meal ? "360px 1fr" : "1fr" }}>
         {meal && (
           <aside className="flex flex-col gap-4 overflow-y-auto">
             {confirmation || (
-              <button onClick={() => onOpenMeal(meal)} className="rounded-3xl overflow-hidden text-left" style={{ background: "#fff", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
+              <button onClick={() => onOpenMeal(meal)} className="rounded-3xl overflow-hidden text-left" style={{ background: "var(--surface)", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
                 <img src={meal.image} alt="" className="w-full h-40 object-cover" />
                 <div className="p-4">
-                  <p style={{ fontSize: 16, fontWeight: 800, color: "#160a2e" }}>{tMaybe(meal.title)}</p>
-                  <p style={{ fontSize: 13, color: "#695a8c", marginTop: 2 }}>{dateLabel(meal.date)} · {meal.time} · {euro(meal.price)}</p>
-                  <p className="flex items-center gap-1 mt-2" style={{ fontSize: 13, fontWeight: 700, color: "#6b21d9" }}>{t("View meal")}{" "}<ChevronRight size={14} /></p>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)" }}>{tMaybe(meal.title)}</p>
+                  <p style={{ fontSize: 13, color: "var(--ink-2)", marginTop: 2 }}>{dateLabel(meal.date)} · {meal.time} · {euro(meal.price)}</p>
+                  <p className="flex items-center gap-1 mt-2" style={{ fontSize: 13, fontWeight: 700, color: "var(--brand-ink)" }}>{t("View meal")}{" "}<ChevronRight size={14} /></p>
                 </div>
               </button>
             )}
-            <div className="rounded-3xl p-4" style={{ background: "#fff", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
-              <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e" }}>{t("Good to know")}</p>
-              <ul className="mt-2 flex flex-col gap-1.5" style={{ fontSize: 12.5, color: "#4a3a6e" }}>
+            <div className="rounded-3xl p-4" style={{ background: "var(--surface)", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
+              <p style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)" }}>{t("Good to know")}</p>
+              <ul className="mt-2 flex flex-col gap-1.5" style={{ fontSize: 12.5, color: "var(--ink-2)" }}>
                 <li>{t("• Keep the chat inside Bite, so we can help if something goes wrong.")}</li>
                 <li>{t("• Never share bank details, ID photos or codes.")}</li>
                 <li>{t("• Pay only at the table, never in advance.")}</li>
                 <li>{t("• Something wrong? Tap ··· above to report or block. We read every report.")}</li>
               </ul>
-              <button type="button" onClick={openSafetyTips} className="mt-2" style={{ fontSize: 12.5, fontWeight: 800, color: "#6b21d9" }}>{t("All safety tips")}</button>
+              <button type="button" onClick={openSafetyTips} className="mt-2" style={{ fontSize: 12.5, fontWeight: 800, color: "var(--brand-ink)" }}>{t("All safety tips")}</button>
             </div>
           </aside>
         )}
-        <section className="flex flex-col min-h-0 rounded-3xl overflow-hidden" style={{ background: "#faf9fd", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
+        <section className="flex flex-col min-h-0 rounded-3xl overflow-hidden" style={{ background: "var(--tint-soft)", boxShadow: "0 4px 24px rgba(46,16,96,0.06)" }}>
           {header}
           {messages}
           {input}
@@ -274,15 +274,15 @@ function ChatBubble({ message, avatar, stream = false }: { message: ChatMessage;
         <div
           className="px-4 py-2.5 rounded-2xl"
           style={{
-            background: isMe ? "#6b21d9" : "#ffffff",
+            background: isMe ? "#6b21d9" : "var(--surface)",
             borderBottomRightRadius: isMe ? 6 : undefined,
             borderBottomLeftRadius: !isMe ? 6 : undefined,
             boxShadow: isMe ? "0 2px 12px rgba(107,33,217,0.28)" : "0 2px 8px rgba(107,33,217,0.06)",
           }}
         >
-          <p style={{ fontSize: 14, color: isMe ? "#fff" : "#160a2e", lineHeight: 1.5, overflowWrap: "anywhere" }}><StreamText text={tMaybe(message.text)} play={stream} /></p>
+          <p style={{ fontSize: 14, color: isMe ? "#fff" : "var(--ink)", lineHeight: 1.5, overflowWrap: "anywhere" }}><StreamText text={tMaybe(message.text)} play={stream} /></p>
         </div>
-        <p className={`mt-1 ${isMe ? "text-right" : "text-left"}`} style={{ fontSize: 10, color: "#695a8c" }}>
+        <p className={`mt-1 ${isMe ? "text-right" : "text-left"}`} style={{ fontSize: 10, color: "var(--ink-2)" }}>
           {timeLabel(message.at)}{isMe && <span style={{ marginLeft: 4, color: "#9b4aff" }}>✓✓</span>}
         </p>
       </div>

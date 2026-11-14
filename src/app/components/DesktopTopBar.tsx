@@ -26,11 +26,11 @@ export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting
   onStartHosting: () => void;
 }) {
   return (
-    <header className="flex-shrink-0" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(14px)", borderBottom: "1px solid rgba(107,33,217,0.08)", fontFamily: "'Figtree Variable', sans-serif", position: "relative", zIndex: 30 }}>
+    <header className="flex-shrink-0" style={{ background: "var(--glass)", backdropFilter: "blur(14px)", borderBottom: "1px solid rgba(107,33,217,0.08)", fontFamily: "'Figtree Variable', sans-serif", position: "relative", zIndex: 30 }}>
       <div className="mx-auto flex items-center gap-8 px-8" style={{ maxWidth: 1240, height: 68 }}>
         <button onClick={() => onNavigate("home")} className="flex items-center gap-2.5" aria-label={t("Bite home")}>
           <img src={logoImg} alt="" style={{ width: 34, height: 34, borderRadius: 10, objectFit: "cover" }} />
-          <span style={{ fontSize: 21, fontWeight: 900, letterSpacing: "-0.04em", color: "#160a2e" }}>Bite</span>
+          <span style={{ fontSize: 21, fontWeight: 900, letterSpacing: "-0.04em", color: "var(--ink)" }}>Bite</span>
         </button>
 
         <nav className="flex items-center gap-1" aria-label={t("Main")}>
@@ -41,12 +41,12 @@ export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting
                 key={id}
                 onClick={() => onNavigate(id)}
                 aria-current={isActive ? "page" : undefined}
-                className="relative flex items-center gap-2 px-3.5 py-2 rounded-xl transition-colors hover:bg-[#f5f0ff]"
+                className="relative flex items-center gap-2 px-3.5 py-2 rounded-xl transition-colors hover:bg-[var(--tint-soft)]"
               >
                 {/* one pill that slides to the active tab (transitions.dev "sliding tabs") */}
-                {isActive && <motion.span layoutId="top-pill" className="absolute inset-0 rounded-xl" style={{ background: "#ede8fb" }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}
+                {isActive && <motion.span layoutId="top-pill" className="absolute inset-0 rounded-xl" style={{ background: "var(--tint)" }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}
                 <Icon size={16} color={isActive ? "#6b21d9" : "#7c6fa0"} strokeWidth={isActive ? 2.4 : 1.9} style={{ position: "relative" }} />
-                <span style={{ position: "relative", fontSize: 14, fontWeight: 700, color: isActive ? "#6b21d9" : "#4b3a6b", transition: "color .25s" }}>{t(label)}</span>
+                <span style={{ position: "relative", fontSize: 14, fontWeight: 700, color: isActive ? "var(--brand-ink)" : "var(--ink-2)", transition: "color .25s" }}>{t(label)}</span>
                 {id === "messages" && unread > 0 && (
                   <motion.span key={unread} initial={{ scale: 0.2 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 520, damping: 14 }} className="relative px-1.5 rounded-full" style={{ background: "#e9345a", fontSize: 11, fontWeight: 800, color: "#fff", lineHeight: "18px", minWidth: 18, textAlign: "center" }}>{unread}</motion.span>
                 )}
@@ -60,17 +60,17 @@ export function DesktopTopBar({ active, unread, name, onNavigate, onStartHosting
           <button
             onClick={onStartHosting}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-transform hover:-translate-y-px"
-            style={{ background: "#160a2e" }}
+            style={{ background: "var(--solid)" }}
           >
             <ChefHat size={15} color="#b87fff" strokeWidth={2.3} />
             <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff", whiteSpace: "nowrap" }}>{t("Start hosting")}</span>
           </button>
           {guest ? (
-            <button onClick={onLogIn} className="px-4 py-2.5 rounded-xl" style={{ background: "#ede8fb", fontSize: 13.5, color: "#6b21d9", fontWeight: 800 }}>{t("Log in")}</button>
+            <button onClick={onLogIn} className="px-4 py-2.5 rounded-xl" style={{ background: "var(--tint)", fontSize: 13.5, color: "var(--brand-ink)", fontWeight: 800 }}>{t("Log in")}</button>
           ) : (
-            <button onClick={() => onNavigate("profile")} className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full" style={{ background: "#ede8fb" }} aria-label={t("Your profile")}>
+            <button onClick={() => onNavigate("profile")} className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full" style={{ background: "var(--tint)" }} aria-label={t("Your profile")}>
               <Avatar size={28} fontSize={11} />
-              <span style={{ fontSize: 13.5, color: "#6b21d9", fontWeight: 700 }}>{name.split(" ")[0]}</span>
+              <span style={{ fontSize: 13.5, color: "var(--brand-ink)", fontWeight: 700 }}>{name.split(" ")[0]}</span>
             </button>
           )}
         </div>

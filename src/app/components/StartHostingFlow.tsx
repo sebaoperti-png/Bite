@@ -188,35 +188,35 @@ function initialAvatar(name: string) {
 /* ── Shared primitives ── */
 
 const purple = "#6b21d9";
-const lightPurple = "#ede8fb";
+const lightPurple = "var(--tint)";
 const inputStyle: React.CSSProperties = {
-  background: "#f5f4f9", border: "1.5px solid rgba(107,33,217,0.13)",
-  borderRadius: 14, padding: "12px 16px", fontSize: 14, color: "#160a2e",
+  background: "var(--page)", border: "1.5px solid rgba(107,33,217,0.13)",
+  borderRadius: 14, padding: "12px 16px", fontSize: 14, color: "var(--ink)",
   width: "100%", outline: "none", fontFamily: "inherit", fontWeight: 500,
 };
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p style={{ fontSize: 11, fontWeight: 700, color: "#695a8c", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>{children}</p>;
+  return <p style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-2)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>{children}</p>;
 }
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: "#fff", borderRadius: 20, padding: "18px 16px", boxShadow: "0 2px 12px rgba(107,33,217,0.07)", ...style }}>
+    <div style={{ background: "var(--surface)", borderRadius: 20, padding: "18px 16px", boxShadow: "0 2px 12px rgba(107,33,217,0.07)", ...style }}>
       {children}
     </div>
   );
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <p style={{ fontSize: 17, fontWeight: 800, color: "#160a2e", marginBottom: 16 }}>{children}</p>;
+  return <p style={{ fontSize: 17, fontWeight: 800, color: "var(--ink)", marginBottom: 16 }}>{children}</p>;
 }
 
 function Toggle({ value, onChange, label, desc }: { value: boolean; onChange: (v: boolean) => void; label: string; desc?: string }) {
   return (
     <div className="flex items-center justify-between gap-3" style={{ padding: "10px 0", borderBottom: "1px solid rgba(107,33,217,0.06)" }}>
       <div>
-        <p style={{ fontSize: 13.5, fontWeight: 600, color: "#160a2e" }}>{t(label)}</p>
-        {desc && <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 1 }}>{t(desc)}</p>}
+        <p style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)" }}>{t(label)}</p>
+        {desc && <p style={{ fontSize: 11.5, color: "var(--ink-2)", marginTop: 1 }}>{t(desc)}</p>}
       </div>
       <motion.button
         onClick={() => onChange(!value)}
@@ -227,7 +227,7 @@ function Toggle({ value, onChange, label, desc }: { value: boolean; onChange: (v
       >
         <motion.div
           className="absolute top-1 rounded-full"
-          style={{ width: 18, height: 18, background: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }}
+          style={{ width: 18, height: 18, background: "var(--surface)", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }}
           animate={{ left: value ? 24 : 4 }}
           transition={{ type: "spring", stiffness: 500, damping: 32 }}
         />
@@ -251,7 +251,7 @@ function ChipGrid({ options, selected, onToggle, color = purple, bg = lightPurpl
             key={id}
             onClick={() => onToggle(id)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-full"
-            style={{ background: active ? color : "#f5f4f9", border: `1.5px solid ${active ? color : "rgba(107,33,217,0.1)"}` }}
+            style={{ background: active ? color : "var(--page)", border: `1.5px solid ${active ? color : "rgba(107,33,217,0.1)"}` }}
             whileTap={{ scale: 0.9 }}
           >
             {Icon && <Icon size={12} color={active ? "#fff" : color} strokeWidth={2} />}
@@ -267,14 +267,14 @@ function Counter({ value, min, max, onChange, label, sublabel }: { value: number
   return (
     <div className="flex items-center justify-between" style={{ padding: "10px 0", borderBottom: "1px solid rgba(107,33,217,0.06)" }}>
       <div>
-        <p style={{ fontSize: 13.5, fontWeight: 600, color: "#160a2e" }}>{t(label)}</p>
-        {sublabel && <p style={{ fontSize: 11.5, color: "#695a8c" }}>{t(sublabel)}</p>}
+        <p style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)" }}>{t(label)}</p>
+        {sublabel && <p style={{ fontSize: 11.5, color: "var(--ink-2)" }}>{t(sublabel)}</p>}
       </div>
       <div className="flex items-center gap-3">
         <motion.button
           onClick={() => onChange(Math.max(min, value - 1))}
           className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: value <= min ? "#f0ecfa" : lightPurple, border: `1.5px solid ${value <= min ? "rgba(107,33,217,0.1)" : purple}` }}
+          style={{ background: value <= min ? "var(--tint)" : lightPurple, border: `1.5px solid ${value <= min ? "rgba(107,33,217,0.1)" : purple}` }}
           whileTap={{ scale: 0.85 }}
         >
           <Minus size={14} color={value <= min ? "#c4b8de" : purple} strokeWidth={2.5} />
@@ -283,12 +283,12 @@ function Counter({ value, min, max, onChange, label, sublabel }: { value: number
           key={value}
           initial={{ scale: 1.3, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          style={{ fontSize: 17, fontWeight: 800, color: "#160a2e", minWidth: 28, textAlign: "center" }}
+          style={{ fontSize: 17, fontWeight: 800, color: "var(--ink)", minWidth: 28, textAlign: "center" }}
         >{value}</motion.span>
         <motion.button
           onClick={() => onChange(Math.min(max, value + 1))}
           className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: value >= max ? "#f0ecfa" : purple, border: `1.5px solid ${value >= max ? "rgba(107,33,217,0.1)" : purple}` }}
+          style={{ background: value >= max ? "var(--tint)" : purple, border: `1.5px solid ${value >= max ? "rgba(107,33,217,0.1)" : purple}` }}
           whileTap={{ scale: 0.85 }}
         >
           <Plus size={14} color={value >= max ? "#c4b8de" : "#fff"} strokeWidth={2.5} />
@@ -371,12 +371,12 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
           onClick={() => write(tone ? TONES[(TONES.findIndex((x) => x.id === tone) + 1) % TONES.length].id : "cosy")}
           disabled={!canWrite || writing}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-          style={{ background: canWrite ? "linear-gradient(135deg, #6b21d9, #9b4aff)" : "#ede8fb", marginBottom: 6 }}
+          style={{ background: canWrite ? "linear-gradient(135deg, #6b21d9, #9b4aff)" : "var(--tint)", marginBottom: 6 }}
           whileTap={{ scale: 0.94 }}
           title={canWrite ? t("Draft a description from your title, dish and cuisine") : t("Add a title, meal name or cuisine first")}
         >
           {writing ? <ThinkingOrb state="composing" size={20} theme="dark" aria-label={t("Writing…")} /> : <Sparkles size={13} color={canWrite ? "#fff" : "#a99cc8"} strokeWidth={2.4} />}
-          <span style={{ fontSize: 12, fontWeight: 800, color: canWrite ? "#fff" : "#a99cc8" }}>{writing ? t("Writing…") : tone ? t("Try another") : t("Write it for me")}</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: canWrite ? "#fff" : "var(--ink-3)" }}>{writing ? t("Writing…") : tone ? t("Try another") : t("Write it for me")}</span>
         </motion.button>
       </div>
       {tone && (
@@ -416,7 +416,7 @@ function DescriptionField({ form, set }: { form: FormData; set: (k: keyof FormDa
         </div>
       )}
       <p style={{ fontSize: 11, color: "#c4b8de", textAlign: "right", marginTop: 4 }}>
-        {tone && !writing && <span style={{ float: "left", color: "#695a8c" }}>{t("Drafted by the Bite assistant — edit it as you like")}</span>}
+        {tone && !writing && <span style={{ float: "left", color: "var(--ink-2)" }}>{t("Drafted by the Bite assistant — edit it as you like")}</span>}
         {form.description.length}/400
       </p>
     </>
@@ -428,12 +428,12 @@ function HostRating() {
   const { live } = useStore();
   const { host, hostAvg } = useMyReviews(live);
   if (live && !host) return null;
-  if (live && host!.length === 0) return <span style={{ fontSize: 12, fontWeight: 700, color: "#695a8c" }}>{t("No reviews yet")}</span>;
+  if (live && host!.length === 0) return <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-2)" }}>{t("No reviews yet")}</span>;
   return (
     <span className="flex items-center gap-1">
       <Star size={12} fill="#f59e0b" color="#f59e0b" />
-      <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e" }}>{dec(live ? hostAvg : 4.9)}</span>
-      {live && <span style={{ fontSize: 11.5, color: "#695a8c" }}>({host!.length})</span>}
+      <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>{dec(live ? hostAvg : 4.9)}</span>
+      {live && <span style={{ fontSize: 11.5, color: "var(--ink-2)" }}>({host!.length})</span>}
     </span>
   );
 }
@@ -458,10 +458,10 @@ function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           {picker.input}
           <div>
             <div className="flex items-center gap-1.5">
-              <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{profile.name}</p>
+              <p style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)" }}>{profile.name}</p>
               {!live && <BadgeCheck size={14} color="#0a7c4e" strokeWidth={2} />}
             </div>
-            <p style={{ fontSize: 12, color: "#695a8c" }}>{live ? localPlace(profile.neighbourhood) : t("{place} · Verified host", { place: localPlace(profile.neighbourhood) })}</p>
+            <p style={{ fontSize: 12, color: "var(--ink-2)" }}>{live ? localPlace(profile.neighbourhood) : t("{place} · Verified host", { place: localPlace(profile.neighbourhood) })}</p>
           </div>
           <div className="ml-auto"><HostRating /></div>
         </div>
@@ -477,9 +477,9 @@ function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           ] as const).map(({ id, label, Icon }) => {
             const on = form.serviceType === id;
             return (
-              <motion.button key={id} onClick={() => set("serviceType", id)} aria-pressed={on} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl" style={{ background: on ? lightPurple : "#f5f4f9", border: `1.5px solid ${on ? purple : "rgba(107,33,217,0.1)"}` }} whileTap={{ scale: 0.95 }}>
+              <motion.button key={id} onClick={() => set("serviceType", id)} aria-pressed={on} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl" style={{ background: on ? lightPurple : "var(--page)", border: `1.5px solid ${on ? purple : "rgba(107,33,217,0.1)"}` }} whileTap={{ scale: 0.95 }}>
                 <Icon size={18} color={on ? purple : "#7c6fa0"} />
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: on ? purple : "#4a3a6e" }}>{t(label)}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: on ? purple : "var(--ink-2)" }}>{t(label)}</span>
               </motion.button>
             );
           })}
@@ -516,7 +516,7 @@ function Step1({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                     key={c}
                     onClick={() => set("cuisineType", active ? "" : c)}
                     className="px-3 py-1.5 rounded-full"
-                    style={{ background: active ? purple : "#f5f4f9", border: `1.5px solid ${active ? purple : "rgba(107,33,217,0.1)"}` }}
+                    style={{ background: active ? purple : "var(--page)", border: `1.5px solid ${active ? purple : "rgba(107,33,217,0.1)"}` }}
                     whileTap={{ scale: 0.9 }}
                   >
                     <span style={{ fontSize: 12, fontWeight: 700, color: active ? "#fff" : purple }}>{t(c)}</span>
@@ -660,16 +660,16 @@ function Step3({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
               key={id}
               onClick={() => set("genderPreference", id)}
               className="flex items-center gap-3 px-4 py-3 rounded-2xl"
-              style={{ background: form.genderPreference === id ? lightPurple : "#f5f4f9", border: `1.5px solid ${form.genderPreference === id ? purple : "transparent"}` }}
+              style={{ background: form.genderPreference === id ? lightPurple : "var(--page)", border: `1.5px solid ${form.genderPreference === id ? purple : "transparent"}` }}
               whileTap={{ scale: 0.97 }}
             >
               <motion.div
                 className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0"
-                animate={{ borderColor: form.genderPreference === id ? purple : "#c4b8de", background: form.genderPreference === id ? purple : "#fff" }}
+                animate={{ borderColor: form.genderPreference === id ? purple : "#c4b8de", background: form.genderPreference === id ? purple : "var(--surface)" }}
               >
-                {form.genderPreference === id && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff" }} />}
+                {form.genderPreference === id && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--surface)" }} />}
               </motion.div>
-              <span style={{ fontSize: 13.5, fontWeight: 600, color: "#160a2e" }}>{t(label)}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)" }}>{t(label)}</span>
             </motion.button>
           ))}
         </div>
@@ -686,12 +686,12 @@ function Step3({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
               key={String(id)}
               onClick={() => set("privateEvent", id)}
               className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-              style={{ background: form.privateEvent === id ? lightPurple : "#fff", border: `1.5px solid ${form.privateEvent === id ? purple : "rgba(107,33,217,0.1)"}`, boxShadow: "0 2px 8px rgba(107,33,217,0.06)" }}
+              style={{ background: form.privateEvent === id ? lightPurple : "var(--surface)", border: `1.5px solid ${form.privateEvent === id ? purple : "rgba(107,33,217,0.1)"}`, boxShadow: "0 2px 8px rgba(107,33,217,0.06)" }}
               whileTap={{ scale: 0.95 }}
             >
               <Icon size={22} color={form.privateEvent === id ? purple : "#7c6fa0"} strokeWidth={1.8} />
-              <p style={{ fontSize: 13, fontWeight: 700, color: form.privateEvent === id ? purple : "#160a2e" }}>{t(label)}</p>
-              <p style={{ fontSize: 11, color: "#695a8c", textAlign: "center", lineHeight: 1.4 }}>{t(desc)}</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: form.privateEvent === id ? purple : "var(--ink)" }}>{t(label)}</p>
+              <p style={{ fontSize: 11, color: "var(--ink-2)", textAlign: "center", lineHeight: 1.4 }}>{t(desc)}</p>
             </motion.button>
           ))}
         </div>
@@ -788,7 +788,7 @@ function Step4({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       </Card>
 
       <div>
-        <p style={{ fontSize: 13, fontWeight: 700, color: "#160a2e", marginBottom: 10 }}>{t("Venue type")}</p>
+        <p style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 10 }}>{t("Venue type")}</p>
         <div className="flex gap-3">
           {([
             { id: "indoor", Icon: Home, label: "Indoor" },
@@ -799,11 +799,11 @@ function Step4({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
               key={id}
               onClick={() => set("venue", id)}
               className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-              style={{ background: form.venue === id ? lightPurple : "#fff", border: `1.5px solid ${form.venue === id ? purple : "rgba(107,33,217,0.1)"}`, boxShadow: "0 2px 8px rgba(107,33,217,0.06)" }}
+              style={{ background: form.venue === id ? lightPurple : "var(--surface)", border: `1.5px solid ${form.venue === id ? purple : "rgba(107,33,217,0.1)"}`, boxShadow: "0 2px 8px rgba(107,33,217,0.06)" }}
               whileTap={{ scale: 0.95 }}
             >
               <Icon size={20} color={form.venue === id ? purple : "#7c6fa0"} strokeWidth={1.8} />
-              <p style={{ fontSize: 12.5, fontWeight: 700, color: form.venue === id ? purple : "#4a3a6e" }}>{t(label)}</p>
+              <p style={{ fontSize: 12.5, fontWeight: 700, color: form.venue === id ? purple : "var(--ink-2)" }}>{t(label)}</p>
             </motion.button>
           ))}
         </div>
@@ -901,7 +901,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       <motion.button onClick={() => onChange(Math.max(min, value - 1))} disabled={value <= min} aria-label={t("Less")} className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: lightPurple, opacity: value <= min ? 0.4 : 1 }} whileTap={{ scale: 0.85 }}>
         <Minus size={16} color={purple} strokeWidth={2.5} />
       </motion.button>
-      <motion.span key={value} initial={{ scale: 1.15, opacity: 0.6 }} animate={{ scale: 1, opacity: 1 }} style={{ fontSize: big ? 40 : 30, fontWeight: 900, color: "#160a2e", minWidth: 80, textAlign: "center" }}>
+      <motion.span key={value} initial={{ scale: 1.15, opacity: 0.6 }} animate={{ scale: 1, opacity: 1 }} style={{ fontSize: big ? 40 : 30, fontWeight: 900, color: "var(--ink)", minWidth: 80, textAlign: "center" }}>
         {euro(value)}
       </motion.span>
       <motion.button onClick={() => onChange(Math.min(max, value + 1))} disabled={value >= max} aria-label={t("More")} className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: purple, opacity: value >= max ? 0.4 : 1 }} whileTap={{ scale: 0.85 }}>
@@ -916,12 +916,12 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       <motion.button
         onClick={() => (id === "estimate" ? void startEstimate() : id === "declared" ? (setReadError(""), startList()) : (set("aiLines", null), form.receiptRead != null ? applyCost(form.receiptRead, "receipt") : fileRef.current?.click()))}
         className="flex-1 text-left p-4 rounded-2xl"
-        style={{ background: on ? lightPurple : "#fff", border: `2px solid ${on ? purple : "rgba(107,33,217,0.12)"}` }}
+        style={{ background: on ? lightPurple : "var(--surface)", border: `2px solid ${on ? purple : "rgba(107,33,217,0.12)"}` }}
         whileTap={{ scale: 0.97 }}
       >
-        <span className="flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 12, background: on ? "#fff" : lightPurple, color: purple }}><Icon size={20} strokeWidth={2} /></span>
-        <p style={{ fontSize: 14.5, fontWeight: 800, color: "#160a2e", marginTop: 6 }}>{t(title)}</p>
-        <p style={{ fontSize: 12, color: "#695a8c", marginTop: 2, lineHeight: 1.4 }}>{t(sub)}</p>
+        <span className="flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 12, background: on ? "var(--surface)" : lightPurple, color: purple }}><Icon size={20} strokeWidth={2} /></span>
+        <p style={{ fontSize: 14.5, fontWeight: 800, color: "var(--ink)", marginTop: 6 }}>{t(title)}</p>
+        <p style={{ fontSize: 12, color: "var(--ink-2)", marginTop: 2, lineHeight: 1.4 }}>{t(sub)}</p>
         {id === "receipt" && <span className="hf-pref">{t("Preferred")}</span>}
       </motion.button>
     );
@@ -930,7 +930,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   return (
     <div className="flex flex-col gap-4">
       <SectionTitle>{t("Split the cost")}</SectionTitle>
-      <p style={{ fontSize: 13.5, color: "#4a3a6e", lineHeight: 1.55, marginTop: -6 }}>{t("On Bite you don't sell food — you share it. Guests chip in for the real cost of the ingredients, like BlaBlaCar for dinner.")}</p>
+      <p style={{ fontSize: 13.5, color: "var(--ink-2)", lineHeight: 1.55, marginTop: -6 }}>{t("On Bite you don't sell food — you share it. Guests chip in for the real cost of the ingredients, like BlaBlaCar for dinner.")}</p>
 
       <Card>
         <Toggle value={form.freeEvent} onChange={v => set("freeEvent", v)}
@@ -960,7 +960,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center" style={{ width: 74, height: 96, borderRadius: 10, background: "#f5f4f9", border: `2px dashed ${purple}`, flexShrink: 0, color: purple }}><Receipt size={28} strokeWidth={1.8} /></div>
+                  <div className="flex items-center justify-center" style={{ width: 74, height: 96, borderRadius: 10, background: "var(--page)", border: `2px dashed ${purple}`, flexShrink: 0, color: purple }}><Receipt size={28} strokeWidth={1.8} /></div>
                 )}
                 <div className="flex-1 min-w-0">
                   {reading !== null ? (
@@ -969,39 +969,39 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                       <div style={{ height: 6, background: lightPurple, borderRadius: 6, marginTop: 10, overflow: "hidden" }}>
                         <motion.div style={{ height: "100%", background: `linear-gradient(90deg, ${purple}, #9b4aff)` }} animate={{ width: `${Math.max(8, reading * 100)}%` }} />
                       </div>
-                      <p style={{ fontSize: 12, color: "#695a8c", marginTop: 6 }}>{t("Looking for “SUMME” on the Kassenbon")}</p>
+                      <p style={{ fontSize: 12, color: "var(--ink-2)", marginTop: 6 }}>{t("Looking for “SUMME” on the Kassenbon")}</p>
                     </>
                   ) : (
                     <>
                       {form.receiptPreview && !readError && form.costSource === "receipt" && form.groceryCost > 0 && (
-                        <p style={{ fontSize: 13.5, color: "#0a7c4e", fontWeight: 800 }}>{t("✓ Found {price} on your receipt", { price: euro(form.groceryCost) })}</p>
+                        <p style={{ fontSize: 13.5, color: "var(--ok-ink)", fontWeight: 800 }}>{t("✓ Found {price} on your receipt", { price: euro(form.groceryCost) })}</p>
                       )}
                       {form.costSource === "receipt" && form.receiptUnsure && !readError && (
                         <div style={{ marginTop: 4 }}>
-                          <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700 }}>{t("Please check it: the photo was hard to read.")}</p>
+                          <p style={{ fontSize: 12.5, color: "var(--warn-ink)", fontWeight: 700 }}>{t("Please check it: the photo was hard to read.")}</p>
                           <div className="flex gap-2 flex-wrap mt-1.5">
                             <button onClick={() => set("receiptUnsure", false)} className="px-3 py-1.5 rounded-full" style={{ fontSize: 12.5, fontWeight: 800, color: "#fff", background: purple }}>{t("That's right")}</button>
                             <button onClick={startList} className="px-3 py-1.5 rounded-full" style={{ fontSize: 12.5, fontWeight: 800, color: purple, background: lightPurple }}>{t("Not right? List it")}</button>
                           </div>
                         </div>
                       )}
-                      {readError && <p style={{ fontSize: 13, color: "#c05e00", fontWeight: 700 }}>{readError}</p>}
+                      {readError && <p style={{ fontSize: 13, color: "var(--warn-ink)", fontWeight: 700 }}>{readError}</p>}
                       <div className="flex gap-3 mt-3 flex-wrap">
                         <button onClick={() => fileRef.current?.click()} style={{ fontSize: 12.5, fontWeight: 800, color: purple }}>{form.receiptPreview ? t("Scan another") : t("Take a photo")}</button>
-                        {!store.live && <button onClick={() => scan("app/sample-receipt.jpg")} style={{ fontSize: 12.5, fontWeight: 700, color: "#695a8c" }}>{t("Try a sample receipt")}</button>}
+                        {!store.live && <button onClick={() => scan("app/sample-receipt.jpg")} style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink-2)" }}>{t("Try a sample receipt")}</button>}
                       </div>
                     </>
                   )}
                 </div>
               </div>
-              <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 12, lineHeight: 1.5 }}>{t("Only the total is shared with guests. The photo stays on your device.")}</p>
+              <p style={{ fontSize: 11.5, color: "var(--ink-2)", marginTop: 12, lineHeight: 1.5 }}>{t("Only the total is shared with guests. The photo stays on your device.")}</p>
             </Card>
           )}
 
           {form.costSource === "declared" && (
             <Card>
               <Label>{t("What you bought")}</Label>
-              <p style={{ fontSize: 12, color: "#695a8c", marginTop: -4, marginBottom: 10, lineHeight: 1.5 }}>{t("Each item with what it cost. Guests see this list, so the price is fair and clear.")}</p>
+              <p style={{ fontSize: 12, color: "var(--ink-2)", marginTop: -4, marginBottom: 10, lineHeight: 1.5 }}>{t("Each item with what it cost. Guests see this list, so the price is fair and clear.")}</p>
               <div className="hf-list">
                 {lines.map((l, i) => (
                   <div key={i} className="hf-list-row">
@@ -1016,11 +1016,11 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
               </div>
               {lines.length < 40 && <button type="button" onClick={() => setLines([...lines, { item: "", price: null }])} className="hf-list-add"><Plus size={14} /> {t("Add an item")}</button>}
               <div className="hf-list-total"><span>{t("Total")}</span><b>{euro(linesTotal(lines))}</b></div>
-              {listProblem(lines) && <p style={{ fontSize: 12, color: "#c05e00", fontWeight: 700, marginTop: 6 }}>{listProblem(lines)}</p>}
+              {listProblem(lines) && <p style={{ fontSize: 12, color: "var(--warn-ink)", fontWeight: 700, marginTop: 6 }}>{listProblem(lines)}</p>}
               {form.groceryCost > 0 && looksTooHigh(form.groceryCost, estimate.total) && (
-                <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700, marginTop: 6 }}>{t("That's much more than this menu usually costs ({price}). Only include the shopping for this dinner.", { price: euro(estimate.total) })}</p>
+                <p style={{ fontSize: 12.5, color: "var(--warn-ink)", fontWeight: 700, marginTop: 6 }}>{t("That's much more than this menu usually costs ({price}). Only include the shopping for this dinner.", { price: euro(estimate.total) })}</p>
               )}
-              <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 8, lineHeight: 1.5 }}>{t("Guests will see it as stated by you. Have the receipt? Scanning it is quicker and shows it's real.")}</p>
+              <p style={{ fontSize: 11.5, color: "var(--ink-2)", marginTop: 8, lineHeight: 1.5 }}>{t("Guests will see it as stated by you. Have the receipt? Scanning it is quicker and shows it's real.")}</p>
             </Card>
           )}
 
@@ -1033,37 +1033,37 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                   <p className="hf-shimmer" style={{ fontSize: 13.5, fontWeight: 800 }}>{t("Pricing your ingredients at the supermarket…")}</p>
                 </div>
               )}
-              {aiNote && !aiBusy && <p style={{ fontSize: 12, color: "#695a8c", marginBottom: 8, lineHeight: 1.5 }}>{aiNote}</p>}
+              {aiNote && !aiBusy && <p style={{ fontSize: 12, color: "var(--ink-2)", marginBottom: 8, lineHeight: 1.5 }}>{aiNote}</p>}
               {!aiBusy && form.aiLines?.length ? (
                 <div className="flex flex-col gap-1.5">
                   {form.aiLines.map((l, i) => (
-                    <div key={i} className="flex justify-between gap-3" style={{ fontSize: 13, color: "#4a3a6e" }}>
-                      <span>{l.item}{l.amount ? <span style={{ color: "#a99cc8" }}> · {l.amount}</span> : null}</span><b style={{ whiteSpace: "nowrap" }}>{euro(l.price)}</b>
+                    <div key={i} className="flex justify-between gap-3" style={{ fontSize: 13, color: "var(--ink-2)" }}>
+                      <span>{l.item}{l.amount ? <span style={{ color: "var(--ink-3)" }}> · {l.amount}</span> : null}</span><b style={{ whiteSpace: "nowrap" }}>{euro(l.price)}</b>
                     </div>
                   ))}
-                  <div className="flex justify-between pt-2 mt-1" style={{ borderTop: "1px dashed rgba(107,33,217,0.2)", fontSize: 14.5, fontWeight: 900, color: "#160a2e" }}>
+                  <div className="flex justify-between pt-2 mt-1" style={{ borderTop: "1px dashed rgba(107,33,217,0.2)", fontSize: 14.5, fontWeight: 900, color: "var(--ink)" }}>
                     <span>{t("Estimated groceries")}</span><span>{euro(form.groceryCost)}</span>
                   </div>
                 </div>
               ) : !aiBusy && (
               <div className="flex flex-col gap-1.5">
                 {estimate.lines.map(l => (
-                  <div key={l.label} className="flex justify-between" style={{ fontSize: 13, color: "#4a3a6e" }}>
+                  <div key={l.label} className="flex justify-between" style={{ fontSize: 13, color: "var(--ink-2)" }}>
                     <span>{l.label} · {euro(l.perPortion)} × {n}</span><b>{euro(l.amount)}</b>
                   </div>
                 ))}
-                <div className="flex justify-between pt-2 mt-1" style={{ borderTop: "1px dashed rgba(107,33,217,0.2)", fontSize: 14.5, fontWeight: 900, color: "#160a2e" }}>
+                <div className="flex justify-between pt-2 mt-1" style={{ borderTop: "1px dashed rgba(107,33,217,0.2)", fontSize: 14.5, fontWeight: 900, color: "var(--ink)" }}>
                   <span>{t("Estimated groceries")}</span><span>€{estimate.total}</span>
                 </div>
               </div>
               )}
-              <p style={{ fontSize: 11.5, color: "#695a8c", marginTop: 10, lineHeight: 1.5 }}>{form.aiLines?.length ? t("Estimated by AI from your ingredient list and typical German supermarket prices, so it can be off. Got the receipt? Scan it for the exact amount.") : t("Based on typical German supermarket prices. Got the receipt? Scan it for the exact amount.")}</p>
+              <p style={{ fontSize: 11.5, color: "var(--ink-2)", marginTop: 10, lineHeight: 1.5 }}>{form.aiLines?.length ? t("Estimated by AI from your ingredient list and typical German supermarket prices, so it can be off. Got the receipt? Scan it for the exact amount.") : t("Based on typical German supermarket prices. Got the receipt? Scan it for the exact amount.")}</p>
             </Card>
           )}
 
           {form.costSource && form.groceryCost > 0 && cap < 1 && (
             <Card>
-              <p style={{ fontSize: 13.5, color: "#c05e00", fontWeight: 700, lineHeight: 1.5 }}>{t("{price} is too little to split between {n} people without someone paying more than their share. Make it free, or check the total.", { price: euro(form.groceryCost), n })}</p>
+              <p style={{ fontSize: 13.5, color: "var(--warn-ink)", fontWeight: 700, lineHeight: 1.5 }}>{t("{price} is too little to split between {n} people without someone paying more than their share. Make it free, or check the total.", { price: euro(form.groceryCost), n })}</p>
               <button onClick={() => set("freeEvent", true)} style={{ marginTop: 10, fontSize: 13, fontWeight: 800, color: purple }}>{t("Make it free")}</button>
             </Card>
           )}
@@ -1074,10 +1074,10 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                 <Label>{t("Contribution per guest")}</Label>
                 <Stepper value={Math.min(Math.max(1, form.pricePerGuest), cap)} onChange={v => set("pricePerGuest", v)} min={1} max={cap} big />
                 <div className="flex gap-2 mt-3 flex-wrap">
-                  <span className="px-2.5 py-1 rounded-full" style={{ background: "#e5f7f0", fontSize: 12, fontWeight: 800, color: "#0a7c4e" }}>{t("Fair share {price}", { price: euro(share) })}</span>
-                  <span className="px-2.5 py-1 rounded-full" style={{ background: "#fff0f3", fontSize: 12, fontWeight: 800, color: "#e9345a" }}>{t("Price cap {price}", { price: euro(cap) })}</span>
+                  <span className="px-2.5 py-1 rounded-full" style={{ background: "var(--ok-bg)", fontSize: 12, fontWeight: 800, color: "var(--ok-ink)" }}>{t("Fair share {price}", { price: euro(share) })}</span>
+                  <span className="px-2.5 py-1 rounded-full" style={{ background: "var(--bad-bg)", fontSize: 12, fontWeight: 800, color: "#e9345a" }}>{t("Price cap {price}", { price: euro(cap) })}</span>
                 </div>
-                <p style={{ fontSize: 12, color: "#695a8c", marginTop: 8, lineHeight: 1.5 }}>{form.costSource === "estimate" ? t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +15% (it's an estimate), rounded to whole euros, and the guests together never pay more than the groceries.") : t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +5%, rounded to whole euros, and the guests together never pay more than the groceries.")}</p>
+                <p style={{ fontSize: 12, color: "var(--ink-2)", marginTop: 8, lineHeight: 1.5 }}>{form.costSource === "estimate" ? t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +15% (it's an estimate), rounded to whole euros, and the guests together never pay more than the groceries.") : t("Like BlaBlaCar, Bite caps the price so nobody makes a profit: the cost per person +5%, rounded to whole euros, and the guests together never pay more than the groceries.")}</p>
               </Card>
 
               <div style={{ background: "linear-gradient(135deg, #6b21d9, #9b4aff)", borderRadius: 20, padding: "18px 16px" }}>
@@ -1109,7 +1109,7 @@ function Step6({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
   return (
     <div className="flex flex-col gap-4">
       <SectionTitle>{t("House rules")}</SectionTitle>
-      <p style={{ fontSize: 13, color: "#695a8c", marginTop: -8 }}>{t("Let guests know what to expect in your home")}</p>
+      <p style={{ fontSize: 13, color: "var(--ink-2)", marginTop: -8 }}>{t("Let guests know what to expect in your home")}</p>
 
       <Card>
         <Toggle value={form.smokingAllowed} onChange={v => set("smokingAllowed", v)}
@@ -1125,16 +1125,16 @@ function Step6({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
       {/* Visual rule icons */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { Icon: Cigarette, label: "Smoking", active: form.smokingAllowed, color: "#695a8c" },
+          { Icon: Cigarette, label: "Smoking", active: form.smokingAllowed, color: "var(--ink-2)" },
           { Icon: Wine, label: "Alcohol", active: form.alcoholAllowed, color: "#7c3fa0" },
-          { Icon: PawPrint, label: "Pets", active: form.petsPresent, color: "#c05e00" },
+          { Icon: PawPrint, label: "Pets", active: form.petsPresent, color: "var(--warn-ink)" },
           { Icon: Footprints, label: "Shoes off", active: form.shoesOff, color: "#0a5fa0" },
         ].map(({ Icon, label, active, color }) => (
           <div key={label} className="flex flex-col items-center py-3 rounded-2xl gap-1.5"
-            style={{ background: active ? lightPurple : "#f5f4f9" }}>
+            style={{ background: active ? lightPurple : "var(--page)" }}>
             <Icon size={18} color={active ? purple : "#c4b8de"} strokeWidth={1.8} />
             <span style={{ fontSize: 10, fontWeight: 700, color: active ? purple : "#c4b8de", textAlign: "center", lineHeight: 1.3 }}>{t(label)}</span>
-            <span style={{ fontSize: 9, fontWeight: 600, color: active ? "#0a7c4e" : "#e9345a" }}>{active ? t("✓ Yes") : "✗ No"}</span>
+            <span style={{ fontSize: 9, fontWeight: 600, color: active ? "var(--ok-ink)" : "#e9345a" }}>{active ? t("✓ Yes") : "✗ No"}</span>
           </div>
         ))}
       </div>
@@ -1246,7 +1246,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           {photos[coverIdx] ? (
             <img src={photos[coverIdx]} alt={t("cover")} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-2" style={{ background: "#f0ecfa", border: `2px dashed ${purple}` }}>
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2" style={{ background: "var(--tint)", border: `2px dashed ${purple}` }}>
               <ImageIcon size={28} color={purple} strokeWidth={1.5} />
               <p style={{ fontSize: 13, color: purple, fontWeight: 600 }}>{t("No cover photo yet")}</p>
             </div>
@@ -1265,7 +1265,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         onClick={() => fileRef.current?.click()}
         onKeyDown={e => { if (e.key === "Enter" || e.key === " ") fileRef.current?.click(); }}
         className="flex flex-col items-center justify-center gap-3 rounded-2xl py-8 cursor-pointer"
-        style={{ background: dragging ? lightPurple : "#f5f4f9", border: `2px dashed ${dragging ? purple : "rgba(107,33,217,0.2)"}` }}
+        style={{ background: dragging ? lightPurple : "var(--page)", border: `2px dashed ${dragging ? purple : "rgba(107,33,217,0.2)"}` }}
         animate={{ scale: dragging ? 1.02 : 1 }}
         onDragOver={e => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
@@ -1275,8 +1275,8 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
           <Camera size={20} color={purple} strokeWidth={1.8} />
         </div>
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontSize: 13.5, fontWeight: 700, color: "#160a2e" }}>{uploading ? t("Adding photos…") : t("Drag & drop photos here")}</p>
-          <p style={{ fontSize: 12, color: "#695a8c", marginTop: 2 }}>{t("or click to upload from your device")}</p>
+          <p style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)" }}>{uploading ? t("Adding photos…") : t("Drag & drop photos here")}</p>
+          <p style={{ fontSize: 12, color: "var(--ink-2)", marginTop: 2 }}>{t("or click to upload from your device")}</p>
         </div>
         <div className="flex gap-2">
           <span style={{ fontSize: 11, color: "#c4b8de" }}>{t("JPG · PNG · WEBP · Max 10MB")}</span>
@@ -1324,7 +1324,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         <div>
           <div className="flex items-center justify-between mb-2">
             <Label>{t("Your gallery (")}{photos.length})</Label>
-            <span style={{ fontSize: 11, color: "#695a8c" }}>{t("Tap star to set cover")}</span>
+            <span style={{ fontSize: 11, color: "var(--ink-2)" }}>{t("Tap star to set cover")}</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {photos.map((url, i) => (
@@ -1345,7 +1345,7 @@ function Step7({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
                 <div style={{ position: "absolute", top: 4, right: 4, display: "flex", gap: 3 }}>
                   <motion.button
                     onClick={() => setCoverIdx(i)}
-                    style={{ width: 22, height: 22, background: "rgba(255,255,255,0.9)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    style={{ width: 22, height: 22, background: "var(--glass)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}
                     whileTap={{ scale: 0.8 }}
                   >
                     <Star size={11} fill={i === coverIdx ? "#f59e0b" : "none"} color={i === coverIdx ? "#f59e0b" : "#7c6fa0"} strokeWidth={2} />
@@ -1394,8 +1394,8 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
 
   const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
     <div className="flex items-center justify-between py-2.5" style={{ borderBottom: "1px solid rgba(107,33,217,0.06)" }}>
-      <span style={{ fontSize: 12.5, color: "#695a8c" }}>{t(label)}</span>
-      <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e", textAlign: "right", maxWidth: "60%" }}>{value}</span>
+      <span style={{ fontSize: 12.5, color: "var(--ink-2)" }}>{t(label)}</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", textAlign: "right", maxWidth: "60%" }}>{value}</span>
     </div>
   );
 
@@ -1410,11 +1410,11 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
           alt={t("cover")}
           style={{ width: "100%", height: 130, objectFit: "cover" }}
         />
-        <div style={{ background: "#fff", padding: "16px" }}>
+        <div style={{ background: "var(--surface)", padding: "16px" }}>
           <div className="flex items-start justify-between gap-2">
             <div>
-              <p style={{ fontSize: 16, fontWeight: 800, color: "#160a2e" }}>{form.eventTitle || t("Your Event")}</p>
-              <p style={{ fontSize: 13, color: "#695a8c", marginTop: 2 }}>{form.mealName || t("Your meal")} · {form.cuisineType ? t(form.cuisineType) : t("Cuisine TBD")}</p>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)" }}>{form.eventTitle || t("Your Event")}</p>
+              <p style={{ fontSize: 13, color: "var(--ink-2)", marginTop: 2 }}>{form.mealName || t("Your meal")} · {form.cuisineType ? t(form.cuisineType) : t("Cuisine TBD")}</p>
             </div>
             <div style={{ background: purple, borderRadius: 10, padding: "4px 10px", flexShrink: 0 }}>
               <span style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{euro(form.freeEvent ? 0 : form.pricePerGuest)}</span>
@@ -1423,11 +1423,11 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
           <div className="flex items-center gap-3 mt-3">
             <div className="flex items-center gap-1">
               <MapPin size={11} color="#7c6fa0" strokeWidth={2} />
-              <span style={{ fontSize: 11, color: "#695a8c" }}>{form.city || t("City")}</span>
+              <span style={{ fontSize: 11, color: "var(--ink-2)" }}>{form.city || t("City")}</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock size={11} color="#7c6fa0" strokeWidth={2} />
-              <span style={{ fontSize: 11, color: "#695a8c" }}>{form.date ? dateLabel(labelForISO(form.date)) : t("Date TBD")} · {form.startTime}</span>
+              <span style={{ fontSize: 11, color: "var(--ink-2)" }}>{form.date ? dateLabel(labelForISO(form.date)) : t("Date TBD")} · {form.startTime}</span>
             </div>
           </div>
         </div>
@@ -1435,15 +1435,15 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
 
       {/* Host profile summary */}
       <Card>
-        <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", marginBottom: 12 }}>{t("Your hosting profile")}</p>
+        <p style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", marginBottom: 12 }}>{t("Your hosting profile")}</p>
         <div className="flex items-center gap-3">
           <Avatar size={44} fontSize={18} />
           <div className="flex-1">
             <div className="flex items-center gap-1.5">
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#160a2e" }}>{profile.name}</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{profile.name}</span>
               {!live && <BadgeCheck size={13} color="#0a7c4e" strokeWidth={2} />}
             </div>
-            <span style={{ fontSize: 11.5, color: "#695a8c" }}>{live ? localPlace(profile.neighbourhood) : t("Verified · {place}", { place: localPlace(profile.neighbourhood) })}</span>
+            <span style={{ fontSize: 11.5, color: "var(--ink-2)" }}>{live ? localPlace(profile.neighbourhood) : t("Verified · {place}", { place: localPlace(profile.neighbourhood) })}</span>
           </div>
           <HostRating />
         </div>
@@ -1451,7 +1451,7 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
 
       {/* Details summary */}
       <Card>
-        <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", marginBottom: 4 }}>{t("Event details")}</p>
+        <p style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", marginBottom: 4 }}>{t("Event details")}</p>
         <Row label={t("Guests")} value={t("{min}–{max} people", { min: form.minGuests, max: form.maxGuests })} />
         <Row label={t("Location")} value={`${form.address ? form.address + ", " : ""}${form.city}`} />
         <Row label={t("Schedule")} value={`${form.startTime} – ${form.endTime}`} />
@@ -1462,7 +1462,7 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
       {/* Pricing summary */}
       {!form.freeEvent && (
         <Card>
-          <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", marginBottom: 4 }}>{t("Cost sharing")}</p>
+          <p style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", marginBottom: 4 }}>{t("Cost sharing")}</p>
           <Row label={t("Groceries")} value={`${euro(form.groceryCost)} · ${proofKind(form) === "receipt" ? t("receipt") : proofKind(form) === "declared" ? t("stated by you") : t("estimate")}`} />
           <Row label={t("Contribution per guest")} value={euro(form.pricePerGuest)} />
           <Row label={t("Price cap per guest")} value={form.costSource ? euro(priceCap(form.groceryCost, form.maxGuests + 1, form.costSource)) : "—"} />
@@ -1474,13 +1474,13 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
       <div className="px-1 pb-1">
         <div className="flex items-center gap-2 mb-3">
           <ShieldCheck size={14} color="#0a7c4e" strokeWidth={2} />
-          <p style={{ fontSize: 12, fontWeight: 700, color: "#0a7c4e" }}>{store.live ? t("Bite's safety basics for your table") : t("Your listing is protected by Bite's Host Guarantee")}</p>
+          <p style={{ fontSize: 12, fontWeight: 700, color: "var(--ok-ink)" }}>{store.live ? t("Bite's safety basics for your table") : t("Your listing is protected by Bite's Host Guarantee")}</p>
         </div>
         <div className="flex flex-col gap-1.5">
           {(store.live ? [t("Every guest has a name and a photo"), t("You choose who sits at your table"), t("Report or block anyone, at any time")] : [t("Identity verified"), t("Secure payments"), t("24/7 support")]).map(item => (
             <div key={item} className="flex items-center gap-2">
               <CheckCircle size={12} color="#0a7c4e" strokeWidth={2.5} />
-              <span style={{ fontSize: 12, color: "#4a3a6e" }}>{t(item)}</span>
+              <span style={{ fontSize: 12, color: "var(--ink-2)" }}>{t(item)}</span>
             </div>
           ))}
         </div>
@@ -1488,9 +1488,9 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
 
       {/* What's in it, as guests will see it */}
       <Card>
-        <p style={{ fontSize: 13, fontWeight: 800, color: "#160a2e", marginBottom: 4 }}>{t("What's in it")}</p>
-        <p style={{ fontSize: 13, color: "#4a3a6e", lineHeight: 1.5 }}>{form.ingredientsText?.trim() || "—"}</p>
-        <p style={{ fontSize: 12.5, color: "#c05e00", fontWeight: 700, marginTop: 6 }}>{form.allergens.size ? t("Contains: {list}", { list: [...form.allergens].map((a) => t(allergenLabel(a))).join(", ") }) : t("No allergens marked")}</p>
+        <p style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", marginBottom: 4 }}>{t("What's in it")}</p>
+        <p style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.5 }}>{form.ingredientsText?.trim() || "—"}</p>
+        <p style={{ fontSize: 12.5, color: "var(--warn-ink)", fontWeight: 700, marginTop: 6 }}>{form.allergens.size ? t("Contains: {list}", { list: [...form.allergens].map((a) => t(allergenLabel(a))).join(", ") }) : t("No allergens marked")}</p>
       </Card>
 
       {/* The host's declaration: required before publishing (live: stored with the meal, timed by the database) */}
@@ -1526,7 +1526,7 @@ function Step8({ form, set, onPublish, publishing }: { form: FormData; set: (k: 
         {publishing && <ThinkingOrb state="shaping" size={20} theme="dark" />}
         <span style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{publishing ? t("Publishing…") : t("Publish event")}</span>
       </motion.button>
-      <p style={{ textAlign: "center", fontSize: 11, color: "#695a8c" }}>{t("You can edit or unpublish at any time after going live")}</p>
+      <p style={{ textAlign: "center", fontSize: 11, color: "var(--ink-2)" }}>{t("You can edit or unpublish at any time after going live")}</p>
     </div>
   );
 }
@@ -1656,16 +1656,16 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
-      <div className="md:hidden" style={{ height: "max(env(safe-area-inset-top), 14px)", background: "#fff", flexShrink: 0 }} />
+    <div className="flex flex-col h-full" style={{ background: "var(--page)", fontFamily: "'Figtree Variable', sans-serif" }}>
+      <div className="md:hidden" style={{ height: "max(env(safe-area-inset-top), 14px)", background: "var(--surface)", flexShrink: 0 }} />
 
       {/* Header */}
-      <div style={{ background: "#fff", borderBottom: "1px solid rgba(107,33,217,0.08)", flexShrink: 0 }}>
+      <div style={{ background: "var(--surface)", borderBottom: "1px solid rgba(107,33,217,0.08)", flexShrink: 0 }}>
         <div className="flex items-center justify-between px-4 pt-2 pb-3">
           <motion.button
             onClick={goPrev}
             className="w-9 h-9 flex items-center justify-center rounded-xl"
-            style={{ background: "#f0ecfa" }}
+            style={{ background: "var(--tint)" }}
             whileTap={{ scale: 0.88 }}
           >
             <ChevronLeft size={18} color={purple} strokeWidth={2.5} />
@@ -1674,25 +1674,25 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-1.5">
               <StepIcon size={13} color={purple} strokeWidth={2.5} />
-              <p style={{ fontSize: 14, fontWeight: 800, color: "#160a2e" }}>{t(STEP_LABELS[step])}</p>
+              <p style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)" }}>{t(STEP_LABELS[step])}</p>
             </div>
-            <p style={{ fontSize: 11, color: "#695a8c", fontWeight: 500 }}>{t("Step {n} of {total}", { n: step + 1, total: TOTAL_STEPS })}</p>
+            <p style={{ fontSize: 11, color: "var(--ink-2)", fontWeight: 500 }}>{t("Step {n} of {total}", { n: step + 1, total: TOTAL_STEPS })}</p>
           </div>
 
           <motion.button
             onClick={saveDraft}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl"
-            style={{ background: savedDraft ? "#e5f7f0" : "#f0ecfa" }}
+            style={{ background: savedDraft ? "var(--ok-bg)" : "var(--tint)" }}
             whileTap={{ scale: 0.88 }}
-            animate={{ background: savedDraft ? "#e5f7f0" : "#f0ecfa" }}
+            animate={{ background: savedDraft ? "var(--ok-bg)" : "var(--tint)" }}
           >
             <Save size={13} color={savedDraft ? "#0a7c4e" : purple} strokeWidth={2} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: savedDraft ? "#0a7c4e" : purple }}>{savedDraft ? t("Saved!") : t("Draft")}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: savedDraft ? "var(--ok-ink)" : purple }}>{savedDraft ? t("Saved!") : t("Draft")}</span>
           </motion.button>
         </div>
 
         {/* Progress bar */}
-        <div style={{ height: 3, background: "#f0ecfa", position: "relative" }}>
+        <div style={{ height: 3, background: "var(--tint)", position: "relative" }}>
           <motion.div
             style={{ position: "absolute", top: 0, left: 0, height: "100%", background: `linear-gradient(90deg, ${purple}, #9b4aff)`, borderRadius: "0 2px 2px 0" }}
             animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
@@ -1708,7 +1708,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
               className="rounded-full"
               animate={{
                 width: i === step ? 20 : 6,
-                background: i < step ? purple : i === step ? purple : "#e0d8f5",
+                background: i < step ? purple : i === step ? purple : "var(--tint-2)",
                 opacity: i > step ? 0.4 : 1,
               }}
               style={{ height: 6 }}
@@ -1746,7 +1746,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
       {/* Validation message */}
       <AnimatePresence>
         {error && (
-          <motion.div role="alert" className="mx-4 mb-2 px-4 py-3 rounded-2xl flex items-center gap-2 flex-shrink-0" style={{ background: "#fff0f3", border: "1px solid rgba(233,52,90,0.25)" }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+          <motion.div role="alert" className="mx-4 mb-2 px-4 py-3 rounded-2xl flex items-center gap-2 flex-shrink-0" style={{ background: "var(--bad-bg)", border: "1px solid rgba(233,52,90,0.25)" }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <AlertCircle size={16} color="#e9345a" />
             <span style={{ fontSize: 13, fontWeight: 700, color: "#c0234a" }}>{error}</span>
           </motion.div>
@@ -1757,7 +1757,7 @@ export function StartHostingFlow({ onBack, onPublished }: StartHostingFlowProps)
       {step < TOTAL_STEPS - 1 && (
         <div
           className="px-4 pt-3 flex-shrink-0"
-          style={{ background: "#fff", borderTop: "1px solid rgba(107,33,217,0.07)", paddingBottom: "max(env(safe-area-inset-bottom), 20px)" }}
+          style={{ background: "var(--surface)", borderTop: "1px solid rgba(107,33,217,0.07)", paddingBottom: "max(env(safe-area-inset-bottom), 20px)" }}
         >
           <motion.button
             onClick={goNext}

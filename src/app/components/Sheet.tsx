@@ -29,7 +29,7 @@ function DesktopDialog({ children, className }: { children: ReactNode; className
         role="dialog"
         aria-modal="true"
         className={`pointer-events-auto w-full max-w-[460px] rounded-3xl overflow-hidden flex flex-col ${className}`}
-        style={{ background: "#fff", maxHeight: "85vh", boxShadow: "0 30px 80px rgba(22,10,46,0.35)", transformOrigin: origin }}
+        style={{ background: "var(--surface)", maxHeight: "85vh", boxShadow: "0 30px 80px rgba(22,10,46,0.35)", transformOrigin: origin }}
         initial={{ opacity: 0, scale: 0.82, filter: "blur(3px)" }}
         animate={{ opacity: 1, scale: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
         exit={{ opacity: 0, scale: 0.9, filter: "blur(2px)", transition: { duration: 0.15, ease: [0.22, 1, 0.36, 1] } }}
@@ -67,14 +67,14 @@ export function Sheet({ open, onClose, children, className = "", mobileMaxHeight
               role="dialog"
               aria-modal="true"
               className={`absolute bottom-0 left-0 right-0 z-50 rounded-t-3xl overflow-hidden ${className}`}
-              style={{ background: "#fff", maxHeight: mobileMaxHeight }}
+              style={{ background: "var(--surface)", maxHeight: mobileMaxHeight }}
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 340, damping: 34 }}
             >
               <div className="flex justify-center pt-3 pb-1">
-                <div className="w-10 h-1 rounded-full" style={{ background: "#e0d8f5" }} />
+                <div className="w-10 h-1 rounded-full" style={{ background: "var(--tint-2)" }} />
               </div>
               {children}
             </motion.div>

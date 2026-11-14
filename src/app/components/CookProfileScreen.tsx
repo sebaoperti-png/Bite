@@ -56,28 +56,28 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#f5f4f9", fontFamily: "'Figtree Variable', sans-serif" }}>
+    <div className="flex flex-col h-full" style={{ background: "var(--page)", fontFamily: "'Figtree Variable', sans-serif" }}>
       {/* Status bar space */}
-      <div style={{ height: "max(env(safe-area-inset-top), 14px)", background: "#fff", flexShrink: 0 }} />
+      <div style={{ height: "max(env(safe-area-inset-top), 14px)", background: "var(--surface)", flexShrink: 0 }} />
 
       {/* Sticky Header */}
       <div
         className="flex items-center justify-between px-4 pb-3 pt-2 flex-shrink-0"
-        style={{ background: "#fff", borderBottom: "1px solid rgba(107,33,217,0.08)" }}
+        style={{ background: "var(--surface)", borderBottom: "1px solid rgba(107,33,217,0.08)" }}
       >
         <motion.button
           onClick={onBack}
           className="w-9 h-9 flex items-center justify-center rounded-xl"
-          style={{ background: "#f0ecfa" }}
+          style={{ background: "var(--tint)" }}
           whileTap={{ scale: 0.88 }}
         >
           <ChevronLeft size={18} color="#6b21d9" strokeWidth={2.5} />
         </motion.button>
-        <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{t("Your host profile")}</p>
+        <p style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)" }}>{t("Your host profile")}</p>
         <motion.button
           onClick={() => { setLiked(l => !l); store.showToast(liked ? t("Removed from favourites") : t("Saved to favourites")); }}
           className="w-9 h-9 flex items-center justify-center rounded-xl"
-          style={{ background: "#f0ecfa" }}
+          style={{ background: "var(--tint)" }}
           whileTap={{ scale: 0.85 }}
         >
           <Heart
@@ -93,7 +93,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
       <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
 
         {/* Hero Card */}
-        <div style={{ background: "#fff", marginBottom: 8 }}>
+        <div style={{ background: "var(--surface)", marginBottom: 8 }}>
           {/* Cover + Avatar */}
           <div className="relative" style={{ height: 140 }}>
             <img
@@ -126,16 +126,16 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h2 style={{ fontSize: 22, fontWeight: 900, color: "#160a2e", lineHeight: 1.2 }}>{name}</h2>
+                  <h2 style={{ fontSize: 22, fontWeight: 900, color: "var(--ink)", lineHeight: 1.2 }}>{name}</h2>
                   <span
                     className="flex items-center gap-1 px-2 py-0.5 rounded-full"
-                    style={{ background: "#e5f7f0", flexShrink: 0 }}
+                    style={{ background: "var(--ok-bg)", flexShrink: 0 }}
                   >
                     <BadgeCheck size={11} color="#0a7c4e" strokeWidth={2.5} />
-                    <span style={{ fontSize: 10, fontWeight: 800, color: "#0a7c4e" }}>{t("VERIFIED")}</span>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "var(--ok-ink)" }}>{t("VERIFIED")}</span>
                   </span>
                 </div>
-                <p style={{ fontSize: 13, color: "#695a8c", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                <p style={{ fontSize: 13, color: "var(--ink-2)", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
                   <MapPin size={12} color="#7c6fa0" strokeWidth={2} />
                   {localPlace(store.profile.neighbourhood)}
                 </p>
@@ -152,9 +152,9 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
                 { value: "47", label: "Meals", icon: <ChefHat size={13} color="#6b21d9" strokeWidth={2} /> },
                 { value: "98%", label: "Response", icon: <Zap size={13} color="#6b21d9" strokeWidth={2} /> },
               ].map(({ value, label, icon }) => (
-                <div key={label} className="flex-1 flex flex-col items-center py-3 rounded-2xl" style={{ background: "#f5f4f9" }}>
-                  <div className="flex items-center gap-1 mb-0.5">{icon}<span style={{ fontSize: 17, fontWeight: 900, color: "#160a2e" }}>{value}</span></div>
-                  <span style={{ fontSize: 10, color: "#695a8c", fontWeight: 600 }}>{t(label)}</span>
+                <div key={label} className="flex-1 flex flex-col items-center py-3 rounded-2xl" style={{ background: "var(--page)" }}>
+                  <div className="flex items-center gap-1 mb-0.5">{icon}<span style={{ fontSize: 17, fontWeight: 900, color: "var(--ink)" }}>{value}</span></div>
+                  <span style={{ fontSize: 10, color: "var(--ink-2)", fontWeight: 600 }}>{t(label)}</span>
                 </div>
               ))}
             </div>
@@ -163,7 +163,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
 
         {/* About section */}
         <Section title={t("About {name}", { name: first })}>
-          <p style={{ fontSize: 13.5, color: "#4a3a6e", lineHeight: 1.7 }}>
+          <p style={{ fontSize: 13.5, color: "var(--ink-2)", lineHeight: 1.7 }}>
             "{tMaybe(store.profile.bio)}"
           </p>
         </Section>
@@ -190,7 +190,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
             ].map(({ icon: Icon, label, done }) => (
               <div key={label} className="flex items-center gap-3">
                 <Icon size={15} color={done ? "#0a7c4e" : "#c4b8de"} strokeWidth={2} />
-                <span style={{ fontSize: 13, color: done ? "#160a2e" : "#c4b8de", fontWeight: done ? 600 : 400 }}>{t(label)}</span>
+                <span style={{ fontSize: 13, color: done ? "var(--ink)" : "#c4b8de", fontWeight: done ? 600 : 400 }}>{t(label)}</span>
                 {done && <CheckCircle size={14} color="#0a7c4e" strokeWidth={2} style={{ marginLeft: "auto", flexShrink: 0 }} />}
               </div>
             ))}
@@ -201,13 +201,13 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
         <Section title={t("Cuisine Specialties")}>
           <div className="flex flex-wrap gap-2 mb-4">
             {CUISINES.map(c => (
-              <span key={c} className="px-3.5 py-1.5 rounded-full" style={{ background: "#ede8fb", fontSize: 12.5, fontWeight: 700, color: "#6b21d9" }}>{t(c)}</span>
+              <span key={c} className="px-3.5 py-1.5 rounded-full" style={{ background: "var(--tint)", fontSize: 12.5, fontWeight: 700, color: "var(--brand-ink)" }}>{t(c)}</span>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: "#695a8c", fontWeight: 600, marginBottom: 10 }}>{t("Dietary options offered")}</p>
+          <p style={{ fontSize: 12, color: "var(--ink-2)", fontWeight: 600, marginBottom: 10 }}>{t("Dietary options offered")}</p>
           <div className="flex flex-wrap gap-2">
             {DIETARY.map(d => (
-              <span key={d} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "#e5f7f0", fontSize: 12, fontWeight: 700, color: "#0a7c4e" }}>
+              <span key={d} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "var(--ok-bg)", fontSize: 12, fontWeight: 700, color: "var(--ok-ink)" }}>
                 <CheckCircle size={10} color="#0a7c4e" strokeWidth={2.5} />
                 {t(d)}
               </span>
@@ -218,27 +218,27 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
         {/* Reviews */}
         <Section title={t("Reviews ({n})", { n: REVIEWS.length })} action={
           <motion.button onClick={() => setShowAllReviews(s => !s)} whileTap={{ scale: 0.9 }}>
-            <span style={{ fontSize: 12, color: "#6b21d9", fontWeight: 700 }}>
+            <span style={{ fontSize: 12, color: "var(--brand-ink)", fontWeight: 700 }}>
               {showAllReviews ? t("Show less") : t("See all")}
             </span>
           </motion.button>
         }>
           {/* Overall rating bar */}
-          <div className="flex items-center gap-3 mb-4 p-3 rounded-2xl" style={{ background: "#f5f4f9" }}>
+          <div className="flex items-center gap-3 mb-4 p-3 rounded-2xl" style={{ background: "var(--page)" }}>
             <div className="flex flex-col items-center">
-              <span style={{ fontSize: 34, fontWeight: 900, color: "#160a2e", lineHeight: 1 }}>{dec(4.9)}</span>
+              <span style={{ fontSize: 34, fontWeight: 900, color: "var(--ink)", lineHeight: 1 }}>{dec(4.9)}</span>
               <div className="flex gap-0.5 mt-1">
                 {[1,2,3,4,5].map(i => (
                   <Star key={i} size={11} color="#f59e0b" fill="#f59e0b" />
                 ))}
               </div>
-              <span style={{ fontSize: 10, color: "#695a8c", marginTop: 3 }}>{t("out of 5")}</span>
+              <span style={{ fontSize: 10, color: "var(--ink-2)", marginTop: 3 }}>{t("out of 5")}</span>
             </div>
             <div className="flex-1">
               {[5,4,3].map((stars, idx) => (
                 <div key={stars} className="flex items-center gap-2 mb-1">
-                  <span style={{ fontSize: 10, color: "#695a8c", width: 8 }}>{stars}</span>
-                  <div className="flex-1 rounded-full overflow-hidden" style={{ height: 5, background: "#e0d8f5" }}>
+                  <span style={{ fontSize: 10, color: "var(--ink-2)", width: 8 }}>{stars}</span>
+                  <div className="flex-1 rounded-full overflow-hidden" style={{ height: 5, background: "var(--tint-2)" }}>
                     <motion.div
                       className="h-full rounded-full"
                       style={{ background: "#6b21d9" }}
@@ -266,8 +266,8 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
                     <img src={r.avatar} alt={r.name} style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#160a2e" }}>{r.name}</span>
-                        <span style={{ fontSize: 11, color: "#695a8c" }}>{t(r.date)}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>{r.name}</span>
+                        <span style={{ fontSize: 11, color: "var(--ink-2)" }}>{t(r.date)}</span>
                       </div>
                       <div className="flex gap-0.5 mt-0.5">
                         {Array.from({ length: r.rating }).map((_, j) => (
@@ -276,7 +276,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
                       </div>
                     </div>
                   </div>
-                  <p style={{ fontSize: 12.5, color: "#4a3a6e", lineHeight: 1.65 }}>{t(r.text)}</p>
+                  <p style={{ fontSize: 12.5, color: "var(--ink-2)", lineHeight: 1.65 }}>{t(r.text)}</p>
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -290,7 +290,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
       {/* Sticky CTA */}
       <div
         className="px-5 pb-8 pt-4 flex flex-col gap-3 flex-shrink-0"
-        style={{ background: "linear-gradient(to top, #fff 70%, transparent)", borderTop: "1px solid rgba(107,33,217,0.07)" }}
+        style={{ background: "linear-gradient(to top, var(--surface) 70%, transparent)", borderTop: "1px solid rgba(107,33,217,0.07)" }}
       >
         <motion.button
           onClick={onContinue}
@@ -314,7 +314,7 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
           style={{ background: "transparent", border: "1.5px solid rgba(107,33,217,0.18)" }}
           whileTap={{ scale: 0.97 }}
         >
-          <span style={{ fontSize: 14, fontWeight: 700, color: "#695a8c" }}>{t("Maybe later")}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-2)" }}>{t("Maybe later")}</span>
         </motion.button>
       </div>
     </div>
@@ -323,9 +323,9 @@ export function CookProfileScreen({ onBack, onContinue }: CookProfileScreenProps
 
 function Section({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div style={{ background: "#fff", marginBottom: 8, padding: "18px 20px" }}>
+    <div style={{ background: "var(--surface)", marginBottom: 8, padding: "18px 20px" }}>
       <div className="flex items-center justify-between mb-3">
-        <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{title}</p>
+        <p style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)" }}>{title}</p>
         {action}
       </div>
       {children}
@@ -336,11 +336,11 @@ function Section({ title, children, action }: { title: string; children: React.R
 function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "#f0ecfa" }}>
+      <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "var(--tint)" }}>
         {icon}
       </div>
-      <span style={{ fontSize: 12.5, color: "#695a8c", fontWeight: 500, minWidth: 120 }}>{label}</span>
-      <span style={{ fontSize: 13, color: "#160a2e", fontWeight: 700, marginLeft: "auto", textAlign: "right" }}>{value}</span>
+      <span style={{ fontSize: 12.5, color: "var(--ink-2)", fontWeight: 500, minWidth: 120 }}>{label}</span>
+      <span style={{ fontSize: 13, color: "var(--ink)", fontWeight: 700, marginLeft: "auto", textAlign: "right" }}>{value}</span>
     </div>
   );
 }
