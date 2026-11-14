@@ -1,5 +1,7 @@
 import { BugReportHost } from "../shared/BugReport";
 import { ContactHost } from "../shared/ContactForm";
+import { LandingMobile } from "./sections/LandingMobile";
+import { usePhone } from "./usePhone";
 import { useEffect, useState } from "react";
 import { LandingNav } from "./sections/LandingNav";
 import { LandingIntro, AppTransition, APP_TRANSITION_MS } from "./sections/LandingIntro";
@@ -110,12 +112,15 @@ export function Landing() {
     savePrefs: () => persist({ functional: prefFunctional, analytics: prefAnalytics, marketing: prefMarketing }),
   };
 
+  // phones get their own landing (LandingMobile), not the desktop squeezed into one column
+  const phone = usePhone();
   return (
     <div className="lp" style={{ overflowX: "clip" }}>
       <FloatingLogos />
       <LandingIntro />
       <LandingNav />
       <main>
+      {phone ? <LandingMobile /> : <>
       <LandingHero />
       <LandingPeople />
       <LandingSavings />
@@ -125,13 +130,14 @@ export function Landing() {
       <LandingBecomeAHost />
       <LandingSafety />
       <LandingTestimonial />
+      </>}
       <LandingAbout />
       <LandingStayUpdated />
       <LandingHelpCustomerService />
       </main>
       <LandingFooter />
       <LandingCookieConsent {...cookieProps} />
-      <LandingKitchenNote ready={!showCookies} />
+      {!phone && <LandingKitchenNote ready={!showCookies} />}
       <LandingMobileStickyCta />
       <LandingAssistant />
       <BugReportHost where="site" />
