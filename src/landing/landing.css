@@ -1506,10 +1506,10 @@ a.rs-go:hover { background: #160a2e; }
 .hs2-cap { position: absolute; left: 0; right: 0; margin: 0; padding: 0 8cqw; text-align: center; font-family: var(--font-serif); font-size: 7.6cqw; line-height: 1.02; color: #fff; text-shadow: 0 2px 22px rgba(10,4,26,0.8); pointer-events: none; }
 .hs2-cap.top { top: 6cqw; }
 .hs2-cap.bottom { bottom: 6cqw; }
-.hs2-note { position: absolute; left: 50%; bottom: 7cqw; width: 84cqw; padding: 3.4cqw 3.8cqw 3.6cqw; border-radius: 5cqw; background: rgba(255,253,248,0.97); box-shadow: 0 30px 50px -18px rgba(0,0,0,0.6); pointer-events: none; }
+.hs2-note { position: absolute; left: 50%; bottom: 9cqw; width: 88cqw; z-index: 2; padding: 3.4cqw 3.8cqw 3.6cqw; border-radius: 5cqw; background: rgba(255,253,248,0.97); box-shadow: 0 30px 50px -18px rgba(0,0,0,0.6); pointer-events: none; }
 .hs2-note-app { display: flex; align-items: center; gap: 1.6cqw; font-size: 2.6cqw; font-weight: 800; color: #7c6fa0; }
 .hs2-note-app i { width: 4.2cqw; height: 4.2cqw; border-radius: 1.2cqw; background: #6b21d9; }
-.hs2-note strong { display: block; margin-top: 1.6cqw; font-family: var(--font-serif); font-weight: 400; font-size: 5.6cqw; line-height: 1.05; color: #160a2e; }
+.hs2-note strong { display: block; margin-top: 1.6cqw; font-family: var(--font-serif); font-weight: 400; font-size: 6.6cqw; line-height: 1.05; color: #160a2e; }
 .hs2-note-sub { display: block; margin-top: 1cqw; font-size: 3cqw; font-weight: 700; color: #6b21d9; }
 .hs2-join { position: absolute; right: 3.6cqw; bottom: 3.4cqw; padding: 1.6cqw 3.6cqw; border-radius: 99px; background: #6b21d9; color: #fff; font-size: 3cqw; font-weight: 800; transition: background .3s; }
 .hs2-join.on { background: #0a8f5a; }
@@ -1563,3 +1563,14 @@ body { background-color: #f3eefb;
 .lp .rs-card h2, .lp .rs-done h3, .lp .kn-title { font-family: var(--font-serif) !important; font-weight: 400 !important; letter-spacing: -0.005em !important; line-height: 1 !important; }
 .fl-canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 .lp .hx-title { font-family: var(--font-serif) !important; font-weight: 400 !important; letter-spacing: -0.012em !important; line-height: .98 !important; }
+
+/* the hero's survey number, a round pink sticker on the film's corner */
+.hx-film { position: relative; }
+.hx-stat { position: absolute; right: -18px; top: 22%; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 138px; height: 138px; margin: 0; padding: 14px; border-radius: 50%; text-align: center;
+  background: #ff4f86; color: #fff; transform: rotate(10deg); box-shadow: 0 0 0 5px #fff, 0 18px 30px -14px rgba(120,20,60,0.6); animation: hxStat .7s .9s cubic-bezier(.2,1.6,.4,1) both; }
+.hx-stat b { font-size: 38px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+.hx-stat span { margin-top: 4px; font-size: 11.5px; font-weight: 700; line-height: 1.2; }
+.hx-stat small { margin-top: 5px; font-family: var(--font-serif); font-style: italic; font-size: 12.5px; opacity: .9; }
+@keyframes hxStat { from { opacity: 0; transform: rotate(-20deg) scale(.4); } to { opacity: 1; transform: rotate(10deg) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .hx-stat { animation: none; } }
+@media (max-width: 900px) { .hx-stat { right: -6px; top: -22px; width: 112px; height: 112px; } .hx-stat b { font-size: 30px; } .hx-stat span { font-size: 10px; } .hx-stat small { font-size: 11px; } }
