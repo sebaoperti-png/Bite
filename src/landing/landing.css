@@ -1469,7 +1469,9 @@ a.rs-go:hover { background: #160a2e; }
 .hs2-svg { display: block; width: 100%; height: 100%; }
 .hs2::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
   background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(8,3,20,0.45) 100%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); mix-blend-mode: normal; }
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); mix-blend-mode: normal; animation: hsGrain .8s steps(5) infinite; }
+@keyframes hsGrain { 0% { background-position: 0 0, 0 0; } 20% { background-position: 0 0, -37px 21px; } 40% { background-position: 0 0, 52px -14px; } 60% { background-position: 0 0, -18px -43px; } 80% { background-position: 0 0, 29px 36px; } 100% { background-position: 0 0, 0 0; } }
+@media (prefers-reduced-motion: reduce) { .hs2::after { animation: none; } }
 .hs2-cap { position: absolute; left: 0; right: 0; margin: 0; padding: 0 8cqw; text-align: center; font-family: var(--font-serif); font-size: 7.6cqw; line-height: 1.02; color: #fff; text-shadow: 0 2px 22px rgba(10,4,26,0.8); pointer-events: none; }
 .hs2-cap.top { top: 6cqw; }
 .hs2-cap.bottom { bottom: 6cqw; }

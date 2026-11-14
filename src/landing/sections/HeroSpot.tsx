@@ -102,7 +102,10 @@ function Window({ w, t }: { w: Win; t: number }) {
   const pinged = t >= w.ping;
   const mood = ramp(t, w.ping + 0.9, w.ping + 1.4);
   const gone = ramp(t, w.leave, w.leave + 0.45);
-  const light = 1 - ramp(t, w.leave + 0.1, w.leave + 0.6);
+  // the light goes off like a real switch: a flicker, then dark
+  const off = ramp(t, w.leave + 0.1, w.leave + 0.6, (x) => x);
+  const light = off <= 0 ? 1 : off >= 1 ? 0 : (1 - off) * (off < 0.35 ? (Math.sin(off * 90) > 0 ? 1 : 0.35) : 1);
+  const breath = 1 + Math.sin(t * 2.4 + w.c * 1.7) * 0.014;
   const glow = pinged && t < w.leave ? 0.6 + 0.4 * Math.sin((t - w.ping) * 9) : 0;
   const down = (1 - mood) * (0.6 + 0.4 * Math.sin(t * 1.3 + w.c));
   const blink = ((t * 10 + w.c * 7) % 37) < 1.2;
@@ -115,7 +118,9 @@ function Window({ w, t }: { w: Win; t: number }) {
         <path d={`M${W / 2} 0v14`} stroke="#ffffff55" strokeWidth="1.2" />
         <path d={`M${W / 2 - 10} 24a10 10 0 0 1 20 0z`} fill="#f4e9ff" />
         <ellipse cx={W / 2} cy="56" rx="44" ry="34" fill="url(#hs-lamp)" />
-        <g opacity={1 - gone} transform={`translate(${44 + gone * 18} ${70 + Math.sin(t * 1.6 + w.c) * 0.8})`}><Person look={LOOKS[w.look]} mood={mood} down={down} blink={blink} /></g>
+        {/* the phone's light on the face, until the note makes them smile */}
+        {pinged && t < w.leave && <path d={`M84 ${H - 20}L30 46Q40 30 60 34z`} fill="url(#hs-phonelight)" opacity={0.3 * glow * (1 - mood * 0.6)} />}
+        <g opacity={1 - gone} transform={`translate(${44 + gone * 18} ${70 + Math.sin(t * 1.6 + w.c) * 0.8}) scale(1 ${breath})`}><Person look={LOOKS[w.look]} mood={mood} down={down} blink={blink} /></g>
         <path d={`M8 ${H - 14}h${W - 16}`} stroke="#efe6ff" strokeWidth="5" strokeLinecap="round" />
         <g opacity={1 - gone}><ellipse cx="46" cy={H - 17} rx="13" ry="3.4" fill="#fff" /><ellipse cx="46" cy={H - 18} rx="7" ry="2" fill={["#e0a050", "#c9553a", "#7fb069", "#e8c547", "#d98a4e", "#b5563a"][w.look]} /></g>
         <g opacity={1 - gone}>
@@ -205,7 +210,7 @@ function Hall({ t }: { t: number }) {
         {SEATX.map((sx, i) => {
           const s = ramp(t, 9.0 + i * 0.16, 9.5 + i * 0.16, back);
           return (
-            <g key={i} transform={`translate(${sx} ${HALL.y + 96 + (1 - s) * 14}) scale(${0.95 * Math.max(0.01, s)})`} opacity={clamp(s)}>
+            <g key={i} transform={`translate(${sx} ${HALL.y + 96 + (1 - s) * 14 - Math.max(0, Math.sin(t * 7 + i)) * toast * 2}) scale(${0.95 * Math.max(0.01, s)} ${0.95 * Math.max(0.01, s) * (1 + Math.sin(t * 2.6 + i) * 0.012)})`} opacity={clamp(s)}>
               <Person look={LOOKS[i]} mood={1} arm={toast * (i % 2 ? 1 : 0.85)} glass blink={((t * 10 + i * 5) % 41) < 1.2} />
             </g>
           );
@@ -258,8 +263,9 @@ function useClock(paused: boolean, still: boolean, box: React.RefObject<HTMLDivE
     if (still || paused || !visible || !loaded) return;
     base.current = performance.now() - now.current * 1000;
     let raf = 0, last = 0;
-    // 30 frames a second is plenty for this film and halves the work on phones
-    const tick = (ms: number) => { if (ms - last > 32) { last = ms; const v = ((ms - base.current) / 1000) % LOOP; now.current = v; setT(v); } raf = requestAnimationFrame(tick); };
+    // 60 frames a second on computers, 30 on phones (half the work, and it still reads as smooth there)
+    const gap = window.matchMedia("(max-width: 640px)").matches ? 32 : 15;
+    const tick = (ms: number) => { if (ms - last > gap) { last = ms; const v = ((ms - base.current) / 1000) % LOOP; now.current = v; setT(v); } raf = requestAnimationFrame(tick); };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [paused, still, visible, loaded]);
@@ -279,6 +285,10 @@ export function HeroSpot() {
   const cy = keys(r, [[0, 165], [3.6, 168], [4.3, 196], [5.7, 196], [6.4, 168], [6.5, 168], [7.6, 260], [9.2, 410], [11.6, 410], [12.8, 448], [16.0, 448], [17.0, 410]], sine);
   const cz = keys(r, [[0, 3.5], [3.4, 3.7], [4.3, 8.2], [5.7, 8.6], [6.4, 3.4], [6.5, 3.4], [7.6, 1.7], [9.2, 1.0], [11.6, 1.0], [12.8, 2.0], [15.6, 2.15], [17.0, 1.0]], sine);
   const fade = still ? 0 : Math.max(1 - ramp(r, 0, 0.6), ramp(r, 17.5, 18));
+  // a hand-held camera: a breath of drift, never still
+  const hx = still ? 0 : Math.sin(r * 0.9) * 1.6 + Math.sin(r * 2.3) * 0.5, hy = still ? 0 : Math.cos(r * 0.7) * 1.2;
+  // it rains while everyone eats alone, and stops when the table fills up
+  const rain = still ? 0 : 1 - ramp(t, 7.4, 9.6);
   const cap = (a: number, b: number) => ramp(t, a, a + 0.4) * (1 - ramp(t, b - 0.4, b));
   const capR = (a: number, b: number) => ramp(r, a, a + 0.4) * (1 - ramp(r, b - 0.4, b));
   const join = r > 5.05;
@@ -288,6 +298,7 @@ export function HeroSpot() {
       <svg viewBox="0 0 600 750" className="hs2-svg" aria-hidden>
         <defs>
           <linearGradient id="hs-room" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7d86d8" /><stop offset="1" stopColor="#4a4ea3" /></linearGradient>
+          <linearGradient id="hs-phonelight" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stopColor="rgba(207,230,255,0.9)" /><stop offset="1" stopColor="rgba(207,230,255,0)" /></linearGradient>
           <radialGradient id="hs-lamp"><stop offset="0" stopColor="rgba(255,240,200,0.35)" /><stop offset="1" stopColor="rgba(255,240,200,0)" /></radialGradient>
           <linearGradient id="hs-warm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffd690" /><stop offset="1" stopColor="#ffab55" /></linearGradient>
           <radialGradient id="hs-sky" cx="0.8" cy="0.05" r="1"><stop offset="0" stopColor="#40287f" /><stop offset=".5" stopColor="#24134c" /><stop offset="1" stopColor="#150a2e" /></radialGradient>
@@ -299,17 +310,23 @@ export function HeroSpot() {
           <clipPath id="hs-hallclip"><rect x={HALL.x} y={HALL.y} width={HALL.w} height={HALL.h} rx="6" /></clipPath>
         </defs>
         <rect width="600" height="750" fill="url(#hs-sky)" />
-        <g transform={`translate(300 375) scale(${cz}) translate(${-cx} ${-cy})`}>
+        <g transform={`translate(300 375) scale(${cz}) translate(${-cx - hx} ${-cy - hy})`}>
           {[[540, 230], [575, 330], [20, 40], [555, 470], [590, 160], [30, 300]].map(([x, y], n) => <circle key={n} cx={x} cy={y} r="1.8" fill="#fff" opacity={0.3 + 0.7 * Math.abs(Math.sin(t * 1.4 + n))} />)}
           <circle cx="530" cy="96" r="70" fill="url(#hs-moonglow)" />
           <circle cx="530" cy="96" r="44" fill="#f3eeff" mask="url(#hs-bite)" />
           <circle cx="516" cy="86" r="6" fill="#e2d9f7" mask="url(#hs-bite)" /><circle cx="534" cy="112" r="4" fill="#e2d9f7" /><circle cx="510" cy="110" r="3" fill="#e2d9f7" />
+          {/* clouds drifting past the moon */}
+          {[[0, 70, 1], [1, 128, 0.7]].map(([n, y, sc]) => { const x = 380 + ((t * (n ? 9 : 6) + n * 140) % 320); return <g key={n} transform={`translate(${x} ${y}) scale(${sc})`} opacity={0.5}><ellipse cx="0" cy="0" rx="34" ry="11" fill="#3a2575" /><ellipse cx="18" cy="-8" rx="20" ry="11" fill="#3a2575" /><ellipse cx="-14" cy="-5" rx="16" ry="9" fill="#3a2575" /></g>; })}
+          {/* smoke from the chimney */}
+          {[0, 1, 2, 3].map((n) => { const k = ((t * 0.55 + n / 4) % 1); return <circle key={`sm${n}`} cx={109 + Math.sin(k * 6 + n) * 6 + k * 16} cy={26 - k * 70} r={5 + k * 12} fill="#c9b8ef" opacity={(1 - k) * 0.22} />; })}
           <rect x="50" y="76" width="420" height="700" rx="10" fill="#2b1a57" />
           <rect x="40" y="62" width="440" height="22" rx="7" fill="#3c2575" />
           <rect x="96" y="30" width="26" height="36" rx="3" fill="#3c2575" /><path d="M400 62v-34M392 34h16M396 44h8" stroke="#3c2575" strokeWidth="3" strokeLinecap="round" />
           <g stroke="rgba(255,255,255,0.04)">{Array.from({ length: 30 }, (_, n) => <path key={n} d={`M50 ${100 + n * 22}h420`} />)}</g>
           <DarkWindow x={COLX[1]} y={110} />
           <DarkWindow x={COLX[2]} y={240} />
+          {/* stairwell lights: they come on as the neighbours go down */}
+          {WINDOWS.map((w) => { const on = ramp(t, w.leave + 0.25, w.leave + 0.45) * (1 - ramp(t, w.leave + 1.7, w.leave + 2.1)); const sx = w.c === 2 ? COLX[2] - 11 : COLX[w.c] + W + 5; return <g key={`st${w.id}`}><rect x={sx} y={w.y + 30} width="8" height="26" rx="2" fill="#150a2e" /><rect x={sx} y={w.y + 30} width="8" height="26" rx="2" fill="#ffd690" opacity={on} style={{ filter: on > 0.1 ? "drop-shadow(0 0 6px #ffcf7a)" : undefined }} /></g>; })}
           <Hall t={t} />
           {WINDOWS.map((w) => <Window key={w.id} w={w} t={t} />)}
           {WINDOWS.map((w) => <Walker key={`k${w.id}`} w={w} t={t} />)}
@@ -319,6 +336,10 @@ export function HeroSpot() {
           <path d="M228 780v-120a32 32 0 0 1 64 0v120z" fill="#5b35a8" stroke="#120824" strokeWidth="6" />
           <circle cx="281" cy="722" r="3.4" fill="#ffd98f" />
         </g>
+        {/* rain, in front of everything (screen space, so it stays put while the camera moves) */}
+        {rain > 0.01 && <g stroke="rgba(214,224,255,0.55)" strokeWidth="1.4" strokeLinecap="round" opacity={rain}>
+          {Array.from({ length: 34 }, (_, i) => { const x = (i * 97) % 640 - 20; const y = ((t * 520 + i * 211) % 820) - 60; return <path key={i} d={`M${x} ${y}l-7 ${18 + (i % 3) * 6}`} opacity={0.35 + (i % 4) * 0.15} />; })}
+        </g>}
         <rect width="600" height="750" fill="#150a2e" opacity={fade} />
       </svg>
 
@@ -335,7 +356,14 @@ export function HeroSpot() {
       <p className="hs2-cap bottom" style={{ opacity: still ? 1 : cap(10.0, 12.4) }}>{tr("Nobody eats alone tonight.")}</p>
       <div className="hs2-reserved" style={{ opacity: still ? 0 : cap(12.5, 14.0), transform: `translate(-50%, 0) rotate(-4deg) scale(${0.6 + 0.4 * ramp(t, 12.5, 12.9, back)})` }}>{tr("Reserved for you")}</div>
       <div className="hs2-end" style={{ opacity: still ? 0 : capR(16.2, 17.8) }}>
-        <svg viewBox="0 0 549 549" width="64" height="64"><rect x="107" y="30" width="83" height="330" rx="41.5" fill="#fff" /><circle cx="285" cy="340" r="178" fill="#fff" /><path d="M190 405q72 62 144 0" fill="none" stroke="#6b21d9" strokeWidth="26" strokeLinecap="round" /></svg>
+        <svg viewBox="0 0 549 549" width="64" height="64" style={{ overflow: "visible" }}>
+          <defs><mask id="hs-endbite" maskUnits="userSpaceOnUse" x="-100" y="-100" width="749" height="749"><rect x="-100" y="-100" width="749" height="749" fill="#fff" />
+            {[[405, 198, 20], [434, 228, 22], [456, 267, 22], [469, 311, 20]].map(([x, y, rr], n) => <circle key={n} cx={x} cy={y} r={rr * 1.25 * ramp(r, 16.75 + n * 0.05, 16.95 + n * 0.05, back)} fill="#000" />)}</mask></defs>
+          <g mask="url(#hs-endbite)" transform={`rotate(${Math.sin(Math.max(0, r - 16.8) * 30) * 4 * (1 - ramp(r, 16.8, 17.2))} 285 340)`}><rect x="107" y="30" width="83" height="330" rx="41.5" fill="#fff" /><circle cx="285" cy="340" r="178" fill="#fff" /></g>
+          <path d="M190 405q72 62 144 0" fill="none" stroke="#6b21d9" strokeWidth="26" strokeLinecap="round" />
+          {/* crumbs */}
+          {[[0, -40, 30], [1, 10, 50], [2, -10, 80]].map(([n, dx, dy]) => { const k = ramp(r, 16.85 + n * 0.04, 17.4 + n * 0.04, (x) => x); return <circle key={n} cx={470 + dx * k + k * 40} cy={260 + dy * k + k * k * 120} r={12 - n * 2} fill="#fff" opacity={k > 0 && k < 1 ? 1 - k : 0} />; })}
+        </svg>
         <p>{tr("Food is better shared.")}</p>
       </div>
       </div>
