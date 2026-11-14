@@ -34,6 +34,10 @@ const WAITLIST_COLUMNS = [
 ];
 const BUG_SHEET = "Bugs";
 const BUG_COLUMNS = ["received", "where", "page", "report", "email", "lang", "screen", "browser", "status", "notes"];
+// "Write to us" contact form (the Impressum's second way to reach us, next to the email address)
+const CONTACT_SHEET = "Contact";
+const CONTACT_COLUMNS = ["received", "name", "email", "message", "lang", "status"];
+const CONTACT_TO = "hello@bitetable.de";
 const KEEP_UNCONFIRMED_DAYS = 30;
 
 function book_() {
@@ -67,6 +71,17 @@ function doPost(e) {
     const email = clean_(data.email, 120).trim().toLowerCase();
     const validEmail = EMAIL_RE.test(email);
     const lang = data.lang === "de" ? "de" : "en";
+
+    // "Write to us": one row in "Contact" and an email to hello@bitetable.de (reply goes straight to the sender)
+    if (data.type === "contact") {
+      const text = clean_(data.text, 3000).trim();
+      const name = clean_(data.name, 80).replace(/[\r\n]+/g, " ").trim();
+      if (text.length < 5 || !validEmail) return json_({ ok: false, error: "missing" });
+      sheet_(CONTACT_SHEET, CONTACT_COLUMNS).appendRow([new Date(), "'" + name, email, "'" + text, lang, "new"]);
+      MailApp.sendEmail({ to: CONTACT_TO, replyTo: email, name: "Bite contact form",
+        subject: "Contact form: " + (name || email), body: text + "\n\n" + (name ? name + "\n" : "") + email + "\n(" + lang + ", bitetable.de contact form)" });
+      return json_({ ok: true });
+    }
 
     // "Report a bug" from the website or the app: one row in "Bugs" (the email only if the reporter gave one)
     if (data.type === "bug") {
