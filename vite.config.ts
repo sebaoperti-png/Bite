@@ -3,7 +3,7 @@ import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-// Four pages: the landing page (index.html), the app (bite.html), the legal page (legal.html) and the fair-stand survey (stand.html).
+// Five pages (plus feedback.html, the "Rate Bite" comment card): the landing page (index.html), the app (bite.html), the legal page (legal.html) and the fair-stand survey (stand.html).
 // base "./" makes the build work on GitHub Pages under /Bite/.
 export default defineConfig({
   base: "./",
@@ -16,6 +16,7 @@ export default defineConfig({
         bite: resolve(__dirname, "bite.html"),
         legal: resolve(__dirname, "legal.html"),
         stand: resolve(__dirname, "stand.html"),
+        feedback: resolve(__dirname, "feedback.html"),
       },
     },
   },
