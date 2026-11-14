@@ -20,7 +20,11 @@ export function LandingHero() {
             <a href="#waitlist" className="hx-tab"><b>{t("Save me a seat")}</b><small>{t("news by email")}</small></a>
           </nav>
         </div>
-        <HeroSpot />
+        <div className="hx-film">
+          <HeroSpot />
+          {/* a real number from our own survey at AIM 2026 (Aalen) */}
+          <p className="hx-stat"><b>58%</b><span>{t("eat 8 or more meals a week alone")}</span><small>{t("Bite survey, AIM 2026")}</small></p>
+        </div>
       </div>
     </section>
   );

@@ -11,7 +11,9 @@ import { useEffect, useRef, useState } from "react";
 import { t as tr } from "../../shared/i18n";
 
 const SLOW = 1.4;              // the story is written in 16 "beats"; it plays 1.4× slower
-const LOOP = 16 * SLOW;
+const BEATS = 18;               // 16 beats of story + a 2-beat hold on the phone when the note arrives
+const LOOP = BEATS * SLOW;
+const HOLD_AT = 3.6, HOLD = 2;
 
 /* ---------- timeline helpers ---------- */
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -116,7 +118,16 @@ function Window({ w, t }: { w: Win; t: number }) {
         <g opacity={1 - gone} transform={`translate(${44 + gone * 18} ${70 + Math.sin(t * 1.6 + w.c) * 0.8})`}><Person look={LOOKS[w.look]} mood={mood} down={down} blink={blink} /></g>
         <path d={`M8 ${H - 14}h${W - 16}`} stroke="#efe6ff" strokeWidth="5" strokeLinecap="round" />
         <g opacity={1 - gone}><ellipse cx="46" cy={H - 17} rx="13" ry="3.4" fill="#fff" /><ellipse cx="46" cy={H - 18} rx="7" ry="2" fill={["#e0a050", "#c9553a", "#7fb069", "#e8c547", "#d98a4e", "#b5563a"][w.look]} /></g>
-        <rect x="80" y={H - 25} width="9" height="14" rx="2" fill={glow ? `rgba(255,255,255,${0.5 + glow / 2})` : "#2a1a3a"} style={glow ? { filter: "drop-shadow(0 0 6px #fff)" } : undefined} opacity={1 - gone} />
+        <g opacity={1 - gone}>
+          <rect x="80" y={H - 25} width="9" height="14" rx="1.6" fill="#1d1230" />
+          {pinged && t < w.leave ? <g style={{ filter: `drop-shadow(0 0 ${2 + glow * 3}px rgba(255,255,255,0.8))` }}>
+            <rect x="80.7" y={H - 24.2} width="7.6" height="12.4" rx="1.1" fill="#f4efff" />
+            <rect x="81.4" y={H - 22.6} width="6.2" height="3.2" rx=".7" fill="#6b21d9" />
+            <rect x="82" y={H - 21.6} width="1.2" height="1.2" rx=".3" fill="#fff" />
+            <path d={`M81.6 ${H - 18}h5.6M81.6 ${H - 16.8}h4`} stroke="#160a2e" strokeWidth=".5" />
+            <rect x="83.2" y={H - 15.2} width="3.6" height="1.6" rx=".8" fill={t > 4.05 && w.id === "A" ? "#0a8f5a" : "#6b21d9"} />
+          </g> : <rect x="80.7" y={H - 24.2} width="7.6" height="12.4" rx="1.1" fill="#2a1a3a" />}
+        </g>
         <path d={`M0 0h16c-6 30-4 70 4 ${H}h-20z`} fill="#4b2e8a" opacity=".85" />
         <path d={`M${W} 0h-16c6 30 4 70-4 ${H}h20z`} fill="#4b2e8a" opacity=".85" />
         {w.id === "A" && <g stroke="rgba(220,230,255,0.45)" strokeWidth="1.1" strokeLinecap="round">
@@ -239,15 +250,18 @@ function useClock(paused: boolean, still: boolean) {
 export function HeroSpot() {
   const [still] = useState(() => typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
   const [paused, setPaused] = useState(false);
-  const t = useClock(paused, still) / (still ? 1 : SLOW);
+  const r = useClock(paused, still) / (still ? 1 : SLOW);        // film time (beats)
+  // story time: frozen while the camera holds on the phone, so the note gets its moment
+  const t = still ? r : r < HOLD_AT ? r : r < HOLD_AT + HOLD ? HOLD_AT : r - HOLD;
 
   // the camera: where it looks and how close, over time
-  const cx = keys(t, [[0, 128], [4.4, 128], [5.6, 270], [7.2, 300], [9.6, 300], [10.8, 260], [14.0, 260], [15.0, 300]], sine);
-  const cy = keys(t, [[0, 165], [4.4, 168], [5.6, 260], [7.2, 410], [9.6, 410], [10.8, 448], [14.0, 448], [15.0, 410]], sine);
-  const cz = keys(t, [[0, 3.5], [3.4, 3.7], [4.4, 3.4], [5.6, 1.7], [7.2, 1.0], [9.6, 1.0], [10.8, 2.0], [13.6, 2.15], [15.0, 1.0]], sine);
-  const fade = still ? 0 : Math.max(1 - ramp(t, 0, 0.6), ramp(t, 15.5, 16));
+  const cx = keys(r, [[0, 128], [3.6, 128], [4.3, 154], [5.7, 154], [6.4, 128], [6.5, 128], [7.6, 270], [9.2, 300], [11.6, 300], [12.8, 260], [16.0, 260], [17.0, 300]], sine);
+  const cy = keys(r, [[0, 165], [3.6, 168], [4.3, 196], [5.7, 196], [6.4, 168], [6.5, 168], [7.6, 260], [9.2, 410], [11.6, 410], [12.8, 448], [16.0, 448], [17.0, 410]], sine);
+  const cz = keys(r, [[0, 3.5], [3.4, 3.7], [4.3, 8.2], [5.7, 8.6], [6.4, 3.4], [6.5, 3.4], [7.6, 1.7], [9.2, 1.0], [11.6, 1.0], [12.8, 2.0], [15.6, 2.15], [17.0, 1.0]], sine);
+  const fade = still ? 0 : Math.max(1 - ramp(r, 0, 0.6), ramp(r, 17.5, 18));
   const cap = (a: number, b: number) => ramp(t, a, a + 0.4) * (1 - ramp(t, b - 0.4, b));
-  const join = t > 4.55;
+  const capR = (a: number, b: number) => ramp(r, a, a + 0.4) * (1 - ramp(r, b - 0.4, b));
+  const join = r > 5.05;
 
   return (
     <div className="hs2">
@@ -289,18 +303,18 @@ export function HeroSpot() {
       </svg>
 
       <div aria-hidden style={{ display: "contents" }}>
-      <p className="hs2-cap top" style={{ opacity: still ? 0 : cap(0.6, 3.4) }}>{tr("Another dinner alone.")}</p>
-      <div className="hs2-note" style={{ opacity: still ? 0 : cap(3.6, 5.3), transform: `translate(-50%, ${(1 - ramp(t, 3.6, 4.0, back)) * 30}px) scale(${0.94 + 0.06 * ramp(t, 3.6, 4.0, back)})` }}>
+      <p className="hs2-cap top" style={{ opacity: still ? 0 : capR(0.6, 3.4) }}>{tr("Another dinner alone.")}</p>
+      <div className="hs2-note" style={{ opacity: still ? 0 : capR(4.0, 6.2), transform: `translate(-50%, ${(1 - ramp(r, 4.0, 4.45, back)) * 40}px) scale(${0.9 + 0.1 * ramp(r, 4.0, 4.45, back)}) rotate(${Math.sin(Math.max(0, r - 4.0) * 40) * 2 * (1 - ramp(r, 4.0, 4.6))}deg)` }}>
         <span className="hs2-note-app"><i />Bite</span>
         <strong>{tr("Amina, 1st floor, is cooking tajine tonight")}</strong>
         <span className="hs2-note-sub">{tr("1 seat left. Want to join?")}</span>
         <span className={`hs2-join ${join ? "on" : ""}`}>{join ? tr("You're in!") : tr("Join")}</span>
-        <span className="hs2-tap" style={{ opacity: ramp(t, 4.3, 4.45) * (1 - ramp(t, 4.6, 4.9)), transform: `scale(${0.6 + ramp(t, 4.4, 4.7)})` }} />
+        <span className="hs2-tap" style={{ opacity: ramp(r, 4.8, 4.95) * (1 - ramp(r, 5.1, 5.4)), transform: `scale(${0.6 + ramp(r, 4.9, 5.2)})` }} />
       </div>
       <p className="hs2-cap top" style={{ opacity: still ? 0 : cap(5.6, 7.5) }}>{tr("Your neighbours got it too.")}</p>
       <p className="hs2-cap bottom" style={{ opacity: still ? 1 : cap(10.0, 12.4) }}>{tr("Nobody eats alone tonight.")}</p>
       <div className="hs2-reserved" style={{ opacity: still ? 0 : cap(12.5, 14.0), transform: `translate(-50%, 0) rotate(-4deg) scale(${0.6 + 0.4 * ramp(t, 12.5, 12.9, back)})` }}>{tr("Reserved for you")}</div>
-      <div className="hs2-end" style={{ opacity: still ? 0 : cap(14.2, 15.8) }}>
+      <div className="hs2-end" style={{ opacity: still ? 0 : capR(16.2, 17.8) }}>
         <svg viewBox="0 0 549 549" width="64" height="64"><rect x="107" y="30" width="83" height="330" rx="41.5" fill="#fff" /><circle cx="285" cy="340" r="178" fill="#fff" /><path d="M190 405q72 62 144 0" fill="none" stroke="#6b21d9" strokeWidth="26" strokeLinecap="round" /></svg>
         <p>{tr("Food is better shared.")}</p>
       </div>
