@@ -24,10 +24,11 @@ export function BugReportHost({ where }: { where: "site" | "app" }) {
   const [details, setDetails] = useState(true);
   const [trap, setTrap] = useState("");
   const [state, setState] = useState<State>("idle");
+  const [shown, setShown] = useState(false); // the form exists in the page only while the dialog is open
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    const open = () => { setState("idle"); setErr(""); dlg.current?.showModal(); requestAnimationFrame(() => area.current?.focus()); };
+    const open = () => { setState("idle"); setErr(""); setShown(true); dlg.current?.showModal(); requestAnimationFrame(() => requestAnimationFrame(() => area.current?.focus())); };
     window.addEventListener(EVENT, open);
     return () => window.removeEventListener(EVENT, open);
   }, []);
@@ -53,8 +54,8 @@ export function BugReportHost({ where }: { where: "site" | "app" }) {
   };
 
   return (
-    <dialog ref={dlg} className="br" aria-labelledby="br-title" onClick={(e) => { if (e.target === dlg.current) close(); }}>
-      <div className="br-card">
+    <dialog ref={dlg} className="br" aria-labelledby="br-title" onClose={() => setShown(false)} onClick={(e) => { if (e.target === dlg.current) close(); }}>
+      {shown && <div className="br-card">
         <button type="button" className="br-x" onClick={close} aria-label={t("Close")}>×</button>
         {state === "done" ? (
           <div className="br-done">
@@ -85,7 +86,7 @@ export function BugReportHost({ where }: { where: "site" | "app" }) {
             <p className="br-fine">{t("Reports are stored in our team's Google Sheet. Details in the")} <a href="legal.html#privacy">{t("privacy policy")}</a>.</p>
           </form>
         )}
-      </div>
+      </div>}
     </dialog>
   );
 }

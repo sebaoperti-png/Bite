@@ -6,8 +6,8 @@ import { createClient } from "@supabase/supabase-js";
  * row level security rules in supabase/migrations, not by hiding this key.
  * Never put the service_role key in this repository.
  */
-export const SUPABASE_URL = "https://hvwcuiknfqhbrjdbcooz.supabase.co";
-export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_yJSohzaIiidmFJyxlosvXA_geTPocx0";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./supabase-keys";
+export { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY };
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },

@@ -19,7 +19,7 @@ export function LangSwitch({ dark = false, size = "md" }: { dark?: boolean; size
           padding: pad, borderRadius: 999, border: "none", cursor: "pointer", fontFamily: "inherit",
           fontSize: size === "sm" ? 11.5 : 12.5, fontWeight: 800, letterSpacing: "0.04em",
           background: on ? (dark ? "#fff" : "#6b21d9") : "transparent",
-          color: on ? (dark ? "#160a2e" : "#fff") : dark ? "rgba(255,255,255,0.75)" : "#6b5a8e",
+          color: on ? (dark ? "#160a2e" : "#fff") : dark ? "rgba(255,255,255,0.75)" : "var(--ink-3, #6b5a8e)",
           transition: "background .2s, color .2s",
         }}
       >
@@ -33,7 +33,7 @@ export function LangSwitch({ dark = false, size = "md" }: { dark?: boolean; size
       aria-label={lang === "de" ? "Sprache" : "Language"}
       style={{
         display: "inline-flex", alignItems: "center", gap: 2, padding: 3, borderRadius: 999, flexShrink: 0,
-        background: dark ? "rgba(255,255,255,0.1)" : "#fff",
+        background: dark ? "rgba(255,255,255,0.1)" : "var(--surface, #fff)",
         border: dark ? "1px solid rgba(255,255,255,0.18)" : "1.5px solid rgba(107,33,217,0.15)",
       }}
     >

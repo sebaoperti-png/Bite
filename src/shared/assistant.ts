@@ -3,11 +3,35 @@
 // The UI only calls `answer()`, so a real language model can be plugged in later behind the same function.
 import { MEALS, AREAS, ANY_AREA, dayLabel, withFee, euro, type Meal } from "../app/data";
 import { t } from "./i18n";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./supabase-keys";
 
+export interface LiveMeal { id: string; title: string; host: string; place: string; starts_at: string; price_cents: number; image: string | null }
 export interface AssistantReply {
   text: string;
-  meals?: Meal[];
+  meals?: Meal[];          // demo meals (the offline fallback)
+  live?: LiveMeal[];       // real meals suggested by the maître d' (Gemini, Edge Function bite-ask)
   chips?: string[];
+  ai?: boolean;
+}
+
+/** Ask the real maître d' (Gemini behind the Supabase Edge Function "bite-ask"). Returns null when it can't
+    answer (offline, busy, today's allowance used up), and the caller falls back to the rule-based answer(). */
+export async function askRemote(question: string, history: { from: "me" | "bot"; text: string }[], lang: string): Promise<AssistantReply | "limit" | null> {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/bite-ask`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_PUBLISHABLE_KEY },
+      body: JSON.stringify({ question, history: history.slice(-6), lang }),
+      signal: AbortSignal.timeout(14000),
+    });
+    if (res.status === 429) return "limit";
+    if (!res.ok) return null;
+    const d = await res.json();
+    if (!d || typeof d.text !== "string" || !d.text) return null;
+    return { text: d.text, live: Array.isArray(d.meals) && d.meals.length ? d.meals : undefined, chips: Array.isArray(d.chips) ? d.chips : [], ai: true };
+  } catch {
+    return null;
+  }
 }
 
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
