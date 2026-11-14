@@ -9,6 +9,8 @@ import { LandingSousChef } from "./sections/LandingSousChef";
 import { LandingLaptop } from "./sections/LandingLaptop";
 import { LandingSafety } from "./sections/LandingSafety";
 import { LandingHelpCustomerService } from "./sections/LandingHelpCustomerService";
+import { LandingPeople } from "./sections/LandingPeople";
+import { LandingAbout } from "./sections/LandingAbout";
 import { LandingTestimonial } from "./sections/LandingTestimonial";
 import { LandingBecomeAHost } from "./sections/LandingBecomeAHost";
 import { LandingSavings } from "./sections/LandingSavings";
@@ -111,6 +113,7 @@ export function Landing() {
       <LandingNav />
       <LandingHero />
       <LandingLogoMarquee />
+      <LandingPeople />
       <LandingSavings />
       <LandingLaptop />
       <LandingServices />
@@ -118,6 +121,7 @@ export function Landing() {
       <LandingBecomeAHost />
       <LandingSafety />
       <LandingTestimonial />
+      <LandingAbout />
       <LandingHelpCustomerService />
       <LandingFooter />
       <LandingCookieConsent {...cookieProps} />
