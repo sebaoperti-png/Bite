@@ -1606,3 +1606,39 @@ body { background-color: #f3eefb;
 .as-meal-noimg { width: 56px; height: 46px; border-radius: 10px; flex-shrink: 0; background: #efe6ff; }
 .as-foot a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 @media (max-width: 640px) { .nv-theme { display: none !important; } }
+
+/* ── Phones, lighter (2026-11-14 redesign pass): one idea per screen, more air, nothing on top of text.
+   Cut on phones: "Why it works" notebook (Savings), the sous-chef demo, the help tickets, the giant footer wordmark. ── */
+@media (max-width: 640px) {
+  /* hero: a smaller film so the note and the film fit the first two screens; the 58% sticker sits on the film's corner */
+  .lp .hx { padding-bottom: 8px !important; }
+  .hs2 { max-width: 290px; border-radius: 26px; }
+  .hx-film { margin-top: 34px; }
+  .hx-stat { width: 92px; height: 92px; padding: 8px; right: max(-4px, calc(50% - 175px)); top: -22px; }
+  .hx-stat b { font-size: 25px; }
+  .hx-stat span { font-size: 9.5px; margin-top: 2px; }
+  .hx-stat small { display: none; }
+  .hx-tab { min-height: 74px; padding: 13px 14px 14px; }
+  .hx-tab small { font-size: 14.5px; }
+
+  /* the same breathing room between every section */
+  .lp main > section { padding-top: 56px !important; padding-bottom: 56px !important; }
+  .lp main > section.sv-dark, .lp main > section.dk-into-dark, .lp main > section.dk-out-light { margin-top: 16px !important; margin-bottom: 16px !important; }
+  #people { padding-top: 64px !important; }
+
+  /* cut on phones */
+  #savings .np, #sous-chef, #help .rl, .ft-word { display: none !important; }
+
+  /* footer: start sooner */
+  .ft-fade { padding-top: 120px !important; }
+
+  /* text a touch larger and looser everywhere it's body copy */
+  .lp main p { line-height: 1.6; }
+}
+@media (max-width: 640px) {
+  .lp-demo-note { display: block; margin: 0 0 6px; }
+  .hx-stat b { line-height: 1.05; }
+  .hx-stat span { line-height: 1.15; max-width: 74px; }
+  .rs-deck .rs-card:not(.front) { visibility: hidden; }
+}
+@media (max-width: 640px) { .hx-stat { top: auto; bottom: -26px; } }
