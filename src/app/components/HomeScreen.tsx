@@ -1,4 +1,5 @@
 import { openBugReport } from "../../shared/BugReport";
+import { InstallBanner } from "./InstallBanner";
 import { useState } from "react";
 import { EmptyPlate } from "../../shared/Restaurant";
 import { openSafetyTips } from "./SafetySheets";
@@ -184,6 +185,8 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
 
                   </div>
 
+                  <div className="pt-4"><InstallBanner /></div>
+
                   <div className="pt-5"><NeighbourCooks layout="row" meals={store.meals.filter((m) => store.seatsLeft(m) > 0 && !(store.myId && m.hostId === store.myId))} onSelectMeal={onSelectMeal} onHost={onStartHosting} /></div>
 
                   {/* Quick tags */}
@@ -191,7 +194,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                     <p className="dh-serif" style={{ fontSize: 17, color: "#6b21d9", marginBottom: 7 }}>{t("Today's specials")}</p>
                     <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
                       {CUISINE_TAGS.map((tag, i) => (
-                        <motion.button key={tag} onClick={() => onSearch({ cuisine: tag, service: "all" })} className="flex-shrink-0 px-3 py-1.5 rounded-full" style={{ background: "#ffffff", border: "1.5px solid rgba(107,33,217,0.13)", fontSize: 11.5, color: "#6b21d9", fontWeight: 600 }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.62 + i * 0.04, type: "spring" }} whileTap={{ scale: 0.9 }}>
+                        <motion.button key={tag} onClick={() => onSearch({ cuisine: tag, service: "all" })} className="tap-chip flex-shrink-0 px-3 py-1.5 rounded-full" style={{ background: "#ffffff", border: "1.5px solid rgba(107,33,217,0.13)", fontSize: 11.5, color: "#6b21d9", fontWeight: 600 }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.62 + i * 0.04, type: "spring" }} whileTap={{ scale: 0.9 }}>
                           {t(tag)}
                         </motion.button>
                       ))}
@@ -202,7 +205,7 @@ export function HomeScreen({ tab, onNavigate, criteria, setCriteria, onSearch, o
                   <div className="px-5 pt-3 pb-24">
                     <div className="flex items-center justify-between mb-2.5">
                       <p style={{ fontSize: 15, fontWeight: 800, color: "#160a2e" }}>{t("Cooking this week")}</p>
-                      <button onClick={() => onSearch({ service: "all" })} className="flex items-center gap-0.5" style={{ fontSize: 12, fontWeight: 700, color: "#6b21d9" }}>{t("See all")}{" "}<ChevronRight size={14} />
+                      <button onClick={() => onSearch({ service: "all" })} className="tap-link flex items-center gap-0.5" style={{ fontSize: 12, fontWeight: 700, color: "#6b21d9" }}>{t("See all")}{" "}<ChevronRight size={14} />
                       </button>
                     </div>
                     <MobileWeekMenu meals={store.meals.filter((m) => store.seatsLeft(m) > 0)} active={activeService} onSelectMeal={onSelectMeal} onSeeService={(s) => onSearch({ service: s })} />
