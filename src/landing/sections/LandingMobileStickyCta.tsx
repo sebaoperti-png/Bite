@@ -18,12 +18,15 @@ export function LandingMobileStickyCta() {
   return (
     <>
       <div className={`mobile-cta ${show ? "in" : ""}`} aria-hidden={!show} {...(show ? {} : { inert: "" })} style={{ position: "fixed", left: "0", right: "0", bottom: "0", zIndex: "800", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "12px 16px calc(12px + env(safe-area-inset-bottom))", background: "rgba(255,255,255,0.94)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(107,33,217,0.12)", boxShadow: "0 -6px 24px rgba(46,16,96,0.1)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: "0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: "0", flex: "1" }}>
           <img src={asset("landing/logo.png")} alt="Bite" style={{ width: "34px", height: "34px", borderRadius: "9px", flexShrink: "0" }} />
           {" "}
           <div style={{ fontSize: "13.5px", fontWeight: "700", color: "#160a2e", lineHeight: "1.25" }}>{t("Eat with your neighbours tonight")}</div>
         </div>
         {" "}
+        <button type="button" className="mc-ask" onClick={() => window.dispatchEvent(new Event("bite:ask"))} aria-label={t("Ask Bite")}>
+          <svg viewBox="0 0 24 24" aria-hidden><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5z" /><path d="M8.5 9.5h7M8.5 12.5h4" /></svg>
+        </button>
         <a href="bite.html" style={{ flexShrink: "0", background: "#6b21d9", color: "#fff", padding: "12px 20px", borderRadius: "12px", fontWeight: "800", fontSize: "14px", boxShadow: "0 8px 20px rgba(107,33,217,0.28)" }}>{t("Open app")}</a>
       </div>
     </>

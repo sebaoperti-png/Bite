@@ -14,6 +14,17 @@ const READY = ["Reviews after every dinner, both ways", "Report or block anyone 
 export function LandingKitchenNote({ ready }: { ready: boolean }) {
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
+  // phones: a slim pill on the first screen, the full card only when tapped; the pill steps aside once you scroll
+  const [small] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches);
+  const [expanded, setExpanded] = useState(false);
+  const [away, setAway] = useState(false);
+  useEffect(() => {
+    if (!small || !open) return;
+    const onScroll = () => setAway(window.scrollY > window.innerHeight * 0.6);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [small, open]);
 
   useEffect(() => {
     if (!ready) return;
@@ -38,6 +49,11 @@ export function LandingKitchenNote({ ready }: { ready: boolean }) {
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!open) return null;
+  if (small && !expanded) return (
+    <button type="button" className={`kn-pill ${away ? "away" : ""}`} onClick={() => setExpanded(true)} aria-haspopup="dialog" {...(away ? { tabIndex: -1 } : {})}>
+      <i aria-hidden />{t("Bite is just opening its doors")} <u>{t("What's ready?")}</u>
+    </button>
+  );
   return (
     <div className={`kn ${closing ? "out" : ""}`} role="dialog" aria-labelledby="kn-title" aria-modal="false">
       <div className="kn-head">

@@ -42,9 +42,18 @@ export function LandingAssistant() {
   // A small "Ask me" nudge appears a few seconds after the page opens
   useEffect(() => {
     // …and steps aside again after a while, so it never sits on top of the page for long
+    // on phones the sticky bar has its own "Ask Bite" button, so no nudge there
+    if (window.matchMedia("(max-width: 640px)").matches) return;
     const t = window.setTimeout(() => setNudge(true), 9000);
     const t2 = window.setTimeout(() => setNudge(false), 17000);
     return () => { window.clearTimeout(t); window.clearTimeout(t2); };
+  }, []);
+
+  // opened from elsewhere (the phone sticky bar): window.dispatchEvent(new Event("bite:ask"))
+  useEffect(() => {
+    const ask = () => setOpen(true);
+    window.addEventListener("bite:ask", ask);
+    return () => window.removeEventListener("bite:ask", ask);
   }, []);
 
   useEffect(() => {

@@ -7,7 +7,7 @@ interface Founder { name: string; role: string; line: string; photo?: string }
 
 // Fill in roles, lines and photos when the founders send them (photo: "landing/team/<name>.jpg", square, about 400 px).
 const FOUNDERS: Founder[] = [
-  { name: "Sebastiano", role: "Co-founder", line: "Italian in Germany. Builds the product and believes every city's best meals are cooked in its homes." },
+  { name: "Sebastiano", role: "Co-founder", line: "Italian in Germany. Builds the product and believes every city's best meals are cooked in its homes.", photo: "landing/team/sebastiano.jpg" },
   { name: "Axelle", role: "Co-founder", line: "" },
   { name: "Chadha", role: "Co-founder", line: "" },
 ];
@@ -18,7 +18,7 @@ function Polaroid({ f, i, lines }: { f: Founder; i: number; lines: boolean }) {
   return (
     <li className={`ab3-pol ab3-p${i}`}>
       <span className="ab3-photo" style={{ background: TONES[i % TONES.length] }}>
-        {f.photo ? <img src={asset(f.photo)} alt="" /> : <i aria-hidden>{f.name.charAt(0)}</i>}
+        {f.photo ? <img src={asset(f.photo)} alt={f.name} loading="lazy" /> : <i aria-hidden>{f.name.charAt(0)}</i>}
       </span>
       <b>{f.name}</b>
       <em>{t(f.role)}</em>
