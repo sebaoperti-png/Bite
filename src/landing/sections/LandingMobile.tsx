@@ -103,6 +103,7 @@ export function LandingMobile() {
     <>
       <section className="mx-hero">
         <div className="mx-film"><HeroSpot /></div>
+        <p className="mx-city"><i aria-hidden />{t("Starting in Aalen")}</p>
         <p className="mx-hello">{t("Hello neighbours,")}</p>
         <h1 className="mx-h1">{t("Real food, real people,")} <em>{t("your neighbourhood.")}</em></h1>
         <p className="mx-sub">{t("Too many of us eat alone, a few doors apart. On Bite a neighbour cooks, you pull up a chair and everyone splits what the groceries cost.")}</p>

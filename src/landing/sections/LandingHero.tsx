@@ -9,6 +9,8 @@ export function LandingHero() {
         {/* the promise as a note in the stairwell, with tear-off strips at the bottom (like the ones on every German noticeboard) */}
         <div className="hx-note">
           <span className="hx-tape" aria-hidden />
+          {/* where the first tables open: a rubber stamp on the note */}
+          <p className="hx-city"><small>{t("Starting in")}</small><b>Aalen</b></p>
           <p className="hx-hello">{t("Hello neighbours,")}</p>
           <h1 className="hx-title">{t("Real food, real people,")} <em>{t("your neighbourhood.")}</em></h1>
           <p className="hx-sub">{t("Too many of us eat alone, a few doors apart. On Bite a neighbour cooks, you pull up a chair and everyone splits what the groceries cost.")}</p>

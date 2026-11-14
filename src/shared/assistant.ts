@@ -79,7 +79,7 @@ const FAQ: { test: (q: string) => boolean; reply: () => AssistantReply }[] = [
   {
     test: (q) => has(q, "where", "city", "cities", "launch", "available", "wo ", "stadt", "städte", "stadte", "verfügbar", "verfugbar"),
     reply: () => ({
-      text: t("Bite is at an early stage — we're gathering feedback before launching. The demo shows meals in Berlin, Hamburg, Munich, Cologne, Frankfurt and Leipzig. Leave your email at the bottom of the page and we'll keep you posted."),
+      text: t("Bite starts in Aalen: the first real tables open there, other cities come later. The demo shows meals in Berlin, Hamburg, Munich, Cologne, Frankfurt and Leipzig. Leave your email at the bottom of the page and we'll tell you when a table opens near you."),
       chips: [t("Dinner in Berlin"), t("Lunch in Munich")],
     }),
   },

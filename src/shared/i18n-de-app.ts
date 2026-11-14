@@ -1282,8 +1282,7 @@ const DE_UI: Record<string, string> = {
   "Bite connects you with home cooks in your neighbourhood. Pick up a meal, sit down at someone's table, or cook together — and split the cost of the groceries. Real food, real people, for less than takeaway.":
     "Bite verbindet dich mit Hobbyköch:innen in deiner Nachbarschaft. Hol dir ein Essen ab, setz dich mit an den Tisch oder kocht zusammen – und teilt die Einkaufskosten. Echtes Essen, echte Menschen, günstiger als der Lieferdienst.",
   "Something warm and vegan": "Etwas Warmes und Veganes",
-  "Bite is at an early stage — we're gathering feedback before launching. The demo shows meals in Berlin, Hamburg, Munich, Cologne, Frankfurt and Leipzig. Leave your email at the bottom of the page and we'll keep you posted.":
-    "Bite ist noch in einer frühen Phase – wir sammeln Feedback vor dem Start. Die Demo zeigt Essen in Berlin, Hamburg, München, Köln, Frankfurt und Leipzig. Hinterlass unten auf der Seite deine E-Mail und wir halten dich auf dem Laufenden.",
+  "Bite starts in Aalen: the first real tables open there, other cities come later. The demo shows meals in Berlin, Hamburg, Munich, Cologne, Frankfurt and Leipzig. Leave your email at the bottom of the page and we'll tell you when a table opens near you.": "Bite startet in Aalen: Dort öffnen die ersten echten Tische, andere Städte folgen später. Die Demo zeigt Essen in Berlin, Hamburg, München, Köln, Frankfurt und Leipzig. Hinterlass unten auf der Seite deine E-Mail und wir sagen dir Bescheid, sobald ein Tisch in deiner Nähe öffnet.",
   "Dinner in Berlin": "Abendessen in Berlin",
   "Lunch in Munich": "Mittagessen in München",
   "Good evening! I'm your maître d' at Bite. Tell me what you feel like eating — or ask me anything about how Bite works.":

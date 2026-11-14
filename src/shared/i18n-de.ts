@@ -310,6 +310,8 @@ const DE_LANDING: Record<string, string> = {
   "Bite, for the whole street": "Bite, für die ganze Straße",
   "Too many of us eat alone, a few doors apart. On Bite a neighbour cooks, you pull up a chair and everyone splits what the groceries cost.": "Viele von uns essen allein, nur ein paar Türen voneinander entfernt. Auf Bite kocht jemand aus der Nachbarschaft, du setzt dich dazu, und alle teilen sich, was der Einkauf kostet.",
   "Real food, real people,": "Echtes Essen, echte Menschen,",
+  "Starting in": "Wir starten in",
+  "Starting in Aalen": "Wir starten in Aalen",
   "Hello neighbours,": "Hallo Nachbarn,",
   "Your neighbours got it too.": "Deine Nachbarn auch.",
   "Join": "Dabei sein",

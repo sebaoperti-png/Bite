@@ -82,7 +82,7 @@ The whole site reads like an evening at a restaurant. Keep new work in this lang
 
 ## Conventions
 - Brand colours: deep purple `#160a2e`, purple `#6b21d9`, lilac `#9b4aff` / `#b87fff`, light lavender `#f0e9fb`. Landing page background: soft lavender `#f3eefb` (not pure white, easier on the eyes).
-- Copy is written in English (UK spelling: neighbourhood); wrap every visible text in `t()` and add its German version. The demo app is set in Frankfurt neighbourhoods, but the site makes no launch-city claims: bite is collecting feedback for now.
+- Copy is written in English (UK spelling: neighbourhood); wrap every visible text in `t()` and add its German version. The demo app is set in Frankfurt neighbourhoods. Bite starts in Aalen (since Nov 2026): the landing hero (`hx-city` stamp, `mx-city` on phones), the assistant's facts (`supabase/functions/bite-ask/index.ts`, `src/shared/assistant.ts`) say so. Name no other launch city or date until it is decided.
 - Links from the landing to the app must point to `bite.html` (the landing fades out on those links).
 - The app is responsive: phone layout under 768px (`useIsDesktop`), a full-width web layout with a top bar above it. Test both, and keep them feature-equal: anything added to one layout gets its counterpart in the other (e.g. "Cooking this week" is `WeekMenu` on desktop and `MobileWeekMenu` on phones; the phone's "+" menu ↔ the desktop top bar's Start hosting).
 - Landing copy is early-stage: no invented user numbers, launch cities, dates or reviews.
