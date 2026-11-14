@@ -232,25 +232,37 @@ function Hall({ t }: { t: number }) {
 }
 
 /* ---------- the film ---------- */
-function useClock(paused: boolean, still: boolean) {
+function useClock(paused: boolean, still: boolean, box: React.RefObject<HTMLDivElement | null>) {
   const [t, setT] = useState(still ? 12.6 : 0);
   const base = useRef(0);
   const now = useRef(0);
+  const [visible, setVisible] = useState(true);
   useEffect(() => {
-    if (still || paused) return;
+    const el = box.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.05 });
+    io.observe(el);
+    const vis = () => setVisible(!document.hidden && el.getBoundingClientRect().bottom > 0);
+    document.addEventListener("visibilitychange", vis);
+    return () => { io.disconnect(); document.removeEventListener("visibilitychange", vis); };
+  }, [box]);
+  useEffect(() => {
+    if (still || paused || !visible) return;
     base.current = performance.now() - now.current * 1000;
-    let raf = 0;
-    const tick = (ms: number) => { const v = ((ms - base.current) / 1000) % LOOP; now.current = v; setT(v); raf = requestAnimationFrame(tick); };
+    let raf = 0, last = 0;
+    // 30 frames a second is plenty for this film and halves the work on phones
+    const tick = (ms: number) => { if (ms - last > 32) { last = ms; const v = ((ms - base.current) / 1000) % LOOP; now.current = v; setT(v); } raf = requestAnimationFrame(tick); };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [paused, still]);
+  }, [paused, still, visible]);
   return t;
 }
 
 export function HeroSpot() {
   const [still] = useState(() => typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
   const [paused, setPaused] = useState(false);
-  const r = useClock(paused, still) / (still ? 1 : SLOW);        // film time (beats)
+  const box = useRef<HTMLDivElement>(null);
+  const r = useClock(paused, still, box) / (still ? 1 : SLOW);        // film time (beats)
   // story time: frozen while the camera holds on the phone, so the note gets its moment
   const t = still ? r : r < HOLD_AT ? r : r < HOLD_AT + HOLD ? HOLD_AT : r - HOLD;
 
@@ -264,7 +276,7 @@ export function HeroSpot() {
   const join = r > 5.05;
 
   return (
-    <div className="hs2">
+    <div className="hs2" ref={box}>
       <svg viewBox="0 0 600 750" className="hs2-svg" aria-hidden>
         <defs>
           <linearGradient id="hs-room" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7d86d8" /><stop offset="1" stopColor="#4a4ea3" /></linearGradient>

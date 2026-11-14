@@ -1,4 +1,5 @@
 // FOOTER (converted from the original design; edit freely)
+import { openBugReport } from "../../shared/BugReport";
 import { useEffect, useRef, useState } from "react";
 import { asset } from "../asset";
 import { LogoWord } from "./LogoWord";
@@ -69,7 +70,7 @@ export function LandingFooter() {
             </div>
             {" "}
             <div>
-              <h4 className="ft-h4">{t("Product")}</h4>
+              <h3 className="ft-h4">{t("Product")}</h3>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#how" style={{ fontSize: "16px", color: "#a897c8" }}>{t("How it works")}</a>
@@ -83,7 +84,7 @@ export function LandingFooter() {
             </div>
             {" "}
             <div>
-              <h4 className="ft-h4">{t("Support")}</h4>
+              <h3 className="ft-h4">{t("Support")}</h3>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#help" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Help Center")}</a>
@@ -94,12 +95,12 @@ export function LandingFooter() {
                   {t("Trust & Safety")}
                 </a>
                 {" "}
-                <a href="#help" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Report an issue")}</a>
+                <button type="button" onClick={openBugReport} className="ft-linkbtn" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Report a bug")}</button>
               </div>
             </div>
             {" "}
             <div>
-              <h4 className="ft-h4">{t("Legal")}</h4>
+              <h3 className="ft-h4">{t("Legal")}</h3>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="legal.html#terms" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Terms of Service")}</a>

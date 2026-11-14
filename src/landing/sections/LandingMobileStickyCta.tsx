@@ -17,7 +17,7 @@ export function LandingMobileStickyCta() {
   }, []);
   return (
     <>
-      <div className={`mobile-cta ${show ? "in" : ""}`} aria-hidden={!show} style={{ position: "fixed", left: "0", right: "0", bottom: "0", zIndex: "800", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "12px 16px calc(12px + env(safe-area-inset-bottom))", background: "rgba(255,255,255,0.94)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(107,33,217,0.12)", boxShadow: "0 -6px 24px rgba(46,16,96,0.1)" }}>
+      <div className={`mobile-cta ${show ? "in" : ""}`} aria-hidden={!show} {...(show ? {} : { inert: "" })} style={{ position: "fixed", left: "0", right: "0", bottom: "0", zIndex: "800", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "12px 16px calc(12px + env(safe-area-inset-bottom))", background: "rgba(255,255,255,0.94)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(107,33,217,0.12)", boxShadow: "0 -6px 24px rgba(46,16,96,0.1)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: "0" }}>
           <img src={asset("landing/logo.png")} alt="Bite" style={{ width: "34px", height: "34px", borderRadius: "9px", flexShrink: "0" }} />
           {" "}

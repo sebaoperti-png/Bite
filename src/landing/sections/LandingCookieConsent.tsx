@@ -39,7 +39,7 @@ export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnal
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "#f7f3fc" }}>
                         <div>
                           <div style={{ fontSize: "14px", fontWeight: "800", color: "#160a2e" }}>{t("Strictly necessary")}</div>
-                          <div style={{ fontSize: "12px", color: "#8a7aa8" }}>{t("Always active, sign-in, security, session.")}</div>
+                          <div style={{ fontSize: "12px", color: "#695a8c" }}>{t("Always active, sign-in, security, session.")}</div>
                         </div>
                         {" "}
                         <span style={{ fontSize: "12px", fontWeight: "800", color: "#0a7c4e" }}>{t("ON")}</span>
@@ -48,7 +48,7 @@ export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnal
                       <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", cursor: "pointer" }}>
                         <div>
                           <div style={{ fontSize: "14px", fontWeight: "800", color: "#160a2e" }}>{t("Functional")}</div>
-                          <div style={{ fontSize: "12px", color: "#8a7aa8" }}>{t("Remembers city, language, filters.")}</div>
+                          <div style={{ fontSize: "12px", color: "#695a8c" }}>{t("Remembers city, language, filters.")}</div>
                         </div>
                         {" "}
                         <input type="checkbox" checked={prefFunctional} onChange={toggleFunctional} style={{ width: "20px", height: "20px", accentColor: "#6b21d9" }} />
@@ -57,7 +57,7 @@ export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnal
                       <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", cursor: "pointer", borderTop: "1px solid rgba(107,33,217,0.08)" }}>
                         <div>
                           <div style={{ fontSize: "14px", fontWeight: "800", color: "#160a2e" }}>{t("Analytics")}</div>
-                          <div style={{ fontSize: "12px", color: "#8a7aa8" }}>{t("Aggregated usage stats to improve Bite.")}</div>
+                          <div style={{ fontSize: "12px", color: "#695a8c" }}>{t("Aggregated usage stats to improve Bite.")}</div>
                         </div>
                         {" "}
                         <input type="checkbox" checked={prefAnalytics} onChange={toggleAnalytics} style={{ width: "20px", height: "20px", accentColor: "#6b21d9" }} />
@@ -66,7 +66,7 @@ export function LandingCookieConsent({ acceptAll, hidePrefs, openPrefs, prefAnal
                       <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", cursor: "pointer", borderTop: "1px solid rgba(107,33,217,0.08)" }}>
                         <div>
                           <div style={{ fontSize: "14px", fontWeight: "800", color: "#160a2e" }}>{t("Marketing")}</div>
-                          <div style={{ fontSize: "12px", color: "#8a7aa8" }}>{t("Measure campaigns, show relevant offers.")}</div>
+                          <div style={{ fontSize: "12px", color: "#695a8c" }}>{t("Measure campaigns, show relevant offers.")}</div>
                         </div>
                         {" "}
                         <input type="checkbox" checked={prefMarketing} onChange={toggleMarketing} style={{ width: "20px", height: "20px", accentColor: "#6b21d9" }} />
