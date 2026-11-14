@@ -1223,52 +1223,79 @@ a.rs-go:hover { background: #160a2e; }
 .sx-try-head .sx-try { margin: 0 auto; }
 @media (max-width: 820px) { .sx-try-head h3 { font-size: 38px; } .sx-try-section { padding-top: 10px; } }
 
-/* ── Sides: the ways to eat as chalkboard specials + the pass with a cloche ── */
-.sd { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 56px; align-items: center; }
+/* ── Sides: the ways to eat as chalkboard specials + a deck of menu cards ── */
+.sd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
 .sd-board { display: flex; flex-direction: column; }
 .sd-board-title { margin-bottom: 14px; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 30px; color: #e9dcff; text-shadow: 0 0 1px rgba(255,255,255,0.4); }
-.sd-line { position: relative; display: flex; align-items: baseline; gap: 14px; padding: 18px 10px; border: 0; border-top: 1px dashed rgba(251,248,255,0.18); background: none; color: rgba(251,248,255,0.55); font: inherit; text-align: left; cursor: pointer; transition: color .35s; }
-.sd-line:last-child { border-bottom: 1px dashed rgba(251,248,255,0.18); }
+.sd-line { position: relative; display: flex; align-items: baseline; gap: 14px; padding: 20px 10px; border: 0; border-top: 1px dashed rgba(251,248,255,0.18); background: none; color: rgba(251,248,255,0.5); font: inherit; text-align: left; cursor: pointer; transition: color .35s, background .35s; border-radius: 0; }
+.sd-line:last-of-type { border-bottom: 1px dashed rgba(251,248,255,0.18); }
+.sd-line:hover { color: rgba(251,248,255,0.8); }
+.sd-line:focus-visible { outline: 2px solid #b87fff; outline-offset: 2px; }
 .sd-n { width: 34px; flex-shrink: 0; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; color: rgba(184,127,255,0.6); }
-.sd-name { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 40px; line-height: 1; white-space: nowrap; text-shadow: 0 0 1px rgba(255,255,255,0.35); transition: transform .4s cubic-bezier(.22,1,.36,1); }
-.sd-dots { flex: 1; min-width: 20px; border-bottom: 2px dotted rgba(251,248,255,0.2); transform: translateY(-8px); }
-.sd-tag { flex-shrink: 0; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: rgba(251,248,255,0.5); }
+.sd-name { position: relative; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 44px; line-height: 1; white-space: nowrap; text-shadow: 0 0 1px rgba(255,255,255,0.35); transition: transform .45s cubic-bezier(.22,1,.36,1); }
+.sd-dots { flex: 1; min-width: 20px; border-bottom: 2px dotted rgba(251,248,255,0.18); transform: translateY(-8px); }
+.sd-tag { flex-shrink: 0; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: rgba(251,248,255,0.45); }
 .sd-line.on { color: #fbf8ff; }
-.sd-line.on .sd-name { transform: translateX(6px); }
+.sd-line.on .sd-name { transform: translateX(8px); }
 .sd-line.on .sd-n { color: #b87fff; }
 .sd-line.on .sd-tag { color: #e3d0ff; }
 .sd-line.soon .sd-tag { padding: 3px 8px; border: 1.5px solid rgba(255,143,180,0.7); border-radius: 6px; color: #ff8fb4; rotate: -4deg; }
-.sd-name { position: relative; }
 .sd-ring { position: absolute; left: -14px; top: -10px; width: calc(100% + 28px); height: calc(100% + 20px); overflow: visible; pointer-events: none; }
 .sd-ring path { fill: none; stroke: #b87fff; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; }
 .sd-line.on .sd-ring path { opacity: 1; animation: sdRing .7s cubic-bezier(.6,0,.3,1) forwards; }
 @keyframes sdRing { to { stroke-dashoffset: 0; } }
-.sd-pass { display: flex; flex-direction: column; align-items: center; }
-.sd-plate { position: relative; width: min(420px, 100%); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #fffdf8 0 56%, #efe6d6 57% 60%, #fffdf8 61% 69%, #e7dcc8 70% 71%, transparent 72%); filter: drop-shadow(0 30px 40px rgba(0,0,0,0.45)); }
-.sd-scene { position: absolute; inset: 16% 12% 18%; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 40%, #8f4bff, #4a1aa3); opacity: 0; transform: scale(.92); transition: opacity .4s .1s, transform .6s .1s cubic-bezier(.2,1.3,.4,1); }
-.sd-scene .sc { width: 96%; max-width: none; }
-.sd-plate.lifted .sd-scene { opacity: 1; transform: none; }
-.sd-cloche { position: absolute; left: 11%; top: 27%; width: 78%; height: auto; transform-origin: 50% 100%; animation: sdDown .45s cubic-bezier(.4,0,.2,1) backwards; transition: transform .7s cubic-bezier(.45,0,.25,1), opacity .6s .1s; filter: drop-shadow(0 12px 16px rgba(0,0,0,0.35)); }
-@keyframes sdDown { from { transform: translateY(-80px); opacity: 0; } to { transform: none; opacity: 1; } }
-.sd-plate.lifted .sd-cloche { transform: translateY(-120%) rotate(-8deg); opacity: 0; }
-.sd-label { margin-top: -6px; width: min(340px, 100%); padding: 14px 20px 16px; text-align: center; background: #fbf6ec; color: #2a1553; border-radius: 4px; rotate: -1.5deg; box-shadow: 0 18px 30px rgba(0,0,0,0.35); animation: sdLabel .5s .45s cubic-bezier(.22,1,.36,1) both; }
-@keyframes sdLabel { from { opacity: 0; transform: translateY(10px); } }
-.sd-label > span { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #7c6aa3; }
-.sd-label b { display: block; margin: 4px 0 4px; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 30px; line-height: 1; }
-.sd-label p { margin: 0; font-size: 14px; line-height: 1.5; color: #4a3a6e; }
-.sd-label em { display: inline-block; margin-top: 8px; padding: 2px 8px; border: 2px solid #ff6f9f; border-radius: 6px; font-style: normal; font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #ff6f9f; rotate: -4deg; }
-@media (max-width: 1000px) { .sd-name { font-size: 32px; } .sd-tag { display: none; } }
-@media (max-width: 820px) {
-  .sd { grid-template-columns: 1fr; gap: 26px; }
-  .sd-pass { order: -1; }
-  .sd-plate { width: min(300px, 82vw); }
-  .sd-board-title { font-size: 24px; text-align: center; margin-bottom: 6px; }
-  .sd-line { padding: 13px 6px; }
-  .sd-name { font-size: 28px; }
-  .sd-n { width: 28px; font-size: 20px; }
-  .sd-label b { font-size: 25px; }
+/* the chalk line under the dish being served fills like a kitchen timer */
+.sd-timer { position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; background: linear-gradient(90deg, #b87fff, #ff8fb4); transform-origin: 0 50%; animation: sdTimer linear both; border-radius: 2px; }
+@keyframes sdTimer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* the deck */
+.sd-deck { position: relative; width: min(440px, 100%); aspect-ratio: 4 / 5; margin: 0 auto; perspective: 1400px; }
+.sd-card { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 18px 18px 22px; border-radius: 20px; background: #fbf6ec; color: #2a1553; box-shadow: 0 30px 60px rgba(8,2,24,0.5), inset 0 0 0 1px rgba(42,21,83,0.06); transform-origin: 50% 90%; transition: transform .7s cubic-bezier(.22,1,.36,1), filter .7s, opacity .7s; cursor: pointer; }
+.sd-card::after { content: ""; position: absolute; inset: 8px; border: 1px solid rgba(124,106,163,0.25); border-radius: 14px; pointer-events: none; }
+.sd-card.d0 { z-index: 4; transform: none; cursor: default; }
+.sd-card.d1 { z-index: 3; transform: translate(22px, -16px) rotate(4deg) scale(.96); filter: brightness(.86); }
+.sd-card.d2 { z-index: 2; transform: translate(40px, -30px) rotate(8deg) scale(.92); filter: brightness(.72); }
+.sd-card.d3 { z-index: 1; transform: translate(54px, -42px) rotate(12deg) scale(.88); filter: brightness(.6); }
+/* the card that was on top flies off to the right and slides in at the back */
+.sd-card.toss { animation: sdToss .8s cubic-bezier(.5,0,.3,1); }
+@keyframes sdToss {
+  0% { z-index: 5; transform: none; filter: none; }
+  45% { z-index: 5; transform: translate(70%, -8%) rotate(18deg) scale(.95); }
+  55% { z-index: 0; transform: translate(70%, -10%) rotate(18deg) scale(.92); }
+  100% { z-index: 1; transform: translate(54px, -42px) rotate(12deg) scale(.88); filter: brightness(.6); }
 }
-@media (prefers-reduced-motion: reduce) { .sd-cloche { display: none; } .sd-scene { opacity: 1; transform: none; transition: none; } .sd-line.on .sd-ring path { animation: none; stroke-dashoffset: 0; } .sd-label { animation: none; } }
+.sd-card-top { display: flex; justify-content: space-between; gap: 10px; padding: 2px 6px 10px; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #7c6aa3; }
+.sd-card-art { position: relative; flex: 1; min-height: 0; display: grid; place-items: center; border-radius: 14px; background: radial-gradient(circle at 50% 38%, #9152ff, #4a1aa3 78%); overflow: hidden; }
+.sd-card-art .sc { width: 100%; height: 100%; max-width: none; }
+.sd-card-art:not(.live) * { animation-play-state: paused !important; }
+.sd-card b { display: block; margin: 14px 6px 4px; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 34px; line-height: 1; color: #160a2e; }
+.sd-card p { margin: 0 6px; font-size: 14.5px; line-height: 1.5; color: #4a3a6e; }
+.sd-card.soon .sd-card-art { filter: grayscale(.55); }
+.sd-stamp { position: absolute; right: 22px; bottom: 26px; padding: 3px 10px; border: 2.5px solid #ff6f9f; border-radius: 6px; font-style: normal; font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: #ff6f9f; rotate: -8deg; background: rgba(251,246,236,0.9); }
+.sd-card.d0 .sd-stamp { animation: sdStamp .5s .35s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes sdStamp { from { opacity: 0; transform: scale(1.8); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 1000px) { .sd-name { font-size: 34px; } .sd-tag { display: none; } .sd { gap: 40px; } }
+@media (max-width: 820px) {
+  .sd { grid-template-columns: 1fr; gap: 34px; }
+  .sd-deck { order: -1; width: min(330px, 78vw); }
+  .sd-card.d1 { transform: translate(12px, -10px) rotate(3deg) scale(.96); }
+  .sd-card.d2 { transform: translate(22px, -18px) rotate(6deg) scale(.92); }
+  .sd-card.d3 { transform: translate(30px, -25px) rotate(9deg) scale(.88); }
+  @keyframes sdToss {
+    0% { z-index: 5; transform: none; filter: none; }
+    45% { z-index: 5; transform: translate(60%, -6%) rotate(14deg) scale(.95); }
+    55% { z-index: 0; transform: translate(60%, -8%) rotate(14deg) scale(.92); }
+    100% { z-index: 1; transform: translate(30px, -25px) rotate(9deg) scale(.88); filter: brightness(.6); }
+  }
+  .sd-card b { font-size: 28px; margin-top: 12px; }
+  .sd-card p { font-size: 13.5px; }
+  .sd-board-title { font-size: 24px; text-align: center; margin-bottom: 6px; }
+  .sd-line { padding: 14px 6px; }
+  .sd-name { font-size: 30px; }
+  .sd-n { width: 28px; font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .sd-card, .sd-card.toss { transition: none; animation: none; } .sd-line.on .sd-ring path { animation: none; stroke-dashoffset: 0; } .sd-card.d0 .sd-stamp { animation: none; } }
 
 /* ── Safety, tap to set the table (2026-11-13): no scroll locking, the layout fits every width ── */
 .sh-section .sh-sticky { grid-template-columns: minmax(250px, 0.85fr) minmax(340px, 1.3fr) minmax(280px, 1fr); gap: 32px; align-items: center; }
