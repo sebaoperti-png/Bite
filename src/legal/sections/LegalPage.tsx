@@ -23,7 +23,7 @@ export function LegalPage() {
         {/* TOC */}
         {" "}
         <nav className="lg-toc" style={{ position: "sticky", top: "100px" }}>
-          <div style={{ fontSize: "12px", fontWeight: "800", letterSpacing: "0.08em", color: "#a091bd", padding: "0 12px 8px" }}>
+          <div style={{ fontSize: "12px", fontWeight: "800", letterSpacing: "0.08em", color: "#695a8c", padding: "0 12px 8px" }}>
             {"LEGAL & POLICIES"}
           </div>
           {" "}
@@ -97,7 +97,7 @@ export function LegalPage() {
               Terms of Service
             </h2>
             {" "}
-            <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
+            <p style={{ color: "#695a8c", fontSize: "13px", margin: "0" }}>
               Effective 13 November 2026
             </p>
             {" "}
@@ -230,7 +230,7 @@ export function LegalPage() {
               Privacy Policy
             </h2>
             {" "}
-            <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
+            <p style={{ color: "#695a8c", fontSize: "13px", margin: "0" }}>
               {"In accordance with Art. 13 & 14 GDPR · Effective 13 November 2026"}
             </p>
             {" "}
@@ -276,7 +276,7 @@ export function LegalPage() {
               <li><strong>Resend</strong>{" (Plus Five Five, Inc., USA): sends the app's emails (confirming your address, resetting your password). Servers in Ireland (EU)."}</li>
               <li><strong>{"GitHub Pages"}</strong>{" (GitHub, Inc., a Microsoft company, USA): hosts the website bitetable.de; receives your IP address when you open a page."}</li>
               <li><strong>{"Apple iCloud Mail"}</strong>{" (Apple Distribution International Ltd., Ireland): our mailbox hello@bitetable.de; receives the emails you send us."}</li>
-              <li><strong>{"Google Apps Script & Google Sheets"}</strong>{" (Google Ireland Ltd.): the survey and the newsletter list (see the Survey section)."}</li>
+              <li><strong>{"Google Apps Script & Google Sheets"}</strong>{" (Google Ireland Ltd.): the survey, the newsletter list (see the Survey section) and bug reports sent with \"Report a bug\" (the text, and only if you tick it the page, screen size, browser and language; your email only if you give it, to answer you; deleted once the bug is closed and at the latest after 12 months; Art. 6(1)(f) GDPR)."}</li>
               <li><strong>{"Photon by komoot"}</strong>{" (komoot GmbH, Germany): the place search in the app; receives the place or postcode you type and your IP address."}</li>
               <li><strong>OpenFreeMap</strong>{" (map tiles from OpenStreetMap data): draws the map in the app; receives your IP address and the map area shown."}</li>
               <li><strong>OpenPLZ API</strong>{" (open data on German postcodes): when a host types a postcode, it finds the town; receives the postcode and your IP address."}</li>
@@ -292,7 +292,7 @@ export function LegalPage() {
             <h3 lang="de">
               {"Kurz auf Deutsch: Empfänger"}
             </h3>
-            <p lang="de">{"Bite nutzt: Supabase (Datenbank, Login, Fotos; Server in Frankfurt am Main), Resend (E-Mails der App; Server in Irland), GitHub Pages (Website), Apple iCloud Mail (unser Postfach), Google Apps Script und Google Sheets (Umfrage und Newsletter), Photon von komoot (Ortssuche), OpenFreeMap (Karte), jsDelivr (nur beim Scannen eines Kassenbons), OpenPLZ API (Postleitzahl zu Ort), Unsplash (Fotos von Gerichten, die Gastgeber auswählen) und die Google Gemini API (nur wenn ein Gastgeber die KI-Hilfe nutzt: dann gehen sein Text oder seine Zutatenliste ohne Namen oder Adresse an Google; im kostenlosen Tarif kann Google diese Texte zur Verbesserung seiner Dienste nutzen). Zahlungen und Ausweisdaten werden derzeit nicht verarbeitet. Wir verkaufen keine personenbezogenen Daten. Fragen: hello@bitetable.de."}</p>
+            <p lang="de">{"Bite nutzt: Supabase (Datenbank, Login, Fotos; Server in Frankfurt am Main), Resend (E-Mails der App; Server in Irland), GitHub Pages (Website), Apple iCloud Mail (unser Postfach), Google Apps Script und Google Sheets (Umfrage, Newsletter und Fehlermeldungen über „Fehler melden“: der Text, auf Wunsch Seite, Bildschirmgröße, Browser und Sprache, deine E-Mail nur, wenn du sie angibst; gelöscht, sobald der Fehler erledigt ist, spätestens nach 12 Monaten), Photon von komoot (Ortssuche), OpenFreeMap (Karte), jsDelivr (nur beim Scannen eines Kassenbons), OpenPLZ API (Postleitzahl zu Ort), Unsplash (Fotos von Gerichten, die Gastgeber auswählen) und die Google Gemini API (nur wenn ein Gastgeber die KI-Hilfe nutzt: dann gehen sein Text oder seine Zutatenliste ohne Namen oder Adresse an Google; im kostenlosen Tarif kann Google diese Texte zur Verbesserung seiner Dienste nutzen). Zahlungen und Ausweisdaten werden derzeit nicht verarbeitet. Wir verkaufen keine personenbezogenen Daten. Fragen: hello@bitetable.de."}</p>
             <h3>
               6. Retention
             </h3>
@@ -336,7 +336,7 @@ export function LegalPage() {
             <h2>
               {"Survey, interviews & newsletter"}
             </h2>
-            <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
+            <p style={{ color: "#695a8c", fontSize: "13px", margin: "0" }}>
               {"Information under Art. 13 GDPR · Effective 20 October 2026 · Deutsche Fassung unten"}
             </p>
             <h3>
@@ -449,7 +449,7 @@ export function LegalPage() {
               Cookie Policy
             </h2>
             {" "}
-            <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
+            <p style={{ color: "#695a8c", fontSize: "13px", margin: "0" }}>
               {"Under the German TDDDG (§ 25) & GDPR · Effective 13 July 2026"}
             </p>
             {" "}
@@ -525,7 +525,7 @@ export function LegalPage() {
               Community Guidelines
             </h2>
             {" "}
-            <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
+            <p style={{ color: "#695a8c", fontSize: "13px", margin: "0" }}>
               The house rules that keep Bite safe and warm
             </p>
             {" "}
@@ -664,7 +664,7 @@ export function LegalPage() {
               Impressum
             </h2>
             {" "}
-            <p style={{ color: "#8a7aa8", fontSize: "13px", margin: "0" }}>
+            <p style={{ color: "#695a8c", fontSize: "13px", margin: "0" }}>
               Information pursuant to § 5 DDG
             </p>
             {" "}
@@ -800,7 +800,7 @@ export function LegalPage() {
             </p>
           </section>
           {" "}
-          <p style={{ marginTop: "40px", paddingTop: "20px", borderTop: "1px solid rgba(107,33,217,0.1)", fontSize: "13px", color: "#8a7aa8" }}>
+          <p style={{ marginTop: "40px", paddingTop: "20px", borderTop: "1px solid rgba(107,33,217,0.1)", fontSize: "13px", color: "#695a8c" }}>
             © 2026 Bite · Sebastiano Operti, Germany. These policies are provided in good faith and should be reviewed by legal counsel for your final launch jurisdiction.
           </p>
         </main>
