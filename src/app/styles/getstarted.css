@@ -5,7 +5,7 @@
 .wt-skip { font-family: 'Figtree Variable', sans-serif; font-size: 12.5px; letter-spacing: 0; text-transform: none; font-weight: 700; color: #7c6aa3; padding: 4px 8px; border-radius: 999px; }
 .wt-skip:hover { background: rgba(107,33,217,0.08); color: #6b21d9; }
 .wt-art { display: block; width: 120px; height: 110px; margin: 14px auto 6px; color: #6b21d9; }
-.wt-title { margin: 4px 0 8px; font-family: 'Fraunces Variable', serif; font-style: italic; font-weight: 400; font-size: 32px; line-height: 1.05; color: #160a2e; }
+.wt-title { margin: 4px 0 8px; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 32px; line-height: 1.05; color: #160a2e; }
 .wt-text { margin: 0 auto; max-width: 330px; font-size: 14.5px; line-height: 1.55; color: #4a3a6e; min-height: 68px; }
 .wt-dots { display: flex; justify-content: center; gap: 7px; margin: 16px 0 14px; }
 .wt-dots button { width: 8px; height: 8px; border-radius: 999px; background: #d9cdee; transition: width .25s, background .25s; }
@@ -42,7 +42,7 @@
 .hf-warn svg { flex-shrink: 0; margin-top: 1px; }
 .hf-warn p { margin: 0; font-size: 12.5px; line-height: 1.5; color: #7a4a10; font-weight: 600; }
 .hf-decl { padding: 16px 16px 14px; border-radius: 18px; background: #fbf6ec; border: 1.5px solid rgba(107,33,217,0.18); }
-.hf-decl-title { margin: 0 0 8px; font-family: 'Fraunces Variable', serif; font-style: italic; font-size: 22px; color: #160a2e; }
+.hf-decl-title { margin: 0 0 8px; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; color: #160a2e; }
 .hf-decl ul { margin: 0 0 12px; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.45; color: #4a3a6e; }
 .hf-decl-check { position: relative; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; color: #160a2e; cursor: pointer; }
 .hf-decl-check input { position: absolute; opacity: 0; width: 1px; height: 1px; }

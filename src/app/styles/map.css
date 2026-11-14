@@ -5,7 +5,7 @@
   position: absolute; left: 50%; transform: translateX(-50%); z-index: 3; padding: 8px 14px; border-radius: 999px;
   background: rgba(255,255,255,0.95); box-shadow: 0 6px 20px rgba(46,16,96,0.12); font-size: 12.5px; font-weight: 700; color: #4b3a6b; white-space: nowrap;
 }
-.mm-loading { top: 46%; font-family: 'Fraunces Variable', serif; font-style: italic; font-size: 18px; font-weight: 400; color: #6b21d9; }
+.mm-loading { top: 46%; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 18px; font-weight: 400; color: #6b21d9; }
 .mm-fallback { top: 40%; white-space: normal; text-align: center; max-width: 280px; }
 .mm-empty { bottom: 22px; }
 .mm-note { position: absolute; left: 12px; bottom: 8px; z-index: 2; margin: 0; font-size: 11px; color: #7c6fa0; background: rgba(255,255,255,0.85); padding: 3px 8px; border-radius: 8px; }
