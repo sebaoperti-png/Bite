@@ -74,8 +74,10 @@ export function LegalPage() {
               Operated by
               {" "}
               <strong>
-                Bite — Sebastiano Operti
+                Sebastiano Operti
               </strong>
+              <br />
+              {"operating the project \"Bite\""}
               , Aalen, Germany. Last updated 13 November 2026.
             </p>
             {" "}
@@ -214,12 +216,7 @@ export function LegalPage() {
             </h3>
             {" "}
             <p>
-              These Terms are governed by the laws of the Federal Republic of Germany, excluding the UN Convention on Contracts for the International Sale of Goods. Mandatory consumer-protection provisions of your country of residence remain unaffected. The EU Online Dispute Resolution platform is available at
-              {" "}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">
-                ec.europa.eu/consumers/odr
-              </a>
-              . We are neither obliged nor willing to participate in dispute-resolution proceedings before a consumer arbitration board.
+              These Terms are governed by the laws of the Federal Republic of Germany, excluding the UN Convention on Contracts for the International Sale of Goods. Mandatory consumer-protection provisions of your country of residence remain unaffected. We are neither obliged nor willing to participate in dispute-resolution proceedings before a consumer arbitration board (§ 36 VSBG).
             </p>
           </section>
           {" "}
@@ -684,14 +681,6 @@ export function LegalPage() {
             </p>
             {" "}
             <h3>
-              Represented by
-            </h3>
-            {" "}
-            <p>
-              Sebastiano Operti, Founder
-            </p>
-            {" "}
-            <h3>
               Contact
             </h3>
             {" "}
@@ -720,16 +709,19 @@ export function LegalPage() {
             </p>
             {" "}
             <h3>
-              EU dispute resolution
+              Consumer dispute resolution
             </h3>
             {" "}
             <p>
-              European Commission Online Dispute Resolution platform:
-              {" "}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">
-                ec.europa.eu/consumers/odr
-              </a>
-              . We are not obliged or willing to participate in dispute-resolution proceedings before a consumer arbitration board.
+              We are not obliged or willing to participate in dispute-resolution proceedings before a consumer arbitration board (§ 36 VSBG).
+            </p>
+            {" "}
+            <h3>
+              Contact point under the Digital Services Act
+            </h3>
+            {" "}
+            <p>
+              Single point of contact for users and authorities (Art. 11 and 12 DSA): hello@bitetable.de, in English or German. To report illegal content or a person, use "Report" on the meal, profile or chat in the app, or write to us with a link and the reason; we confirm receipt and tell you what we decided.
             </p>
           </section>
           {" "}
