@@ -2,10 +2,10 @@
 // it shows what it is doing (a short reasoning list), then serves its suggestions on a small menu card.
 import { useEffect, useRef, useState } from "react";
 import { ThinkingOrb } from "thinking-orbs";
-import { answer, greeting, type AssistantReply } from "../../shared/assistant";
+import { answer, askRemote, greeting, type AssistantReply } from "../../shared/assistant";
 import { withFee, euro } from "../../app/data";
 import { asset } from "../asset";
-import { t, t as tr, tMaybe, dateLabel } from "../../shared/i18n";
+import { t, t as tr, tMaybe, dateLabel, getLang } from "../../shared/i18n";
 
 interface Msg { id: number; from: "bot" | "me"; reply?: AssistantReply; text: string; done: boolean }
 
@@ -88,16 +88,27 @@ export function LandingAssistant() {
     }, delay);
   };
 
-  const send = (text: string) => {
-    const t = text.trim();
-    if (!t || thinking) return;
+  // The real maître d' (Gemini, through the Edge Function bite-ask) answers first, with the real meals on Bite.
+  // If it can't (offline, busy, today's questions used up), the rule-based answer() takes over.
+  const [waiting, setWaiting] = useState(false);
+  const send = async (text: string) => {
+    const q = text.trim();
+    if (!q || thinking || waiting) return;
     setInput("");
-    setMsgs((m) => [...m, { id: nextId++, from: "me", text: t, done: true }]);
-    const reply = answer(t);
-    const lines = reply.meals
-      ? [tr("Checking tonight's kitchens"), tr("Matching what you asked"), reply.meals.length === 1 ? tr("Found 1 table") : tr("Found {n} tables", { n: reply.meals.length })]
-      : [tr("Reading your question"), tr("Asking the kitchen")];
-    pushBot(reply, 1300 + Math.min(700, t.length * 10), lines);
+    const history = msgs.filter((m) => m.done).map((m) => ({ from: m.from, text: m.text }));
+    setMsgs((m) => [...m, { id: nextId++, from: "me", text: q, done: true }]);
+    setWaiting(true); setThinking(true);
+    const live = [tr("Reading your question"), tr("Checking tonight's kitchens"), tr("Choosing for you")];
+    setSteps(live); setStepDone(0);
+    const timers = live.map((_, i) => window.setTimeout(() => setStepDone(i + 1), 900 * (i + 1)));
+    const remote = await askRemote(q, history, getLang());
+    timers.forEach(window.clearTimeout);
+    setWaiting(false);
+    if (remote && remote !== "limit") { pushBot(remote, 250, []); return; }
+    const reply = answer(q);
+    if (reply.meals?.length) reply.text = `${tr("I can't reach the kitchen right now, so here are examples from our demo.")} ${reply.text}`;
+    if (remote === "limit") reply.text = `${tr("I've answered a lot of questions today, so here is my quick version.")} ${reply.text}`;
+    pushBot(reply, 300, []);
   };
 
   return (
@@ -131,11 +142,30 @@ export function LandingAssistant() {
             {msgs.map((m) => (
               <div key={m.id} className={`as-msg ${m.from}`}>
                 <div className="as-bubble">{m.text}{m.from === "bot" && !m.done && <span className="as-caret" />}</div>
+                {m.from === "bot" && m.done && m.reply?.live && (
+                  <div className="as-meals">
+                    <span className="as-menu-title">{t("The maître d' suggests")}</span>
+                    {m.reply.live.map((meal) => {
+                      const d = new Date(meal.starts_at);
+                      const when = d.toLocaleString(getLang() === "de" ? "de-DE" : "en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+                      return (
+                        <a key={meal.id} className="as-meal" href={`bite.html?live&meal=${encodeURIComponent(meal.id)}`}>
+                          {meal.image ? <img src={meal.image.startsWith("https://") ? meal.image : asset(meal.image)} alt="" /> : <span className="as-meal-noimg" aria-hidden />}
+                          <span className="as-meal-body">
+                            <b>{meal.title}</b>
+                            <span>{[meal.host, meal.place, when].filter(Boolean).join(", ")}</span>
+                          </span>
+                          <em>{meal.price_cents === 0 ? t("Free") : euro(meal.price_cents / 100)}</em>
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
                 {m.from === "bot" && m.done && m.reply?.meals && (
                   <div className="as-meals">
                     <span className="as-menu-title">{t("The maître d' suggests")}</span>
                     {m.reply.meals.map((meal) => (
-                      <a key={meal.id} className="as-meal" href={`bite.html?meal=${meal.id}`}>
+                      <a key={meal.id} className="as-meal" href={`bite.html?preview&meal=${meal.id}`}>
                         <img src={asset(meal.image)} alt="" />
                         <span className="as-meal-body">
                           <b>{tMaybe(meal.title)}</b>
@@ -183,7 +213,7 @@ export function LandingAssistant() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
             </button>
           </form>
-          <p className="as-foot">{t("Demo assistant. It runs in your browser and stores nothing.")}</p>
+          <p className="as-foot">{t("Answers come from Google Gemini, using only what Bite really offers. Please don't share personal details.")} <a href="legal.html#privacy">{t("Privacy")}</a></p>
         </div>
       )}
     </>

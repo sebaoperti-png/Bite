@@ -75,7 +75,7 @@ export function LandingFooter() {
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <a href="#how" style={{ fontSize: "16px", color: "#a897c8" }}>{t("How it works")}</a>
                 {" "}
-                <a href="#services" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Ways to eat")}</a>
+                <a href="#services" className="wide-only" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Ways to eat")}</a>
                 {" "}
                 <a href="#cooks" style={{ fontSize: "16px", color: "#a897c8" }}>{t("Become a host")}</a>
                 {" "}

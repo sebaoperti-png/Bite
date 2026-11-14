@@ -85,7 +85,7 @@ export function LandingNav() {
         <div id="mobile-menu" style={{ borderTop: "1px solid rgba(107,33,217,0.08)", background: "#f3eefb", padding: "8px 24px 20px" }}>
           <span className="nv-menu-title">{t("Tonight's menu")}</span>
           {[...LINKS, { href: "#waitlist", label: "Stay updated", n: 0 }].map((l) => (
-            <a key={l.href} className="nv-menu-line" href={l.href} onClick={() => setOpen(false)}>
+            <a key={l.href} className={`nv-menu-line ${l.href === "#services" ? "wide-only" : ""}`} href={l.href} onClick={() => setOpen(false)}>
               <span>{t(l.label)}</span><i />{l.n ? <em>No. {l.n}</em> : <em>{l.href === "#about" ? t("the three of us") : t("in the hero")}</em>}
             </a>
           ))}
