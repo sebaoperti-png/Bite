@@ -1,0 +1,13 @@
+/* Website dark mode (landing + legal): the "inverted contrast" look the founders liked from a dark-reader
+   extension. The whole page is inverted and hue-rotated (purple stays purple, cream turns deep aubergine),
+   then everything that must keep its real colours is inverted back: photos, video, the hero film, the app preview. */
+:root[data-theme="dark"] { filter: invert(1) hue-rotate(180deg); background: #fff; color-scheme: light; }
+:root[data-theme="dark"] :is(img, video, picture, iframe, .hs2, .no-invert) { filter: invert(1) hue-rotate(180deg); }
+:root[data-theme="dark"] :is(.hs2, .no-invert) :is(img, video, picture, iframe) { filter: none; }
+@media (prefers-reduced-motion: no-preference) { :root { transition: filter .3s ease; } }
+
+.th-tg { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 999px; border: 1.5px solid rgba(107,33,217,0.15); background: #fff; color: #4b3a6b; cursor: pointer; padding: 0; flex-shrink: 0; }
+.th-tg svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.th-tg:hover { color: #6b21d9; border-color: rgba(107,33,217,0.35); }
+.th-tg:focus-visible { outline: 2.5px solid #6b21d9; outline-offset: 2px; }
+.th-tg.wide { width: auto; height: 44px; gap: 8px; padding: 0 16px; display: inline-flex; align-items: center; font: inherit; font-size: 14px; font-weight: 700; }
