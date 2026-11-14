@@ -38,6 +38,9 @@ const BUG_COLUMNS = ["received", "where", "page", "report", "email", "lang", "sc
 const CONTACT_SHEET = "Contact";
 const CONTACT_COLUMNS = ["received", "name", "email", "message", "lang", "status"];
 const CONTACT_TO = "hello@bitetable.de";
+// "Rate Bite" feedback card (feedback.html): stars, what they tried, the 10 SUS answers (1-5) and the SUS score
+const FEEDBACK_SHEET = "Feedback";
+const FEEDBACK_COLUMNS = ["received", "lang", "source", "device", "stars", "tried", "sus1", "sus2", "sus3", "sus4", "sus5", "sus6", "sus7", "sus8", "sus9", "sus10", "susScore", "liked", "confused", "wouldUse", "email", "interview", "consentVersion"];
 const KEEP_UNCONFIRMED_DAYS = 30;
 
 function book_() {
@@ -71,6 +74,21 @@ function doPost(e) {
     const email = clean_(data.email, 120).trim().toLowerCase();
     const validEmail = EMAIL_RE.test(email);
     const lang = data.lang === "de" ? "de" : "en";
+
+    // "Rate Bite" (feedback.html): one row in "Feedback"; the email only with the interview consent
+    if (data.type === "feedback") {
+      const sus = [].concat(data.sus || []).slice(0, 10).map(function (x) { const n = Number(x); return n >= 1 && n <= 5 ? n : ""; });
+      while (sus.length < 10) sus.push("");
+      let score = "";
+      if (sus.every(function (x) { return x !== ""; })) score = sus.reduce(function (s, x, i) { return s + (i % 2 === 0 ? x - 1 : 5 - x); }, 0) * 2.5;
+      const stars = Number(data.stars) >= 1 && Number(data.stars) <= 5 ? Number(data.stars) : "";
+      const keepEmail = !!data.interview && validEmail;
+      sheet_(FEEDBACK_SHEET, FEEDBACK_COLUMNS).appendRow([new Date(), lang, clean_(data.source, 40), clean_(data.device, 10), stars,
+        [].concat(data.tried || []).map(function (x) { return clean_(x, 20); }).join(", ")].concat(sus).concat([score,
+        "'" + clean_(data.liked, 1500), "'" + clean_(data.confused, 1500), clean_(data.use, 10),
+        keepEmail ? email : "", keepEmail ? "yes" : "", keepEmail ? clean_(data.consentVersion, 40) : ""]));
+      return json_({ ok: true });
+    }
 
     // "Write to us": one row in "Contact" and an email to hello@bitetable.de (reply goes straight to the sender)
     if (data.type === "contact") {
