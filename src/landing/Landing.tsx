@@ -1,4 +1,5 @@
 import { BugReportHost } from "../shared/BugReport";
+import { ContactHost } from "../shared/ContactForm";
 import { useEffect, useState } from "react";
 import { LandingNav } from "./sections/LandingNav";
 import { LandingIntro, AppTransition, APP_TRANSITION_MS } from "./sections/LandingIntro";
@@ -134,6 +135,7 @@ export function Landing() {
       <LandingMobileStickyCta />
       <LandingAssistant />
       <BugReportHost where="site" />
+      <ContactHost />
 
       {/* Bite animation played while jumping into the app */}
       {leaving && <AppTransition />}
