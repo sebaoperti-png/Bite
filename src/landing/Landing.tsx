@@ -1,3 +1,4 @@
+import { BugReportHost } from "../shared/BugReport";
 import { useEffect, useState } from "react";
 import { LandingNav } from "./sections/LandingNav";
 import { LandingIntro, AppTransition, APP_TRANSITION_MS } from "./sections/LandingIntro";
@@ -113,6 +114,7 @@ export function Landing() {
       <FloatingLogos />
       <LandingIntro />
       <LandingNav />
+      <main>
       <LandingHero />
       <LandingPeople />
       <LandingSavings />
@@ -125,11 +127,13 @@ export function Landing() {
       <LandingAbout />
       <LandingStayUpdated />
       <LandingHelpCustomerService />
+      </main>
       <LandingFooter />
       <LandingCookieConsent {...cookieProps} />
       <LandingKitchenNote ready={!showCookies} />
       <LandingMobileStickyCta />
       <LandingAssistant />
+      <BugReportHost where="site" />
 
       {/* Bite animation played while jumping into the app */}
       {leaving && <AppTransition />}
