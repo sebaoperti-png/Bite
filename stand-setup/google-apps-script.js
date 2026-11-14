@@ -40,6 +40,13 @@ const CONTACT_COLUMNS = ["received", "name", "email", "message", "lang", "status
 const CONTACT_TO = "hello@bitetable.de";
 // "Rate Bite" feedback card (feedback.html): stars, what they tried, the 10 SUS answers (1-5) and the SUS score
 const FEEDBACK_SHEET = "Feedback";
+const DESK_KEY_SHA256 = "50326d40895e67dd6a0dfaca2911210a4903fd1676b54f98af2f6252d9f1e0a1";
+function deskKeyOk_(k) {
+  if (!k) return false;
+  const hex = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, k, Utilities.Charset.UTF_8)
+    .map(function (b) { return ("0" + ((b + 256) % 256).toString(16)).slice(-2); }).join("");
+  return hex === DESK_KEY_SHA256;
+}
 const FEEDBACK_COLUMNS = ["received", "lang", "source", "device", "stars", "tried", "sus1", "sus2", "sus3", "sus4", "sus5", "sus6", "sus7", "sus8", "sus9", "sus10", "susScore", "liked", "confused", "wouldUse", "email", "interview", "consentVersion"];
 const KEEP_UNCONFIRMED_DAYS = 30;
 
@@ -250,6 +257,24 @@ function doGet(e) {
     } finally {
       lock.releaseLock();
     }
+  }
+  // The feedback desk (feedback.html?desk): anonymous feedback rows (never the email) for the team only.
+  // The key is not in this file: only its SHA-256 is (DESK_KEY_SHA256), so the public repo can't open it.
+  if (p.action === "feedback") {
+    if (!deskKeyOk_(String(p.k || ""))) return json_({ ok: false, error: "key" });
+    const fs = book_().getSheetByName(FEEDBACK_SHEET);
+    if (!fs || fs.getLastRow() < 2) return json_({ ok: true, rows: [] });
+    const fv = fs.getRange(2, 1, fs.getLastRow() - 1, FEEDBACK_COLUMNS.length).getValues();
+    const fc = function (name) { return FEEDBACK_COLUMNS.indexOf(name); };
+    return json_({ ok: true, rows: fv.map(function (r) {
+      return {
+        at: r[0], lang: r[fc("lang")], source: String(r[fc("source")] || ""), device: r[fc("device")], stars: r[fc("stars")],
+        tried: String(r[fc("tried")] || "").split(", ").filter(String),
+        sus: r.slice(fc("sus1"), fc("sus10") + 1), score: r[fc("susScore")],
+        liked: String(r[fc("liked")] || ""), confused: String(r[fc("confused")] || ""), use: r[fc("wouldUse")],
+        interview: r[fc("interview")] === "yes",
+      };
+    }) });
   }
   if (p.action !== "stats") return json_({ ok: true, service: "Bite forms" });
 
