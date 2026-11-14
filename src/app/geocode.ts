@@ -79,9 +79,11 @@ function offline(q: string): Suggestion[] {
 
 /** Coordinates for a new meal, rounded to ~1 km so the map never points at the host's door */
 // (only the town is looked up: the street never leaves the app for this)
-export async function approximateSpot(city: string): Promise<{ lat: number; lng: number } | null> {
-  if (!city.trim()) return null;
-  const place = await geocodePlace(city);
+export async function approximateSpot(city: string, postcode = ""): Promise<{ lat: number; lng: number } | null> {
+  if (!city.trim() && !postcode.trim()) return null;
+  // with the postcode the spot is the right part of town (or the right village), not just the town's centre
+  const place = (postcode.trim() ? (await geocodePlace(`${postcode.trim()} ${city.trim()}`).catch(() => null)) ?? placeFromPostcode(postcode) : null)
+    ?? await geocodePlace(city);
   if (!place) return null;
   const round = (x: number) => Math.round(x * 100) / 100;
   return { lat: round(place.lat), lng: round(place.lng) };

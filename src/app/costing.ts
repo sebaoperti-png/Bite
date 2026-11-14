@@ -6,7 +6,29 @@
 import { t } from "../shared/i18n";
 
 export type CostSource = "receipt" | "declared" | "estimate";
-export interface CostProof { kind: CostSource; total: number; people: number }
+export interface CostLine { item: string; price: number | null; amount?: string }
+export interface CostProof { kind: CostSource; total: number; people: number; lines?: { item: string; price: number; amount?: string }[] }
+
+/** the sum of a shopping list, to the cent (lines without a price count 0) */
+export const linesTotal = (lines: CostLine[]) => Math.round(lines.reduce((n, l) => n + Math.round((l.price ?? 0) * 100), 0)) / 100;
+/** what is wrong with a typed shopping list, or "" (the database checks the same: at least two named, priced items) */
+export function listProblem(lines: CostLine[]): string {
+  const used = lines.filter((l) => l.item.trim() || l.price);
+  if (used.length < 2) return t("List at least two things you bought, each with its price");
+  if (used.some((l) => l.item.trim().length < 2)) return t("Every item in the list needs a name");
+  if (used.some((l) => !l.price || l.price <= 0)) return t("Every item in the list needs a price");
+  if (used.some((l) => (l.price ?? 0) > 500)) return t("One item costs more than 500 €. Check the prices.");
+  if (used.length > 40) return t("At most 40 items in the list");
+  return "";
+}
+/** the host's ingredient list as the first rows of a shopping list (names only, the host adds the prices) */
+export function linesFromIngredients(text: string): CostLine[] {
+  const names = text.replace(/\(.*?\)/g, "").split(/[,;\n•·]+/).map((x) => x.replace(/^[-*\d.\s]+/, "").replace(/\s+/g, " ").trim())
+    .filter((x) => x.length > 1 && x.length <= 60 && !/^(salt|salz|sale|pepper|pfeffer|pepe|water|wasser|acqua)$/i.test(x));
+  return [...new Set(names)].slice(0, 20).map((item) => ({ item, price: null }));
+}
+/** an AI estimate is used only when it is close to Bite's own estimate (half to double); otherwise Bite's stands */
+export const plausibleEstimate = (aiTotal: number, ruleTotal: number) => aiTotal >= ruleTotal * 0.5 && aiTotal <= ruleTotal * 2;
 
 /** Typical cost of ingredients per portion in Germany, by cuisine (main dish only) */
 const MAIN_PER_PORTION: Record<string, number> = {

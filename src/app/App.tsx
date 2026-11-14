@@ -231,7 +231,7 @@ function AppInner() {
             <div className={narrow ? "relative h-full mx-auto w-full max-w-[760px]" : "relative h-full"} style={narrow ? { boxShadow: "0 0 0 1px rgba(107,33,217,0.06)" } : undefined}>
               {screen === "onboarding" && (
                 <OnboardingScreen
-                  onCook={() => store.account ? navigate("cook-profile", true) : navigate({ screen: "auth", authMode: "signup", role: "cook" })}
+                  onCook={() => store.account ? navigate(store.live ? "start-hosting" : "cook-profile", true) : navigate({ screen: "auth", authMode: "signup", role: "cook" })}
                   onEat={() => store.account ? navigate("home", true) : navigate({ screen: "auth", authMode: "signup", role: "eat" })}
                   onSignIn={() => navigate({ screen: "auth", authMode: "login" })}
                 />
@@ -243,7 +243,8 @@ function AppInner() {
                   onBack={store.account || store.live ? () => { afterAuth.current = null; if (idx.current > 0) window.history.back(); else navigate("home", true); } : undefined}
                   onDone={() => {
                     // The sign-up screen is not a place to come back to: start a fresh history
-                    const next: Screen = route.role === "cook" ? "cook-profile" : "home";
+                    // the cook profile page is a demo page (sample stats and reviews): in live a new cook goes straight to hosting
+                    const next: Screen = route.role === "cook" ? (store.live ? "start-hosting" : "cook-profile") : "home";
                     stack.current = [next]; idx.current = 0;
                     setHomeTab("home");
                     window.history.replaceState({ screen: next, idx: 0 } satisfies HistoryState, "");

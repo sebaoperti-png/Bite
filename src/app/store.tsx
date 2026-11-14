@@ -592,8 +592,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setOptimistic((o) => [meal, ...o]);
         void L.publishMeal(uid!, {
           id, title: m.title, description: m.description, serviceType: m.serviceType, price: m.price, seats: m.seats,
-          dateISO: m.dateISO ?? new Date().toISOString().slice(0, 10), time: m.time, city: m.city ?? "", area: "",
-          address: m.street ?? m.location, tags: m.tags, image: m.image, gallery: m.gallery ?? [], costProof: m.costProof,
+          dateISO: m.dateISO ?? new Date().toISOString().slice(0, 10), time: m.time, city: m.city ?? "", postcode: m.postcode ?? "", area: "",
+          address: m.street ?? m.location, tags: m.tags, image: m.image, gallery: m.gallery ?? [], costProof: m.costProof, imageCredit: m.imageCredit,
           ingredients: m.ingredientsText ?? "", allergens: m.allergens ?? [], allergyNotes: m.allergyNotes ?? "", declared: !!m.hostDeclared,
         }).then(() => {
           void refresh().then(() => setOptimistic((o) => o.filter((x) => x.id !== id)));

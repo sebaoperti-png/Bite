@@ -1,3 +1,4 @@
+import { getLang } from "../shared/i18n";
 import { supabase } from "../shared/supabase";
 import { approximateSpot } from "./geocode";
 import { labelForISO, SERVICE_FEE, type Meal, type ServiceType } from "./data";
@@ -25,7 +26,7 @@ const isoDay = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d
 export interface MealRow {
   id: string; host_id: string; title: string; description: string; service_type: ServiceType;
   price_cents: number; seats: number; starts_at: string; city: string; area: string;
-  lat: number | null; lng: number | null; tags: string[]; image_url: string | null; gallery: string[];
+  lat: number | null; lng: number | null; tags: string[]; image_url: string | null; gallery: string[]; image_credit?: Meal["imageCredit"] | null;
   cost_proof: Meal["costProof"] | null; status: "draft" | "published" | "cancelled";
   host_name: string; host_photo: string | null; host_verified: boolean; host_bio: string | null;
   seats_left: number; host_rating: number | null; host_reviews: number;
@@ -46,6 +47,7 @@ export function mealFromRow(r: MealRow, me: string | null, address?: string): Me
     seats: r.seats,
     serviceType: r.service_type,
     image: r.image_url || FALLBACK_IMAGE,
+    imageCredit: r.image_url && r.image_credit ? r.image_credit : undefined,
     gallery: r.gallery ?? [],
     tags: r.tags ?? [],
     // the exact address only for the host and confirmed guests (the database decides who gets it)
@@ -180,22 +182,22 @@ export async function fillCoords<M extends Meal>(meals: M[]): Promise<Map<string
 
 export interface NewMeal {
   id: string; title: string; description: string; serviceType: ServiceType; price: number; seats: number;
-  dateISO: string; time: string; city: string; area: string; address: string; tags: string[];
-  image?: string; gallery: string[]; costProof?: Meal["costProof"];
+  dateISO: string; time: string; city: string; postcode?: string; area: string; address: string; tags: string[];
+  image?: string; gallery: string[]; costProof?: Meal["costProof"]; imageCredit?: Meal["imageCredit"];
   /** every ingredient, the allergens it contains, notes, and the host's declaration (0008) */
   ingredients: string; allergens: string[]; allergyNotes: string; declared: boolean;
 }
 
 export async function publishMeal(me: string, m: NewMeal) {
   // where the meal shows on the map: the town's centre, rounded to ~1 km (never the street)
-  const spot = await approximateSpot(m.city).catch(() => null);
+  const spot = await approximateSpot(m.city, m.postcode ?? "").catch(() => null);
   const photos = [m.image, ...m.gallery].filter(Boolean) as string[];
   const urls = await Promise.all(photos.map((p, i) => uploadPhoto(me, m.id, i, p)));
   const startsAt = new Date(`${m.dateISO}T${m.time || "19:00"}`).toISOString();
   const { error } = await supabase.from("meals").insert({
     id: m.id, host_id: me, title: m.title.slice(0, 80), description: m.description, service_type: m.serviceType,
     price_cents: Math.round(m.price * 100), seats: m.seats, starts_at: startsAt, city: m.city, area: m.area,
-    tags: m.tags, lat: spot?.lat ?? null, lng: spot?.lng ?? null, image_url: urls[0] ?? null, gallery: urls.slice(1), cost_proof: m.costProof ?? null, status: "published",
+    tags: m.tags, lat: spot?.lat ?? null, lng: spot?.lng ?? null, image_url: urls[0] ?? null, gallery: urls.slice(1), image_credit: m.imageCredit ?? null, cost_proof: m.costProof ?? null, status: "published",
     ingredients: m.ingredients.slice(0, 2000), allergens: m.allergens, allergy_notes: m.allergyNotes.slice(0, 500),
     host_declared_at: m.declared ? new Date().toISOString() : null,
   });
@@ -276,4 +278,36 @@ export async function fetchMyGuestReviews(): Promise<HostReview[]> {
   const { data, error } = await supabase.rpc("my_guest_reviews");
   if (error || !Array.isArray(data)) return [];
   return data.map((r: any) => ({ rating: r.rating, comment: r.comment ?? "", at: Date.parse(r.created_at), author: r.author || "Host", photo: r.author_photo || initialAvatar(r.author || "H"), meal: r.meal_title }));
+}
+
+// ---------------------------------------------------------------- AI helpers (Edge Function "bite-ai", Gemini)
+
+export type AiError = "sign_in" | "limit" | "not_configured" | "busy" | "failed" | "too_short" | "no_ingredients";
+async function callAi<T>(body: Record<string, unknown>): Promise<{ data?: T; error?: AiError }> {
+  try {
+    const { data, error } = await supabase.functions.invoke("bite-ai", { body: { ...body, lang: getLang() } });
+    if (error) {
+      // the function answers errors as { error: "…" } with a 4xx/5xx status
+      const ctx = (error as { context?: Response }).context;
+      const parsed = ctx && typeof ctx.json === "function" ? await ctx.json().catch(() => null) : null;
+      return { error: (parsed?.error as AiError) ?? "failed" };
+    }
+    if (data?.error) return { error: data.error as AiError };
+    return { data: data as T };
+  } catch {
+    return { error: "failed" };
+  }
+}
+/** the host's rough notes → a warm description (same facts, nothing invented) */
+export const aiPolish = (b: { text: string; mealName: string; cuisine: string; serviceType: string; ingredients?: string }) =>
+  callAi<{ text: string }>({ task: "polish", ...b });
+/** the ingredient list → what the shopping costs, item by item */
+export const aiEstimate = (b: { ingredients: string; people: number; mealName: string; cuisine: string }) =>
+  callAi<{ lines: { item: string; amount?: string; price: number }[] }>({ task: "estimate", ...b });
+export function aiErrorText(e: AiError | undefined, tr: (s: string) => string) {
+  if (e === "limit") return tr("You've used today's AI help. Try again tomorrow.");
+  if (e === "busy") return tr("The AI is busy right now. Try again in a minute.");
+  if (e === "sign_in") return tr("Log in to use the AI help.");
+  if (e === "too_short") return tr("Write a few words first, then let the AI polish them.");
+  return tr("The AI help isn't available right now.");
 }

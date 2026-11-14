@@ -37,7 +37,9 @@ export interface Meal {
   /** Extra dish photos shown after the cover on the meal page */
   gallery?: string[];
   /** How the contribution was set: from the host's receipt or Bite's estimate */
-  costProof?: { kind: "receipt" | "declared" | "estimate"; total: number; people: number };
+  /** a cover photo from Unsplash: the photographer to credit */
+  imageCredit?: { name: string; username: string; link: string };
+  costProof?: { kind: "receipt" | "declared" | "estimate"; total: number; people: number; lines?: { item: string; price: number; amount?: string }[] };
   /** Listings published from this browser through "Start hosting" */
   ownedByMe?: boolean;
   /* ── live mode only ── */
@@ -50,6 +52,8 @@ export interface Meal {
   /** Set by the hosting flow so the live store can save the parts separately */
   dateISO?: string;
   city?: string;
+  /** the host's postcode (hosting only: it places the meal on the map; never shown) */
+  postcode?: string;
   street?: string;
 }
 
