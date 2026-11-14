@@ -8,6 +8,7 @@ import { LangSwitch } from "../../shared/LangSwitch";
 const LINKS = [
   { href: "#savings", label: "Why Bite", n: 2 },
   { href: "#how", label: "How it works", n: 3 },
+  { href: "#services", label: "Ways to eat", n: 4 },
   { href: "#cooks", label: "For cooks", n: 5 },
   { href: "#safety", label: "Safety", n: 6 },
   { href: "#help", label: "Help", n: 7 },

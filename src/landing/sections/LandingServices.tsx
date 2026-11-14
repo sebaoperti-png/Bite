@@ -1,6 +1,6 @@
-// FOUR WAYS TO EAT — on the chalkboard: the ways to eat written up as today's specials, and beside them the pass,
-// where a cloche comes down on the plate and lifts to serve the animated scene of the way you picked.
-// Cycles on its own while visible; hover or tap a line to pick it.
+// FOUR WAYS TO EAT (course No. 4, Sides): on the chalkboard the ways to eat written up as today's specials, beside
+// them a little deck of menu cards. The picked way's card sits on top with its animated scene; changing the pick
+// tosses the top card to the back. Cycles on its own while visible (the chalk line fills like a timer); hover or tap.
 import { useEffect, useRef, useState } from "react";
 import { SCENES } from "./ServiceScenes";
 import { Course } from "../../shared/Restaurant";
@@ -16,20 +16,16 @@ const WAYS = [
   { title: "Delivery", text: "We're working on it: soon you'll be able to have it dropped at your door, still warm.", tag: "Coming soon", soon: true },
 ];
 const NUMERALS = ["i", "ii", "iii", "iv"];
-const reduceMotionNow = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export function LandingServices() {
   const [active, setActive] = useState(1);
   const [hovering, setHovering] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [lift, setLift] = useState(false);
+  const [prev, setPrev] = useState(-1);
+  const last = useRef(1);
   const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    setLift(false);
-    const id = window.setTimeout(() => setLift(true), reduceMotionNow() ? 0 : 520);
-    return () => window.clearTimeout(id);
-  }, [active]);
+  // remember which card was on top, so it can be tossed to the back of the deck
+  useEffect(() => { if (last.current !== active) { setPrev(last.current); last.current = active; } }, [active]);
   const reduceMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
@@ -57,15 +53,16 @@ export function LandingServices() {
         </div>
 
         <div className="sd" onMouseLeave={() => setHovering(false)}>
-          {/* today's specials, in chalk */}
-          <div className="sd-board">
+          {/* today's specials, in chalk; the line being served fills up like a timer */}
+          <div className="sd-board" role="tablist" aria-label={t("Today's specials")}>
             <span className="sd-board-title">{t("Today's specials")}</span>
             {WAYS.map((w, i) => (
               <button
                 key={w.title}
                 type="button"
+                role="tab"
                 className={`sd-line ${i === active ? "on" : ""} ${w.soon ? "soon" : ""}`}
-                aria-pressed={i === active}
+                aria-selected={i === active}
                 onMouseEnter={() => { setHovering(true); setActive(i); }}
                 onFocus={() => setActive(i)}
                 onClick={() => setActive(i)}
@@ -74,28 +71,31 @@ export function LandingServices() {
                 <span className="sd-name">{t(w.title)}<svg className="sd-ring" viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden><path pathLength={1} d="M150 4C230 2 296 14 294 32S220 58 140 56 4 46 6 28 80 4 166 6" /></svg></span>
                 <i className="sd-dots" aria-hidden />
                 <span className="sd-tag">{t(w.tag)}</span>
+                {i === active && visible && !hovering && !reduceMotion && <i key={`t${active}`} className="sd-timer" style={{ animationDuration: `${CYCLE_MS}ms` }} aria-hidden />}
               </button>
             ))}
           </div>
 
-          {/* the pass: the cloche comes down and lifts to serve the picked way */}
-          <div className="sd-pass">
-            <div key={active} className={`sd-plate ${lift ? "lifted" : ""}`}>
-              <div className="sd-scene">{(() => { const Scene = SCENES[active]; return <Scene />; })()}</div>
-              <svg className="sd-cloche" viewBox="0 0 200 120" aria-hidden>
-                <defs><linearGradient id="sd-steel" x1="0" x2="1"><stop offset="0" stopColor="#8f84a8" /><stop offset=".35" stopColor="#f4f1fa" /><stop offset=".6" stopColor="#c9c1da" /><stop offset="1" stopColor="#7d7296" /></linearGradient></defs>
-                <path d="M14 108a86 86 0 0 1 172 0z" fill="url(#sd-steel)" />
-                <path d="M40 70a62 62 0 0 1 40-36" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity=".7" />
-                <rect x="88" y="10" width="24" height="12" rx="6" fill="#7d7296" />
-                <rect x="6" y="106" width="188" height="8" rx="4" fill="#6b5f86" />
-              </svg>
-            </div>
-            <div key={`l${active}`} className={`sd-label ${WAYS[active].soon ? "soon" : ""}`}>
-              <span>{t("No.")} 0{active + 1}</span>
-              <b>{t(WAYS[active].title)}</b>
-              <p>{t(WAYS[active].text)}</p>
-              {WAYS[active].soon && <em>{t("Coming soon")}</em>}
-            </div>
+          {/* the menu cards: a little deck, the picked way on top; the card before is tossed to the back */}
+          <div className="sd-deck" aria-live="polite">
+            {WAYS.map((w, i) => {
+              const depth = (i - active + WAYS.length) % WAYS.length;
+              const Scene = SCENES[i];
+              return (
+                <article
+                  key={w.title}
+                  className={`sd-card d${depth} ${i === prev && i !== active ? "toss" : ""} ${w.soon ? "soon" : ""}`}
+                  aria-hidden={depth !== 0}
+                  onClick={() => depth !== 0 && setActive(i)}
+                >
+                  <div className="sd-card-top"><span>{t("No.")} 0{i + 1}</span><span>{t(w.tag)}</span></div>
+                  <div className={`sd-card-art ${depth === 0 ? "live" : ""}`}><Scene /></div>
+                  <b>{t(w.title)}</b>
+                  <p>{t(w.text)}</p>
+                  {w.soon && <em className="sd-stamp">{t("Coming soon")}</em>}
+                </article>
+              );
+            })}
           </div>
         </div>
       </div>
