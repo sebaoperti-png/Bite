@@ -3,7 +3,6 @@ import { LandingNav } from "./sections/LandingNav";
 import { LandingIntro, AppTransition, APP_TRANSITION_MS } from "./sections/LandingIntro";
 import { LandingAssistant } from "./sections/LandingAssistant";
 import { LandingHero } from "./sections/LandingHero";
-import { LandingLogoMarquee } from "./sections/LandingLogoMarquee";
 import { LandingServices } from "./sections/LandingServices";
 import { LandingSousChef } from "./sections/LandingSousChef";
 import { LandingLaptop } from "./sections/LandingLaptop";
@@ -11,6 +10,7 @@ import { LandingSafety } from "./sections/LandingSafety";
 import { LandingHelpCustomerService } from "./sections/LandingHelpCustomerService";
 import { LandingPeople } from "./sections/LandingPeople";
 import { LandingAbout } from "./sections/LandingAbout";
+import { LandingStayUpdated } from "./sections/LandingStayUpdated";
 import { LandingTestimonial } from "./sections/LandingTestimonial";
 import { LandingBecomeAHost } from "./sections/LandingBecomeAHost";
 import { LandingSavings } from "./sections/LandingSavings";
@@ -112,7 +112,6 @@ export function Landing() {
       <LandingIntro />
       <LandingNav />
       <LandingHero />
-      <LandingLogoMarquee />
       <LandingPeople />
       <LandingSavings />
       <LandingLaptop />
@@ -122,6 +121,7 @@ export function Landing() {
       <LandingSafety />
       <LandingTestimonial />
       <LandingAbout />
+      <LandingStayUpdated />
       <LandingHelpCustomerService />
       <LandingFooter />
       <LandingCookieConsent {...cookieProps} />
