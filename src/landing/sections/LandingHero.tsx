@@ -17,7 +17,7 @@ export function LandingHero() {
             {t("your neighbourhood.")}</RevealWords>
           </h1>
           {" "}
-          <p style={{ fontSize: "19px", lineHeight: "1.55", color: "#4b3a6b", maxWidth: "460px", margin: "0 0 32px" }}>{t("Bite connects you with home cooks nearby. Share a home-cooked meal, split the cost of the groceries and pay less than takeaway, because")}{" "}{t("food is better shared.")}
+          <p style={{ fontSize: "19px", lineHeight: "1.55", color: "#4b3a6b", maxWidth: "460px", margin: "0 0 32px" }}>{t("Bite is a seat at your neighbour's table. Someone nearby cooks, you pull up a chair, you meet the people who live around you, and everyone splits what the groceries cost.")}
           </p>
           {" "}
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>

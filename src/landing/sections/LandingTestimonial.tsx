@@ -37,7 +37,7 @@ export function LandingTestimonial() {
               {t("Sebastiano Operti")}
               <svg viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden><path d="M2 9C40 3 90 2 130 6s50 4 66-2" pathLength="1" /></svg>
             </b>
-            <span className="fn-role">{t("Founder, Bite")}</span>
+            <span className="fn-role">{t("Co-founder, Bite")}</span>
           </div>
         </div>
       </div>

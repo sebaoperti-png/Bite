@@ -11,6 +11,7 @@ const LINKS = [
   { href: "#services", label: "Ways to eat", n: 4 },
   { href: "#cooks", label: "For cooks", n: 5 },
   { href: "#safety", label: "Safety", n: 6 },
+  { href: "#about", label: "About us", n: 0 },
   { href: "#help", label: "Help", n: 7 },
 ];
 
@@ -54,7 +55,7 @@ export function LandingNav() {
 
         <nav aria-label={t("Main")} style={{ display: "flex", alignItems: "center", gap: "22px" }}>
           {LINKS.map((l) => (
-            <a key={l.href} className={`r-navlink nv-link ${l.href === "#help" ? "r-nav-extra" : ""}`} href={l.href} style={{ fontSize: "14.5px", fontWeight: "600", color: "#4b3a6b" }}><sup className="nv-no">{l.n}</sup>{t(l.label)}</a>
+            <a key={l.href} className={`r-navlink nv-link ${l.href === "#help" || l.href === "#how" ? "r-nav-extra" : ""}`} href={l.href} style={{ fontSize: "14.5px", fontWeight: "600", color: "#4b3a6b" }}>{l.n ? <sup className="nv-no">{l.n}</sup> : null}{t(l.label)}</a>
           ))}
           <a className="r-navlink r-nav-extra" href="#waitlist" style={{ fontSize: "14.5px", fontWeight: "700", color: "#6b21d9" }}>{t("Stay updated")}</a>
           <LangSwitch />
@@ -85,7 +86,7 @@ export function LandingNav() {
           <span className="nv-menu-title">{t("Tonight's menu")}</span>
           {[...LINKS, { href: "#waitlist", label: "Stay updated", n: 0 }].map((l) => (
             <a key={l.href} className="nv-menu-line" href={l.href} onClick={() => setOpen(false)}>
-              <span>{t(l.label)}</span><i />{l.n ? <em>No. {l.n}</em> : <em>{t("in the hero")}</em>}
+              <span>{t(l.label)}</span><i />{l.n ? <em>No. {l.n}</em> : <em>{l.href === "#about" ? t("the three of us") : t("in the hero")}</em>}
             </a>
           ))}
           <a href="bite.html?host" onClick={() => setOpen(false)} style={{ display: "block", marginTop: "16px", textAlign: "center", padding: "14px", borderRadius: "14px", border: "1.5px solid rgba(22,10,46,0.14)", fontWeight: 800, color: "#160a2e" }}>{t("I want to host")}</a>
