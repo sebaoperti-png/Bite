@@ -63,7 +63,7 @@ select t_fails($$ insert into meals (host_id, title, service_type, price_cents, 
 select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
   values (auth.uid(),'Odd proof','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"vibes","total":24,"people":4}', 'Lamb, onions, apricots, couscous', now()) $$, 'an unknown kind of cost is refused');
 select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
-  values (auth.uid(),'Huge','eat-together',2000,3,now()+interval '1 day','Aalen','{"kind":"declared","total":5000,"people":4}', 'Lamb, onions, apricots, couscous', now()) $$, 'a grocery cost above 1000 € is refused');
+  values (auth.uid(),'Huge','eat-together',2000,3,now()+interval '1 day','Aalen','{"kind":"receipt","total":5000,"people":4}', 'Lamb, onions, apricots, couscous', now()) $$, 'a grocery cost above 1000 € is refused');
 select t_ok(public.price_cap_cents(4200, 4, 'receipt') = 900 and public.price_cap_cents(4000, 9, 'receipt') = 400 and public.price_cap_cents(400, 6, 'estimate') = 0, 'the database cap matches the app (42 €/5 → 9 €, 40 €/10 → 4 €, 4 €/7 → free)');
 insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, status)
 values (auth.uid(), 'Free soup', 'pickup', 0, 2, now() + interval '2 days', 'Aalen', 'draft');
@@ -79,6 +79,17 @@ insert into meals (id, host_id, title, service_type, price_cents, seats, starts_
         'Tajine', 'eat-together', 600, 3, now() + interval '2 days', 'Aalen', 'Hirschbach', '{"kind":"receipt","total":24,"people":4}', 'Lamb, onions, apricots, couscous', now());
 select t_fails($$ update meals set price_cents = 1500 where id = '11111111-1111-1111-1111-111111111111' $$, 'the host cannot raise the price above the cap later');
 select t_fails($$ update meals set cost_proof = null where id = '11111111-1111-1111-1111-111111111111' $$, 'the host cannot remove the grocery cost later');
+-- a typed total must be itemised (0009)
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
+  values (auth.uid(),'Typed','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"declared","total":24,"people":4}', 'Rice, beans', now()) $$, 'a typed total without a shopping list is refused');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
+  values (auth.uid(),'One line','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"declared","total":24,"people":4,"lines":[{"item":"Groceries","price":24}]}', 'Rice, beans', now()) $$, 'one line ("groceries 24 €") is not a list');
+select t_fails($$ insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at)
+  values (auth.uid(),'Wrong sum','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"declared","total":24,"people":4,"lines":[{"item":"Rice","price":4},{"item":"Lamb","price":12}]}', 'Rice, lamb', now()) $$, 'a list that does not add up to the total is refused');
+insert into meals (host_id, title, service_type, price_cents, seats, starts_at, city, cost_proof, ingredients, host_declared_at, status)
+  values (auth.uid(),'Listed','eat-together',600,3,now()+interval '1 day','Aalen','{"kind":"declared","total":24,"people":4,"lines":[{"item":"Rice","price":4.5},{"item":"Lamb","price":19.5}]}', 'Rice, lamb', now(), 'draft');
+select t_ok((select count(*) from meals where title = 'Listed') = 1, 'a typed total with a list that adds up is accepted');
+delete from meals where title = 'Listed';
 select t_ok((select host_declared_at > now() - interval '1 minute' from meals where id = '11111111-1111-1111-1111-111111111111'), 'the declaration time is set by the database');
 insert into meal_addresses values ('11111111-1111-1111-1111-111111111111', 'Brunnenstr. 1, Aalen');
 update profiles set verified = true where id = auth.uid();
