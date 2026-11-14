@@ -10,7 +10,8 @@
 import { useEffect, useRef, useState } from "react";
 import { t as tr } from "../../shared/i18n";
 
-const LOOP = 16;
+const SLOW = 1.4;              // the story is written in 16 "beats"; it plays 1.4× slower
+const LOOP = 16 * SLOW;
 
 /* ---------- timeline helpers ---------- */
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -19,9 +20,10 @@ const back = (x: number) => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1
 /** 0 → 1 between a and b (eased) */
 const ramp = (t: number, a: number, b: number, f = ease) => f(clamp((t - a) / (b - a)));
 /** piecewise keyframes [[time, value], …] */
-function keys(t: number, k: [number, number][]) {
+const sine = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2;
+function keys(t: number, k: [number, number][], f = ease) {
   if (t <= k[0][0]) return k[0][1];
-  for (let i = 1; i < k.length; i++) if (t <= k[i][0]) return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * ease((t - k[i - 1][0]) / (k[i][0] - k[i - 1][0]));
+  for (let i = 1; i < k.length; i++) if (t <= k[i][0]) return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * f((t - k[i - 1][0]) / (k[i][0] - k[i - 1][0]));
   return k[k.length - 1][1];
 }
 
@@ -111,9 +113,9 @@ function Window({ w, t }: { w: Win; t: number }) {
         <path d={`M${W / 2} 0v14`} stroke="#ffffff55" strokeWidth="1.2" />
         <path d={`M${W / 2 - 10} 24a10 10 0 0 1 20 0z`} fill="#f4e9ff" />
         <ellipse cx={W / 2} cy="56" rx="44" ry="34" fill="url(#hs-lamp)" />
-        <g opacity={1 - gone} transform={`translate(${44 + gone * 18} 70)`}><Person look={LOOKS[w.look]} mood={mood} down={down} blink={blink} /></g>
+        <g opacity={1 - gone} transform={`translate(${44 + gone * 18} ${70 + Math.sin(t * 1.6 + w.c) * 0.8})`}><Person look={LOOKS[w.look]} mood={mood} down={down} blink={blink} /></g>
         <path d={`M8 ${H - 14}h${W - 16}`} stroke="#efe6ff" strokeWidth="5" strokeLinecap="round" />
-        <ellipse cx="46" cy={H - 17} rx="13" ry="3.4" fill="#fff" opacity={1 - gone} />
+        <g opacity={1 - gone}><ellipse cx="46" cy={H - 17} rx="13" ry="3.4" fill="#fff" /><ellipse cx="46" cy={H - 18} rx="7" ry="2" fill={["#e0a050", "#c9553a", "#7fb069", "#e8c547", "#d98a4e", "#b5563a"][w.look]} /></g>
         <rect x="80" y={H - 25} width="9" height="14" rx="2" fill={glow ? `rgba(255,255,255,${0.5 + glow / 2})` : "#2a1a3a"} style={glow ? { filter: "drop-shadow(0 0 6px #fff)" } : undefined} opacity={1 - gone} />
         <path d={`M0 0h16c-6 30-4 70 4 ${H}h-20z`} fill="#4b2e8a" opacity=".85" />
         <path d={`M${W} 0h-16c6 30 4 70-4 ${H}h20z`} fill="#4b2e8a" opacity=".85" />
@@ -121,9 +123,11 @@ function Window({ w, t }: { w: Win; t: number }) {
           {Array.from({ length: 14 }, (_, i) => { const yy = 4 + ((t * 70 + i * 37) % (H - 22)); const xx = 10 + ((i * 53) % (W - 20)); return <path key={i} d={`M${xx} ${yy}l-2 9`} />; })}
         </g>}
       </g>
+      <rect width={W} height={H} rx="4" fill="url(#hs-sheen)" />
       <rect width={W} height={H} rx="4" fill="none" stroke="#120824" strokeWidth="7" />
       <path d={`M${W / 2} 0v${H}`} stroke="#120824" strokeWidth="4" opacity=".6" />
       <rect x="-8" y={H + 2} width={W + 16} height="8" rx="3" fill="#3e2780" />
+      <path d={`M-8 ${H + 10}h${W + 16}`} stroke="rgba(0,0,0,0.25)" strokeWidth="3" />
       {ping > 0.01 && <g transform={`translate(${W - 6} -4) scale(${ping})`}>
         <circle r="17" fill="#ff5a8a" />
         <circle r="17" fill="none" stroke="#ff5a8a" strokeWidth="3" opacity={1 - ((t - w.ping) % 0.8) / 0.8} transform={`scale(${1 + ((t - w.ping) % 0.8)})`} />
@@ -172,10 +176,12 @@ function Hall({ t }: { t: number }) {
   const free = ramp(t, 12.4, 12.8);
   return (
     <g>
+      <ellipse cx={HALL.x + HALL.w / 2} cy={HALL.y + HALL.h / 2} rx={HALL.w * 0.75} ry={HALL.h * 1.3} fill="url(#hs-spill)" opacity={light} />
       <rect x={HALL.x - 7} y={HALL.y - 7} width={HALL.w + 14} height={HALL.h + 14} rx="9" fill="#120824" />
       <rect x={HALL.x} y={HALL.y} width={HALL.w} height={HALL.h} rx="6" fill="#180d30" />
       <g clipPath="url(#hs-hallclip)" opacity={light}>
         <rect x={HALL.x} y={HALL.y} width={HALL.w} height={HALL.h} fill="url(#hs-warm)" />
+        <rect x={HALL.x} y={HALL.y} width={HALL.w} height={HALL.h} fill="url(#hs-sheen)" />
         <path d={`M${HALL.x} ${HALL.y + 12}q50 18 100 0t100 0t100 0t100 0`} fill="none" stroke="#6a4424" strokeWidth="1.3" />
         {Array.from({ length: 14 }, (_, n) => {
           const bx = HALL.x + 14 + n * 28.5, by = HALL.y + 19 + Math.sin((n / 13) * Math.PI * 8) * 3;
@@ -233,12 +239,12 @@ function useClock(paused: boolean, still: boolean) {
 export function HeroSpot() {
   const [still] = useState(() => typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
   const [paused, setPaused] = useState(false);
-  const t = useClock(paused, still);
+  const t = useClock(paused, still) / (still ? 1 : SLOW);
 
   // the camera: where it looks and how close, over time
-  const cx = keys(t, [[0, 128], [4.4, 128], [5.6, 270], [7.2, 300], [9.6, 300], [10.8, 260], [14.0, 260], [15.0, 300]]);
-  const cy = keys(t, [[0, 165], [4.4, 168], [5.6, 260], [7.2, 410], [9.6, 410], [10.8, 448], [14.0, 448], [15.0, 410]]);
-  const cz = keys(t, [[0, 3.5], [3.4, 3.7], [4.4, 3.4], [5.6, 1.7], [7.2, 1.0], [9.6, 1.0], [10.8, 2.0], [13.6, 2.15], [15.0, 1.0]]);
+  const cx = keys(t, [[0, 128], [4.4, 128], [5.6, 270], [7.2, 300], [9.6, 300], [10.8, 260], [14.0, 260], [15.0, 300]], sine);
+  const cy = keys(t, [[0, 165], [4.4, 168], [5.6, 260], [7.2, 410], [9.6, 410], [10.8, 448], [14.0, 448], [15.0, 410]], sine);
+  const cz = keys(t, [[0, 3.5], [3.4, 3.7], [4.4, 3.4], [5.6, 1.7], [7.2, 1.0], [9.6, 1.0], [10.8, 2.0], [13.6, 2.15], [15.0, 1.0]], sine);
   const fade = still ? 0 : Math.max(1 - ramp(t, 0, 0.6), ramp(t, 15.5, 16));
   const cap = (a: number, b: number) => ramp(t, a, a + 0.4) * (1 - ramp(t, b - 0.4, b));
   const join = t > 4.55;
@@ -251,21 +257,31 @@ export function HeroSpot() {
           <radialGradient id="hs-lamp"><stop offset="0" stopColor="rgba(255,240,200,0.35)" /><stop offset="1" stopColor="rgba(255,240,200,0)" /></radialGradient>
           <linearGradient id="hs-warm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffd690" /><stop offset="1" stopColor="#ffab55" /></linearGradient>
           <radialGradient id="hs-sky" cx="0.8" cy="0.05" r="1"><stop offset="0" stopColor="#40287f" /><stop offset=".5" stopColor="#24134c" /><stop offset="1" stopColor="#150a2e" /></radialGradient>
+          <mask id="hs-bite"><rect x="400" y="0" width="200" height="220" fill="#fff" />{[[572, 74, 12], [578, 96, 11], [571, 118, 10]].map(([x, y, r], n) => <circle key={n} cx={x} cy={y} r={r} fill="#000" />)}</mask>
+          <radialGradient id="hs-moonglow"><stop offset=".55" stopColor="rgba(230,220,255,0.35)" /><stop offset="1" stopColor="rgba(230,220,255,0)" /></radialGradient>
+          <radialGradient id="hs-lampglow"><stop offset="0" stopColor="rgba(255,226,150,0.45)" /><stop offset="1" stopColor="rgba(255,226,150,0)" /></radialGradient>
+          <radialGradient id="hs-spill"><stop offset="0" stopColor="rgba(255,190,110,0.55)" /><stop offset="1" stopColor="rgba(255,190,110,0)" /></radialGradient>
+          <linearGradient id="hs-sheen" x1="0" y1="0" x2="1" y2="1"><stop offset=".35" stopColor="rgba(255,255,255,0)" /><stop offset=".5" stopColor="rgba(255,255,255,0.13)" /><stop offset=".62" stopColor="rgba(255,255,255,0)" /></linearGradient>
           <clipPath id="hs-hallclip"><rect x={HALL.x} y={HALL.y} width={HALL.w} height={HALL.h} rx="6" /></clipPath>
         </defs>
         <rect width="600" height="750" fill="url(#hs-sky)" />
         <g transform={`translate(300 375) scale(${cz}) translate(${-cx} ${-cy})`}>
           {[[540, 230], [575, 330], [20, 40], [555, 470], [590, 160], [30, 300]].map(([x, y], n) => <circle key={n} cx={x} cy={y} r="1.8" fill="#fff" opacity={0.3 + 0.7 * Math.abs(Math.sin(t * 1.4 + n))} />)}
-          <circle cx="530" cy="96" r="44" fill="#f3eeff" style={{ filter: "drop-shadow(0 0 20px rgba(230,220,255,0.55))" }} />
-          {[[566, 76, 11], [572, 96, 10], [565, 116, 9]].map(([x, y, r], n) => <circle key={n} cx={x} cy={y} r={r} fill="#2c1960" />)}
+          <circle cx="530" cy="96" r="70" fill="url(#hs-moonglow)" />
+          <circle cx="530" cy="96" r="44" fill="#f3eeff" mask="url(#hs-bite)" />
+          <circle cx="516" cy="86" r="6" fill="#e2d9f7" mask="url(#hs-bite)" /><circle cx="534" cy="112" r="4" fill="#e2d9f7" /><circle cx="510" cy="110" r="3" fill="#e2d9f7" />
           <rect x="50" y="76" width="420" height="700" rx="10" fill="#2b1a57" />
           <rect x="40" y="62" width="440" height="22" rx="7" fill="#3c2575" />
+          <rect x="96" y="30" width="26" height="36" rx="3" fill="#3c2575" /><path d="M400 62v-34M392 34h16M396 44h8" stroke="#3c2575" strokeWidth="3" strokeLinecap="round" />
           <g stroke="rgba(255,255,255,0.04)">{Array.from({ length: 30 }, (_, n) => <path key={n} d={`M50 ${100 + n * 22}h420`} />)}</g>
           <DarkWindow x={COLX[1]} y={110} />
           <DarkWindow x={COLX[2]} y={240} />
           <Hall t={t} />
           {WINDOWS.map((w) => <Window key={w.id} w={w} t={t} />)}
           {WINDOWS.map((w) => <Walker key={`k${w.id}`} w={w} t={t} />)}
+          <rect x="-200" y="742" width="1000" height="60" fill="#120a26" />
+          <g transform="translate(505 742)"><path d="M0 0v-120q0-14 14-14h10" stroke="#3b2a66" strokeWidth="5" fill="none" /><path d="M18 -138h20l-4 9h-12z" fill="#3b2a66" /><ellipse cx="28" cy="-112" rx="38" ry="46" fill="url(#hs-lampglow)" /><circle cx="28" cy="-127" r="4" fill="#ffe7a8" /></g>
+          <g transform="translate(14 742)"><path d="M0 0v-36" stroke="#2a1d14" strokeWidth="5" /><circle cy="-52" r="24" fill="#2f5d4a" /><circle cx="-12" cy="-40" r="16" fill="#2a5242" /><circle cx="12" cy="-40" r="16" fill="#336a52" /></g>
           <path d="M228 780v-120a32 32 0 0 1 64 0v120z" fill="#5b35a8" stroke="#120824" strokeWidth="6" />
           <circle cx="281" cy="722" r="3.4" fill="#ffd98f" />
         </g>
