@@ -28,7 +28,7 @@ export function linesFromIngredients(text: string): CostLine[] {
   return [...new Set(names)].slice(0, 20).map((item) => ({ item, price: null }));
 }
 /** an AI estimate is used only when it is not far from Bite's own estimate (40% to double); otherwise Bite's stands.
- *  It prices only what the recipe uses, so it is often below the rule of thumb, which counts whole portions. */
+ *  (The AI is told to price what goes in the basket, like a receipt; the lower bound is generous for cheap, simple dishes.) */
 export const plausibleEstimate = (aiTotal: number, ruleTotal: number) => aiTotal >= ruleTotal * 0.4 && aiTotal <= ruleTotal * 2;
 
 /** Typical cost of ingredients per portion in Germany, by cuisine (main dish only) */
