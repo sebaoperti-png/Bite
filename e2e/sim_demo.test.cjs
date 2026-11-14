@@ -45,7 +45,7 @@ const nav = async (p, desk, name) => {
     const p = await open(browser, vp, `${BASE}/bite.html?demo&reset&lang=en`);
 
     await step(`${label}: tabs`, async () => {
-      check((await body(p)).includes("eating today?"), `${label}: Home opens`);
+      check((await body(p)).includes("cooking for you today?"), `${label}: Home opens`);
       await noOverflow(p, `${label} Home`);
       for (const tab of ["Browse", "Messages", "Profile", "Home"]) {
         await nav(p, desk, tab);

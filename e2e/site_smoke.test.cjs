@@ -39,7 +39,7 @@ const check = (c, m) => { if (c) { pass++; console.log("ok  ", m); } else { fail
       }
       if (path.startsWith("/bite.html?live")) {
         const t = await p.locator("body").innerText();
-        check(t.includes("eating today?") && !t.includes("Welcome back"), `${label} live app: visitors see Home, no log-in wall`);
+        check(t.includes("cooking for you today?") && !t.includes("Welcome back"), `${label} live app: visitors see Home, no log-in wall`);
         await p.evaluate(() => sessionStorage.setItem("bite_view", "map"));
         await p.getByRole("button", { name: "Browse" }).last().click();
         await p.waitForTimeout(8000);
