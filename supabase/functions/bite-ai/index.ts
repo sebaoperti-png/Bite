@@ -96,7 +96,7 @@ function estimatePrompt(b: Record<string, unknown>) {
     `Estimate what the groceries for this home-cooked meal cost at a normal German supermarket (Rewe, Edeka, Lidl, Aldi) today, in euros.`,
     `The meal: "${clip(b.mealName, 80)}" (${clip(b.cuisine, 40) || "any cuisine"}), for ${Number(b.people) || 4} people in total.`,
     `The ingredient list:\n"""${clip(b.ingredients, 1200)}"""`,
-    `For every ingredient give the amount the recipe needs for that many people (as text, e.g. "600 g") and the price of that amount, worked out from a normal pack price (leftovers stay in the cook's kitchen and are not charged to the guests).`,
+    `List what the cook would actually put in the supermarket basket for this meal, in normal pack sizes, for generous home portions (as text, e.g. "1 kg" or "2 × 400 g"), with the price of that pack. This is what a receipt would show.`,
     `Staples a kitchen usually has (salt, pepper, a splash of oil, a pinch of spices) count only a small share, at most 0.30 € each.`,
     `Use realistic current prices (fresh meat and fish cost what they really cost). Write item names and amounts in ${de ? "German" : "English"}. Prices are numbers with two decimals.`,
   ].join("\n");
