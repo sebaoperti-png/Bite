@@ -64,7 +64,7 @@ export function LandingFooter() {
               <p style={{ fontSize: "16px", color: "#a897c8", lineHeight: "1.6", margin: "0 0 18px", maxWidth: "320px" }}>{t("Real food, real people, your neighbourhood. Home cooking shared safely across your city.")}</p>
               {" "}
               <div style={{ fontSize: "16px", color: "#fff", fontWeight: 700 }}>{t("Sebastiano Operti")}</div>
-              <div style={{ fontSize: "13px", color: "#a897c8", margin: "2px 0 8px" }}>{t("Founder")}</div>
+              <div style={{ fontSize: "13px", color: "#a897c8", margin: "2px 0 8px" }}>{t("Co-founder")}</div>
               <a href="mailto:hello@bitetable.de" style={{ fontSize: "16px", color: "#b87fff", fontWeight: 700 }}>{t("hello@bitetable.de")}</a>
             </div>
             {" "}
