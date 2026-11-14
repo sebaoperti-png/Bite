@@ -902,7 +902,7 @@ function Step5({ form, set }: { form: FormData; set: (k: keyof FormData, v: any)
         <Minus size={16} color={purple} strokeWidth={2.5} />
       </motion.button>
       <motion.span key={value} initial={{ scale: 1.15, opacity: 0.6 }} animate={{ scale: 1, opacity: 1 }} style={{ fontSize: big ? 40 : 30, fontWeight: 900, color: "#160a2e", minWidth: 80, textAlign: "center" }}>
-        €{value}
+        {euro(value)}
       </motion.span>
       <motion.button onClick={() => onChange(Math.min(max, value + 1))} disabled={value >= max} aria-label={t("More")} className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: purple, opacity: value >= max ? 0.4 : 1 }} whileTap={{ scale: 0.85 }}>
         <Plus size={16} color="#fff" strokeWidth={2.5} />
