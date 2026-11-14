@@ -74,7 +74,7 @@ export function LandingLaptop() {
       <div className="lp-head">
         <Course n={3} name={t("Main course")}>{t("how it works")}</Course>
         <h2 className="r-h-44"><RevealWords>{t("Three taps to a real meal")}</RevealWords></h2>
-        <p>{t("No mock-ups: the demo below is the same app you can open on your phone. Browse tonight's tables, book a seat or start hosting.")}</p>
+        <p>{t("No mock-ups: below is the real app, filled with sample meals so you can try it right here. Open it on your phone to see the real tables near you.")}</p>
       </div>
 
       {/* the three steps as lines of a menu, read left to right; the real app below is the demonstration */}
@@ -96,7 +96,7 @@ export function LandingLaptop() {
               {/* a status bar, so the app starts below the camera island like on a real phone */}
               <span className="lp-status" aria-hidden><b>19:30</b><i /></span>
               {load && (
-                <iframe title={t("The Bite demo app")} src={`bite.html?preview&lang=${getLang()}`} loading="lazy" tabIndex={live ? 0 : -1}
+                <iframe title={t("The Bite app with sample meals")} src={`bite.html?preview&lang=${getLang()}`} loading="lazy" tabIndex={live ? 0 : -1}
                   style={{ width: PHONE_W, height: PHONE_H - Math.round(STATUS / scale), transform: `scale(${scale})`, top: STATUS }} />
               )}
             </div>
@@ -111,7 +111,7 @@ export function LandingLaptop() {
             <div ref={screen} className={`lp-screen ${live ? "live" : ""}`}>
               {load && (
                 <iframe
-                  title={t("The Bite demo app")}
+                  title={t("The Bite app with sample meals")}
                   src={`bite.html?preview&lang=${getLang()}`}
                   loading="lazy"
                   tabIndex={live ? 0 : -1}

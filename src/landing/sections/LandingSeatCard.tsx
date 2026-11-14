@@ -130,7 +130,7 @@ export function LandingSeatCard() {
             <h3>{t("Your seat is saved.")}</h3>
             <p>{t("Last step: we sent an email to")} <b>{email.trim()}</b>{t(". Click the link inside to confirm.")}</p>
             <div className="rs-links">
-              <a className="lm" href="bite.html"><Arrowed text={t("Try the demo app")} /></a>
+              <a className="lm" href="bite.html"><Arrowed text={t("Open the app")} /></a>
               <a className="lm" href="stand.html?ref=landing"><Arrowed text={t("Got 60 seconds? Take our survey")} /></a>
             </div>
           </div>

@@ -10,7 +10,7 @@ import { t, t as tr, tMaybe, dateLabel, getLang } from "../../shared/i18n";
 interface Msg { id: number; from: "bot" | "me"; reply?: AssistantReply; text: string; done: boolean }
 
 const LINK_CHIPS: Record<string, string> = {
-  "Open the hosting demo": "bite.html?host",
+  "Start hosting": "bite.html?host",
 };
 
 let nextId = 1;
@@ -179,8 +179,8 @@ export function LandingAssistant() {
                 {m.from === "bot" && m.done && m.reply?.chips && m.reply.chips.length > 0 && m.id === msgs[msgs.length - 1]?.id && (
                   <div className="as-chips">
                     {m.reply.chips.map((c) =>
-                      c === t("Open the hosting demo") ? (
-                        <a key={c} className="as-chip link" href={LINK_CHIPS["Open the hosting demo"]}>{c}</a>
+                      c === t("Start hosting") ? (
+                        <a key={c} className="as-chip link" href={LINK_CHIPS["Start hosting"]}>{c}</a>
                       ) : (
                         <button key={c} className="as-chip" onClick={() => send(c)}>{c}</button>
                       ),

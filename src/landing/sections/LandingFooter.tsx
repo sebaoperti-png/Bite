@@ -45,9 +45,9 @@ export function LandingFooter() {
           <div className="ft-hero">
             <Course n={8} name={t("Coffee & the bill")} light size={28}>{t("food is better shared")}</Course>
             <h2 className="ft-title">{t("See you at the table.")}</h2>
-            <p className="ft-sub">{t("Bite is a young startup building a new way to eat with your neighbours. Try the demo, tell us what you think, or just say hi.")}</p>
+            <p className="ft-sub">{t("Bite is a young startup building a new way to eat with your neighbours. Try the app, tell us what you think, or just say hi.")}</p>
             <div className="ft-ctas">
-              <a href="bite.html" className="ft-btn primary">{t("Open the demo app")}</a>
+              <a href="bite.html" className="ft-btn primary">{t("Open the app")}</a>
               <a href="stand.html?ref=footer" className="ft-btn">{t("Take the 60-second survey")}</a>
               <a href="mailto:hello@bitetable.de" className="ft-btn">{t("Write to Sebastiano")}</a>
             </div>
