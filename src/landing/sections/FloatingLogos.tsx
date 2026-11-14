@@ -2,7 +2,6 @@
 // The mouse pushes them away when it passes near (springy, then they drift on). One canvas, fixed behind the page,
 // paused when the tab is hidden; still with reduced motion; fewer logos on small screens.
 import { useEffect, useRef } from "react";
-import { asset } from "../asset";
 
 interface Crumb { x: number; y: number; vx: number; vy: number; dx: number; dy: number; s: number; a: number; r: number; vr: number }
 
@@ -14,8 +13,18 @@ export function FloatingLogos() {
     const ctx = cv.getContext("2d");
     if (!ctx) return;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const img = new Image();
-    img.src = asset("landing/logo.png");
+    // the logo's "b" alone (stem, round belly, smile and bite cut out), drawn once into a small sprite
+    const img = document.createElement("canvas");
+    img.width = img.height = 256;
+    const g = img.getContext("2d")!;
+    g.scale(256 / 549, 256 / 549);
+    g.fillStyle = "#7c3aed";
+    g.beginPath(); g.roundRect(107, 30, 83, 330, 41.5); g.fill();
+    g.beginPath(); g.arc(285, 340, 178, 0, Math.PI * 2); g.fill();
+    g.globalCompositeOperation = "destination-out";
+    g.lineWidth = 26; g.lineCap = "round";
+    g.beginPath(); g.moveTo(190, 405); g.quadraticCurveTo(262, 467, 334, 405); g.stroke();
+    for (const [x, y, r] of [[405, 198, 20], [434, 228, 22], [456, 267, 22], [469, 311, 20]]) { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); }
     let w = 0, h = 0, dpr = 1, raf = 0;
     let crumbs: Crumb[] = [];
     const mouse = { x: -9999, y: -9999 };
@@ -24,7 +33,7 @@ export function FloatingLogos() {
       const n = w < 700 ? 6 : w < 1200 ? 10 : 13;
       crumbs = Array.from({ length: n }, () => {
         const dx = rand(-0.18, 0.18), dy = rand(-0.14, 0.14);
-        return { x: rand(0, w), y: rand(0, h), vx: dx, vy: dy, dx, dy, s: rand(26, w < 700 ? 44 : 62), a: rand(0.05, 0.1), r: rand(-0.5, 0.5), vr: rand(-0.002, 0.002) };
+        return { x: rand(0, w), y: rand(0, h), vx: dx, vy: dy, dx, dy, s: rand(26, w < 700 ? 44 : 62), a: rand(0.07, 0.14), r: rand(-0.5, 0.5), vr: rand(-0.002, 0.002) };
       });
     };
     const resize = () => {
@@ -60,7 +69,8 @@ export function FloatingLogos() {
     const onLeave = () => { mouse.x = -9999; mouse.y = -9999; };
     const onVis = () => { cancelAnimationFrame(raf); if (!document.hidden && !reduce) raf = requestAnimationFrame(step); };
     resize();
-    img.onload = () => { draw(); if (!reduce) raf = requestAnimationFrame(step); };
+    draw();
+    if (!reduce) raf = requestAnimationFrame(step);
     window.addEventListener("resize", resize);
     window.addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("pointerleave", onLeave);
