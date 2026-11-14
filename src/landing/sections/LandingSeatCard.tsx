@@ -80,37 +80,37 @@ export function LandingSeatCard() {
       <svg className="rs-leaf" viewBox="0 0 40 40" aria-hidden><path d="M6 34C6 16 18 6 34 6c0 16-10 28-28 28z" fill="#4fd18b" /><path d="M8 32L30 10" stroke="#2f9e67" strokeWidth="2" /></svg>
 
       <div className="rs-tabs" role="tablist">
-        <button role="tab" aria-selected={front === "survey"} className={front === "survey" ? "on" : ""} onClick={() => setFront("survey")}>{front === "survey" && <motion.span layoutId="rs-pill" className="rs-pill" transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}<span>{t("60-sec survey")}</span></button>
+        <button role="tab" aria-selected={front === "survey"} className={front === "survey" ? "on" : ""} onClick={() => setFront("survey")}>{front === "survey" && <motion.span layoutId="rs-pill" className="rs-pill" transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}<span>{t("Your feedback")}</span></button>
         <button role="tab" aria-selected={front === "seat"} className={front === "seat" ? "on" : ""} onClick={() => setFront("seat")}>{front === "seat" && <motion.span layoutId="rs-pill" className="rs-pill" transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} />}<span>{t("Save a seat")}</span></button>
       </div>
 
       <Tilt max={5} className="rs-tilt">
       <div className="rs-deck">
-      {/* Card 1: the 60-second survey, styled like a waiter's order pad */}
+      {/* Card 1: feedback (feedback.html: rate the app, or the 60-second survey for those who haven't tried it), styled like a waiter's order pad */}
       <div className={`rs-card rs-survey ${front === "survey" ? "front" : "back"}`} onClick={front === "survey" ? undefined : () => setFront("survey")}>
         <div className="rs-head">
-          <span>{t("Survey")}</span>
+          <span>{t("Feedback")}</span>
         </div>
         <div className="rs-survey-top">
-          <h2>{t("Got 60 seconds?")}</h2>
+          <h2>{t("Tried Bite? Rate it.")}</h2>
           <svg className="rs-timer" viewBox="0 0 80 80" aria-hidden>
             <rect x="34" y="2" width="12" height="7" rx="2" fill="#6b21d9" />
             <circle cx="40" cy="44" r="32" fill="#fff" stroke="#efe8fb" strokeWidth="6" />
             <circle className="rs-timer-ring" cx="40" cy="44" r="32" fill="none" stroke="#9b4aff" strokeWidth="6" strokeLinecap="round" pathLength={1} transform="rotate(-90 40 44)" />
             <line className="rs-timer-hand" x1="40" y1="44" x2="40" y2="22" stroke="#160a2e" strokeWidth="3.5" strokeLinecap="round" />
             <circle cx="40" cy="44" r="4" fill="#160a2e" />
-            <text x="40" y="66" textAnchor="middle" fontSize="10" fontWeight="900" fill="#6b21d9" fontFamily="Figtree Variable, sans-serif">60s</text>
+            <text x="40" y="66" textAnchor="middle" fontSize="10" fontWeight="900" fill="#6b21d9" fontFamily="Figtree Variable, sans-serif">2 min</text>
           </svg>
         </div>
-        <p className="rs-sub">{t("Tell us how you eat. Eight quick questions that shape what we build next.")}</p>
+        <p className="rs-sub">{t("Two minutes: stars, how easy it was, what to fix first. Not tried it yet? Tell us how you eat instead.")}</p>
         <ul className="rs-qs">
-          <li><span>1</span>{t("How often do you cook at home?")}</li>
-          <li><span>2</span>{t("Would you eat at a neighbour's table?")}</li>
-          <li><span>3</span>{t("What would you pay per plate?")}</li>
-          <li className="more">{t("+ 5 more, just as quick")}</li>
+          <li><span>1</span>{t("How was your first taste of Bite?")}</li>
+          <li><span>2</span>{t("How easy was it to use?")}</li>
+          <li><span>3</span>{t("What would you change?")}</li>
+          <li className="more">{t("+ a few more, just as quick")}</li>
         </ul>
-        <a className="rs-go" href="stand.html?ref=landing">{t("Start the survey")}</a>
-        <p className="rs-fine">{t("Anonymous, about a minute")}</p>
+        <a className="rs-go" href="feedback.html?ref=landing">{t("Give feedback")}</a>
+        <p className="rs-fine">{t("Anonymous, about two minutes")}</p>
         <button type="button" className="rs-switch" onClick={(e) => { e.stopPropagation(); setFront("seat"); }}>{t("Rather get updates? Save me a seat")}</button>
       </div>
 
@@ -131,7 +131,7 @@ export function LandingSeatCard() {
             <p>{t("Last step: we sent an email to")} <b>{email.trim()}</b>{t(". Click the link inside to confirm.")}</p>
             <div className="rs-links">
               <a className="lm" href="bite.html"><Arrowed text={t("Open the app")} /></a>
-              <a className="lm" href="stand.html?ref=landing"><Arrowed text={t("Got 60 seconds? Take our survey")} /></a>
+              <a className="lm" href="feedback.html?ref=landing"><Arrowed text={t("Give us feedback")} /></a>
             </div>
           </div>
         ) : (

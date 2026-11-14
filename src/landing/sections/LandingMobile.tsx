@@ -1,10 +1,9 @@
 // THE PHONE LANDING (≤640px, 2026-11-14): its own layout instead of the desktop squeezed into a column.
 // 1 the film first, then the promise and one big button; 2 the story as swipeable menu cards (why, price, how,
-// for cooks, safety) with dots; 3 the real app as one still phone; then About us, feedback, FAQ and the footer
+// for cooks, safety) with dots; 3 "Open the app" (no demo screenshot on phones); then About us, feedback, FAQ and the footer
 // (those are the shared sections). Copy reuses the desktop strings, so the German is already there.
 import { useEffect, useRef, useState } from "react";
 import { HeroSpot } from "./HeroSpot";
-import { asset } from "../asset";
 import { t, getLang } from "../../shared/i18n";
 
 const euro = (n: number) => (getLang() === "de" ? `${n} €` : `€${n}`);
@@ -119,7 +118,6 @@ export function LandingMobile() {
       <Story />
 
       <section className="mx-app" id="how">
-        <div className="mx-phone"><img src={asset("landing/app-phone.jpg")} alt={t("The Bite app with sample meals")} loading="lazy" width={585} height={1266} /></div>
         <p className="mx-p center">{t("The real app, in your browser. No download needed.")}</p>
         <a className="mx-btn" href="bite.html">{t("Open the app")}</a>
       </section>
