@@ -97,3 +97,12 @@ The whole site reads like an evening at a restaurant. Keep new work in this lang
 - Landing ≤640px: no floating Ask Bite button or nudge; the sticky bar has an "Ask Bite" icon (`.mc-ask`, dispatches `bite:ask`). The kitchen note starts as a slim pill under the nav (`.kn-pill`), opens on tap, steps aside on scroll.
 - App: `InstallBanner.tsx` on the phone home ("Keep Bite on your home screen"): Android uses beforeinstallprompt, iOS shows the Share > Add to Home Screen steps. Hidden in standalone mode and once closed (localStorage `bite_install_banner`).
 - About us: `public/landing/team/sebastiano.jpg` (480x600, 4:5).
+
+## Dark mode (app, 2026-11-14)
+- `src/app/styles/dark.css`: theme variables (`--page`, `--surface`, `--paper`, `--tint*`, `--ink*`, `--brand-ink`, `--solid`, `--glass`, ok/warn/bad). App components use these instead of literal colours (codemods in the commit). New app code: use the variables, not hex. Icons coloured with an SVG attribute are recoloured by `svg[stroke="#…"]` rules; white buttons on photos carry `.on-photo`.
+- Choice auto / light / dark: `src/app/theme.ts`, localStorage `bite_theme`, applied before first paint by the inline script in `bite.html`; Settings → Appearance. The landing stays light by design (paper and chalkboard).
+
+## Ask Bite with Gemini (2026-11-14)
+- Edge Function `supabase/functions/bite-ask/index.ts` (deployed from the dashboard editor, Verify JWT off): Gemini answers from FACTS + the real upcoming meals (meal_cards), JSON `{text, meals, chips}`. Limits: 25 questions per visitor per day (daily-salted IP hash) and 1500 per site (`ask_take`, migration `0010_ask_bite.sql`). Visitor text is never treated as instructions.
+- Client: `askRemote()` in `src/shared/assistant.ts` (plain fetch, `src/shared/supabase-keys.ts`), falls back to the rule-based `answer()` with demo meals (labelled as demo, links `bite.html?preview&meal=`). Real meals link to `bite.html?live&meal=<id>`; App.tsx opens it once live meals load. Keep FACTS in sync with what the site says.
+- App phone home: search shows only "Where?"; date, time, guests behind "More filters". "Your first steps" card removed (Profile's Mise en place covers it; the tour stays). Landing ≤640px hides "Ways to eat" (#services) and the help tickets except the emergency one.
