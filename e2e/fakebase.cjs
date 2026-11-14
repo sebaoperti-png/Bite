@@ -85,6 +85,17 @@ async function handle({ method, url, headers, body }) {
     }
     if (u.pathname === "/auth/v1/logout") return { status: 204, body: "" };
 
+    // ---- the Edge Function "bite-ai" (Gemini is not called in tests: fixed answers, same shape)
+    if (u.pathname === "/functions/v1/bite-ai") {
+      if (!sub) return json(401, { error: "sign_in" });
+      if (body.task === "polish") return json(200, { text: `Polished: ${String(body.text).trim()}` });
+      if (body.task === "estimate") {
+        const items = String(body.ingredients).split(/[,\n]+/).map((x) => x.replace(/\(.*?\)/g, "").trim()).filter(Boolean);
+        return json(200, { lines: items.map((item, i) => ({ item, amount: `${100 * (i + 1)} g`, price: i === 0 ? 9.5 : 1.8 })) });
+      }
+      return json(400, { error: "task" });
+    }
+
     // ---- storage (photos): accept the upload; public reads get a tiny placeholder image
     if (u.pathname.startsWith("/storage/v1/object/public/")) {
       return { status: 200, contentType: "image/png", body: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64") };

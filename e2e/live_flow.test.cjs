@@ -72,7 +72,7 @@ async function logIn(page, email) {
     description: "Slow-cooked tajine like my grandmother makes it.", mainDishes: "Lamb tajine", appetizers: "Zaalouk", desserts: "Mint tea",
     drinksIncluded: true, dietary: [], allergens: ["gluten"], allergyNotes: "Cooked with almonds nearby.", maxGuests: 4, minGuests: 1,
     address: "Brunnenstraße 25", city: "Aalen", date: dateISO, startTime: "19:30", endTime: "22:00",
-    groceryCost: 28, costSource: "receipt", pricePerGuest: 5, freeEvent: false, photos: [PHOTO], coverIdx: 0, ingredientsText: "Lamb, apricots, onions, couscous (wheat), olive oil, cinnamon, salt", declared: true,
+    groceryCost: 28, costSource: "receipt", receiptRead: 28, pricePerGuest: 5, freeEvent: false, photos: [PHOTO], coverIdx: 0, ingredientsText: "Lamb, apricots, onions, couscous (wheat), olive oil, cinnamon, salt", declared: true,
   };
   await anna.page.evaluate((f) => localStorage.setItem("bite_hosting_draft", JSON.stringify({ step: 7, form: f })), form);
   await anna.page.goto(`${BASE}/bite.html?host&lang=en`);

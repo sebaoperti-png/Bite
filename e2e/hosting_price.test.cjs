@@ -49,32 +49,38 @@ const FORM = { serviceType: "eat-together", eventTitle: "Price night", mealName:
     await p.getByText(/Found €|couldn't find|Couldn't read/).first().waitFor({ timeout: 90000 });
     const t1 = await body();
     check(t1.includes("Found €34.81"), `${label} receipt photo: reads €34.81${t1.includes("Found €") ? " (read " + t1.match(/Found (€[\d.]+)/)[1] + ")" : ""}`);
-    check(await total.inputValue() === "34.81" && await chip(/^Price cap/) === 8 && await stepperValue() === 7, `${label} receipt photo: suggested €7, cap €8 (34.81 ÷ 5 = 6.96)`);
+    check(await chip(/^Price cap/) === 8 && await stepperValue() === 7, `${label} receipt photo: suggested €7, cap €8 (34.81 ÷ 5 = 6.96)`);
+    check(!(await total.count()), `${label} a scanned total cannot be retyped (a different total needs the shopping list)`);
 
-    // ---- typing a different total: honest label
-    await total.fill("30");
-    check((await body()).includes("You changed the total, so guests will see it as stated by you."), `${label} typed total: marked as stated by the host`);
-    check(await chip(/^Price cap/) === 7 && await stepperValue() === 6, `${label} typed total €30: suggested €6, cap €7`);
-    await total.fill("34.81");
-    check(!(await body()).includes("You changed the total"), `${label} typing the scanned total back makes it receipt-backed again`);
+    // ---- "List what you bought": the total is the sum of the list, which starts from the ingredients
+    await p.getByText("List what you bought").first().click(); await p.waitForTimeout(300);
+    const items = p.getByRole("textbox", { name: /^Item \d+$/ });
+    const prices = p.locator('input[aria-label^="Price of item"]');
+    check(await items.count() === 6 && await items.nth(0).inputValue() === "Lamb" && await items.nth(3).inputValue() === "couscous", `${label} list: starts from the ingredient list (6 items, salt left out)`);
+    await next.click(); await p.waitForTimeout(300);
+    check((await body()).includes("Every item in the list needs a price") && (await body()).includes("Split the cost"), `${label} list: an item without a price stops you`);
+    for (let i = 5; i >= 2; i--) await p.getByRole("button", { name: `Remove item ${i + 1}` }).click();
+    await prices.nth(0).fill("21.5"); await prices.nth(1).fill("8.5");
+    const tl = await body(); check(/Total\s*€30\b/.test(tl) && tl.includes("Guests will see it as stated by you"), `${label} list: €21.50 + €8.50 = €30, marked as stated by the host`);
+    check(await chip(/^Price cap/) === 7 && await stepperValue() === 6, `${label} list €30: suggested €6, cap €7`);
+    check(await p.getByRole("button", { name: "Remove item 2" }).isDisabled(), `${label} list: at least two items stay`);
 
     // ---- too high for this menu
-    await total.fill("400");
+    await prices.nth(0).fill("392.5");
     const t2 = await body();
-    check(t2.includes("much more than this menu usually costs"), `${label} €400 for a risotto for 5: warned`);
-    await total.fill("401");
+    check(t2.includes("much more than this menu usually costs"), `${label} €401 for a risotto for 5: warned`);
     await next.click(); await p.waitForTimeout(300);
-    check((await body()).includes("Scan the receipt to use this total") && (await body()).includes("Split the cost"), `${label} a typed €401 cannot be used without a scan`);
+    check((await body()).includes("Scan the receipt to use this total") && (await body()).includes("Split the cost"), `${label} a listed €401 cannot be used without a scan`);
 
     // ---- too little to split
-    await total.fill("3");
+    await prices.nth(0).fill("1"); await prices.nth(1).fill("2");
     check((await body()).includes("too little to split") && !(await p.getByRole("button", { name: "More" }).count()), `${label} €3 for 5 people: no price can be set`);
     await p.getByRole("button", { name: "Make it free" }).click();
     check((await body()).includes("It's on me") && !(await body()).includes("too little to split"), `${label} "Make it free" turns it into a free meal`);
     await p.getByText("It's on me").first().click(); // back to paid
 
     // ---- the sample receipt (demo only)
-    await openStep({ ...FORM, costSource: "declared", groceryCost: 0 });
+    await openStep({ ...FORM, costSource: "receipt", groceryCost: 0 });
     await p.getByRole("button", { name: "Try a sample receipt" }).click();
     await p.getByText(/Found €|couldn't find/).first().waitFor({ timeout: 90000 });
     check((await body()).includes("Found €42.25"), `${label} sample receipt: reads €42.25`);
@@ -87,7 +93,7 @@ const FORM = { serviceType: "eat-together", eventTitle: "Price night", mealName:
     check(!(await body()).includes("Split the cost"), `${label} with a confirmed receipt the next step opens`);
 
     // ---- what guests see: a typed total is "Stated by the host"
-    await p.evaluate((f) => localStorage.setItem("bite_hosting_draft", JSON.stringify({ step: 7, form: f })), { ...FORM, costSource: "declared", groceryCost: 30, pricePerGuest: 6 });
+    await p.evaluate((f) => localStorage.setItem("bite_hosting_draft", JSON.stringify({ step: 7, form: f })), { ...FORM, costSource: "declared", groceryCost: 30, pricePerGuest: 6, costLines: [{ item: "Arborio rice", price: 4.5 }, { item: "Parmigiano", price: 25.5 }] });
     await p.goto(`${BASE}/bite.html?demo&host&lang=en`); await p.waitForTimeout(1200);
     await p.getByRole("button", { name: /Publish event/ }).click(); await p.waitForTimeout(1200);
     if ((await body()).includes("Six promises every host makes")) {
@@ -97,6 +103,8 @@ const FORM = { serviceType: "eat-together", eventTitle: "Price night", mealName:
     await p.getByText("Price test risotto").first().click(); await p.waitForTimeout(1200);
     const t3 = await body();
     check(t3.includes("Stated by the host") && t3.includes("€6 each"), `${label} meal page: "Stated by the host", €30 ÷ 5 = €6 each`);
+    await p.getByText(/What the host bought \(2 items\)/).click(); await p.waitForTimeout(300);
+    check((await body()).includes("Parmigiano") && (await body()).includes("€25.50"), `${label} meal page: guests can open what the host bought`);
 
     check(errs.length === 0, `${label}: no page errors ${errs.join(" | ")}`);
     await ctx.close();
