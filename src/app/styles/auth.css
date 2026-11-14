@@ -1,5 +1,5 @@
 /* Log in / sign up: the night outside, the table with your seat, and the reservation book (AuthScreen.tsx) */
-.au { position: relative; height: 100%; overflow-y: auto; font-family: 'Inter', sans-serif; color: #2a1553;
+.au { position: relative; height: 100%; overflow-y: auto; font-family: 'Figtree Variable', sans-serif; color: #2a1553;
   background:
     radial-gradient(ellipse 60% 45% at 30% 35%, rgba(242,166,90,0.16), transparent 70%),
     radial-gradient(ellipse 80% 60% at 50% -10%, rgba(107,33,217,0.5), transparent 70%),
@@ -23,7 +23,7 @@
 .au-flame { transform-origin: 200px 198px; animation: auFlame 1.6s ease-in-out infinite; }
 @keyframes auFlame { 0%, 100% { transform: scale(1) rotate(0); } 30% { transform: scale(1.08, .94) rotate(-4deg); } 60% { transform: scale(.95, 1.06) rotate(3deg); } }
 .au-side-text { text-align: center; }
-.au-side-title { margin: 0; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 34px; line-height: 1.05; color: #fff; }
+.au-side-title { margin: 0; font-family: 'Fraunces Variable', serif; font-style: italic; font-size: 34px; line-height: 1.05; color: #fff; }
 .au-side-text ul { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; color: rgba(255,255,255,0.68); }
 .au-side-text li::before { content: "·"; margin-right: 8px; color: #b87fff; font-weight: 900; }
 
@@ -39,7 +39,7 @@
   box-shadow: 0 30px 70px rgba(0,0,0,0.45), inset 3px 0 0 rgba(192,57,43,0.25); }
 .au-page::after { content: ""; position: absolute; top: -6px; right: 28px; width: 18px; height: 54px; background: #c0392b; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 .au-page-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; margin-bottom: 14px; border-bottom: 2px dashed rgba(42,21,83,0.2); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7c6aa3; padding-right: 30px; }
-.au-title { margin: 0; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 38px; line-height: 1; letter-spacing: 0; color: #160a2e; }
+.au-title { margin: 0; font-family: 'Fraunces Variable', serif; font-style: italic; font-weight: 400; font-size: 38px; line-height: 1; letter-spacing: 0; color: #160a2e; }
 .au-lead { margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: #6a5a8c; }
 .au-small { margin: 8px 0 0; font-size: 12.5px; color: #9a8bb8; }
 .au-form { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
@@ -47,9 +47,9 @@
 .au-label { display: block; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7c6aa3; }
 .au-line { display: flex; align-items: center; gap: 10px; height: 44px; border-bottom: 2px solid rgba(42,21,83,0.25); color: #9a8bb8; transition: border-color .2s; }
 .au-line:focus-within { border-color: #6b21d9; color: #6b21d9; }
-.au-line input { flex: 1; min-width: 0; height: 100%; background: transparent; border: 0; outline: none; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; color: #160a2e; }
+.au-line input { flex: 1; min-width: 0; height: 100%; background: transparent; border: 0; outline: none; font-family: 'Fraunces Variable', serif; font-style: italic; font-size: 22px; color: #160a2e; }
 .au-line input::placeholder { color: rgba(42,21,83,0.28); }
-.au-line input[type="password"] { font-family: 'Inter', sans-serif; font-style: normal; font-size: 16px; letter-spacing: .12em; }
+.au-line input[type="password"] { font-family: 'Figtree Variable', sans-serif; font-style: normal; font-size: 16px; letter-spacing: .12em; }
 .au-field.bad .au-line { border-color: #d6455d; }
 .au-field-error, .au-error { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 700; color: #c0392b; }
 .au-eye { padding: 4px; color: #9a8bb8; }
